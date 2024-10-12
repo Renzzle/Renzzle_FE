@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -82,6 +83,7 @@ function App(): React.JSX.Element {
           </Section>
           <Section title="See Your Changes">
             <ReloadInstructions />
+            <Icon name="puzzle-plus" size={24} color="#2200ff" />
           </Section>
           <Section title="Debug">
             <DebugInstructions />
