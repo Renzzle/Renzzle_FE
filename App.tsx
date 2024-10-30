@@ -16,6 +16,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Image,
 } from 'react-native';
 
 import {
@@ -26,6 +27,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import CustomText from './src/components/common/CustomText';
+import { BellIcon, CheckIcon, ChevronRightIcon, ChevronThinLeftIcon, CloseIcon, DeleteAccountIcon, ErrorIcon, FilterIcon, HeartIcon, HeartOutlineIcon, LevelIcon, LockIcon, LogoutIcon, MenuIcon, PlusIcon, RadioBlankIcon, RadioMarkedIcon, RankingIcon, SearchIcon, SubscribeIcon } from './src/components/common/Icons';
+import theme from './src/styles/theme';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -35,6 +38,7 @@ function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
+      <Image source={require('./src/assets/images/logo.png')} style={{ width: 100, height: 100 }} />
       <Text
         style={[
           styles.sectionTitle,
@@ -94,6 +98,26 @@ function App(): React.JSX.Element {
           <Section title="See Your Changes">
             <ReloadInstructions />
             <Icon name="puzzle-plus" size={24} color="#2200ff" />
+            <HeartOutlineIcon />
+            <HeartIcon />
+            <SubscribeIcon />
+            <LevelIcon />
+            <RankingIcon />
+            <DeleteAccountIcon />
+            <LogoutIcon />
+            <SearchIcon />
+            <FilterIcon />
+            <BellIcon />
+            <RadioBlankIcon />
+            <RadioMarkedIcon />
+            <LockIcon />
+            <PlusIcon />
+            <MenuIcon />
+            <ErrorIcon />
+            <CloseIcon />
+            <CheckIcon />
+            <ChevronThinLeftIcon />
+            <ChevronRightIcon />
           </Section>
           <Section title="Debug">
             <DebugInstructions />
@@ -112,6 +136,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
+    backgroundColor: theme.color['gray/gray200'],
   },
   sectionTitle: {
     fontSize: 24,
