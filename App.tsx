@@ -25,6 +25,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import CustomText from './src/components/common/CustomText';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -43,6 +44,15 @@ function Section({children, title}: SectionProps): React.JSX.Element {
         ]}>
         {title}
       </Text>
+      <CustomText color="gray/gray500" size={12} weight="bold">
+        안녕 여러분
+      </CustomText>
+      <CustomText color="gray/gray800" size={16} weight="normal" lineHeight="sm">
+        안녕 여러분
+      </CustomText>
+      <CustomText color="gray/gray900" size={20} weight="bold" lineHeight="lg">
+        안녕 여러분
+      </CustomText>
       <Text
         style={[
           styles.sectionDescription,
