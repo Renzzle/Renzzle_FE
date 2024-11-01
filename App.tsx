@@ -10,7 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './src/screens/Home';
 import theme from './src/styles/theme';
-import { Image } from 'react-native';
+import CustomHeaderLeft from './src/components/features/CustomHeaderLeft';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,15 +39,6 @@ function App(): React.JSX.Element {
         />
       </Stack.Navigator>
     </NavigationContainer>
-  );
-}
-
-function CustomHeaderLeft() {
-  return (
-    <Image
-      source={require('./src/assets/images/logo-small.png')}
-      style={{ width: 24, height: 24, marginRight: 5 }}
-    />
   );
 }
 
