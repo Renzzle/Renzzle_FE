@@ -8,9 +8,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from './src/screens/Home';
 import theme from './src/styles/theme';
-import CustomHeaderLeft from './src/components/features/CustomHeaderLeft';
+import LessonPuzzleList from './src/screens/PuzzleList/LessonPuzzleList';
+import CommunityPuzzleList from './src/screens/PuzzleList/CommunityPuzzleList';
+import DrawerNavigator from './src/screens/DrawerNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,19 +24,23 @@ function App(): React.JSX.Element {
           headerStyle: {
             backgroundColor: theme.color['gray/grayBG'],
           },
-          headerTintColor: theme.color['main_color/green'],
           headerTitleStyle: {
-            fontFamily: 'ChangaOne-Regular',
-            fontSize: 24,
+            fontSize: 18,
           },
         }}
       >
         <Stack.Screen
-          name="Renzzle"
-          component={Home}
-          options={{
-            headerLeft: CustomHeaderLeft,
-          }}
+          name="Home"
+          component={DrawerNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LessonPuzzleList"
+          component={LessonPuzzleList}
+        />
+        <Stack.Screen
+          name="CommunityPuzzleList"
+          component={CommunityPuzzleList}
         />
       </Stack.Navigator>
     </NavigationContainer>

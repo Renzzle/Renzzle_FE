@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
   headerImage: {
     width: 24,
     height: 24,
-    marginRight: 5,
+    marginLeft: 15,
   },
 });
 

@@ -1,9 +1,15 @@
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import React from 'react';
-import { Text } from 'react-native';
+import { Button, Text, View } from 'react-native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 
 const Home = () => {
+  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
   return (
-    <Text>Home</Text>
+    <View>
+      <Text>Home</Text>
+      <Button title="Go to LessonPuzzleList" onPress={() => navigation.navigate('LessonPuzzleList')} />
+    </View>
   );
 };
 
