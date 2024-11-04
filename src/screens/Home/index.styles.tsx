@@ -1,6 +1,14 @@
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
+import theme from '../../styles/theme';
 
 export const MenuButton = styled(TouchableOpacity)`
   margin-right: 15;
+`;
+
+export const ButtonContainer = styled(View)`
+  background-color: ${theme.color['gray/grayBG']};
+  gap: 10;
+  flex: 1;
+  justify-content: center;
 `;

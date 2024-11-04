@@ -35,11 +35,11 @@ function App(): React.JSX.Element {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="LessonPuzzleList"
+          name="Lesson"
           component={LessonPuzzleList}
         />
         <Stack.Screen
-          name="CommunityPuzzleList"
+          name="Community"
           component={CommunityPuzzleList}
         />
       </Stack.Navigator>

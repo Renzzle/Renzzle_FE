@@ -1,15 +1,17 @@
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import React from 'react';
-import { Button, Text, View } from 'react-native';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
+import MainFeatureButton from '../../components/features/MainFeatureButton';
+import { ButtonContainer } from './index.styles';
 
 const Home = () => {
   const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
   return (
-    <View>
-      <Text>Home</Text>
-      <Button title="Go to LessonPuzzleList" onPress={() => navigation.navigate('LessonPuzzleList')} />
-    </View>
+    <ButtonContainer>
+      <MainFeatureButton text="Lesson" color="sub_color/green/c" onPress={() => navigation.navigate('Lesson')} />
+      <MainFeatureButton text="Community" color="sub_color/green/s" onPress={() => navigation.navigate('Community')} />
+      <MainFeatureButton text="AI Puzzle" color="sub_color/green/p" onPress={() => navigation.navigate('Lesson')} />
+    </ButtonContainer>
   );
 };
 
