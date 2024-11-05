@@ -11,12 +11,12 @@ export const ButtonContainer = styled(TouchableOpacity)<{ buttonWidth: number, c
   border-radius: 25px;
   background-color: ${(props) => theme.color[props.color]};
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-  elevation: 5;
+  elevation: 4;
 `;
 
-export const ButtonText = styled(Text)`
+export const ButtonText = styled(Text)<{ textColor: ColorType }>`
   font-family: "ChangaOne-Regular";
-  color: ${theme.color['gray/white']};
+  color: ${(props) => theme.color[props.textColor]};
   font-size: 48;
 `;
 

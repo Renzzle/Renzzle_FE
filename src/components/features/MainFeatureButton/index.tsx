@@ -6,21 +6,23 @@ import { ButtonContainer, ButtonImg, ButtonText } from './index.styles';
 interface MainFeatureButtonProps {
   text: string;
   color: ColorType;
+  textColor?: ColorType;
   onPress: () => void;
 }
 
 const imageMap: { [key: string]: any } = {
   'Community': require('../../../assets/images/community.png'),
   'AI Puzzle': require('../../../assets/images/ai.png'),
+  'Ch. 1': require('../../../assets/images/lesson-green.png'),
 };
 
-const MainFeatureButton = ({ text, color, onPress}: MainFeatureButtonProps) => {
+const MainFeatureButton = ({ text, color, textColor = 'gray/white', onPress}: MainFeatureButtonProps) => {
   const { width } = useWindowDimensions();
   const defaultImg = require('../../../assets/images/lesson.png');
   const imageSource = imageMap[text] || defaultImg;
   return (
     <ButtonContainer buttonWidth={width} color={color} onPress={onPress}>
-      <ButtonText>{ text }</ButtonText>
+      <ButtonText textColor={textColor}>{ text }</ButtonText>
       <ButtonImg source={imageSource} />
     </ButtonContainer>
   );
