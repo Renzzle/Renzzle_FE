@@ -9,7 +9,7 @@ const LessonChapterList = () => {
   return (
     <ButtonContainer>
       <MainFeatureButton text="Ch. 1" color="main_color/green" textColor="gray/white" onPress={() => navigation.navigate('LessonPuzzleList')} />
-      <MainFeatureButton text="Ch. 2" color="sub_color/green/bg" textColor="main_color/green" onPress={() => ''} />
+      <MainFeatureButton text="Ch. 2" color="sub_color/green/h" textColor="main_color/green" onPress={() => ''} />
       <MainFeatureButton text="Ch. 3" color="main_color/green" textColor="gray/white" onPress={() => ''} />
     </ButtonContainer>
   );

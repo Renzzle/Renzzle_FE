@@ -10,7 +10,7 @@ export const ButtonContainer = styled(TouchableOpacity)<{ buttonWidth: number, c
   padding: 18px 24px;
   border-radius: 25px;
   background-color: ${(props) => theme.color[props.color]};
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 1);
   elevation: 4;
 `;
 

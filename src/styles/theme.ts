@@ -28,6 +28,7 @@ export type ColorType =
   | 'sub_color/green/p'
   | 'sub_color/green/s'
   | 'sub_color/green/c'
+  | 'sub_color/green/h'
   | 'sub_color/green/bg'
   | 'sub_color/blue/p'
   | 'sub_color/blue/s'
@@ -80,6 +81,7 @@ const theme = {
     'sub_color/green/p': '#658780',
     'sub_color/green/s': '#81B8A2',
     'sub_color/green/c': '#ADCEC1',
+    'sub_color/green/h': '#DAEDE6',
     'sub_color/green/bg': '#E8F5F0',
     'sub_color/blue/p': '#52A5E1',
     'sub_color/blue/s': '#AFD4FB',
