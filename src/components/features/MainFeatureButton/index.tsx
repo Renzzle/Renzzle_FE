@@ -13,7 +13,7 @@ interface MainFeatureButtonProps {
 const imageMap: { [key: string]: any } = {
   'Community': require('../../../assets/images/community.png'),
   'AI Puzzle': require('../../../assets/images/ai.png'),
-  'Ch. 1': require('../../../assets/images/lesson-green.png'),
+  'Ch. 2': require('../../../assets/images/lesson-green.png'),
 };
 
 const MainFeatureButton = ({ text, color, textColor = 'gray/white', onPress}: MainFeatureButtonProps) => {
