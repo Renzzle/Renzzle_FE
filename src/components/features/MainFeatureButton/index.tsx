@@ -10,13 +10,13 @@ interface MainFeatureButtonProps {
 }
 
 const imageMap: { [key: string]: any } = {
-  'Community': require('../../../assets/images/Community.png'),
-  'AI Puzzle': require('../../../assets/images/AI.png'),
+  'Community': require('../../../assets/images/community.png'),
+  'AI Puzzle': require('../../../assets/images/ai.png'),
 };
 
 const MainFeatureButton = ({ text, color, onPress}: MainFeatureButtonProps) => {
   const { width } = useWindowDimensions();
-  const defaultImg = require('../../../assets/images/Lesson.png');
+  const defaultImg = require('../../../assets/images/lesson.png');
   const imageSource = imageMap[text] || defaultImg;
   return (
     <ButtonContainer buttonWidth={width} color={color} onPress={onPress}>

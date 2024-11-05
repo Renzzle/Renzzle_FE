@@ -12,6 +12,7 @@ import theme from './src/styles/theme';
 import LessonPuzzleList from './src/screens/PuzzleList/LessonPuzzleList';
 import CommunityPuzzleList from './src/screens/PuzzleList/CommunityPuzzleList';
 import DrawerNavigator from './src/screens/DrawerNavigator';
+import LessonChapterList from './src/screens/LessonChapterList';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,8 +36,14 @@ function App(): React.JSX.Element {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Lesson"
+          name="LessonChapterList"
+          component={LessonChapterList}
+          options={{ title: 'Lesson' }}
+        />
+        <Stack.Screen
+          name="LessonPuzzleList"
           component={LessonPuzzleList}
+          options={{ title: 'Lesson' }}
         />
         <Stack.Screen
           name="Community"

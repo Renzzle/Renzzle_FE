@@ -23,6 +23,7 @@ export type ColorType =
   | 'sub_color/beige/p'
   | 'sub_color/beige/s'
   | 'sub_color/beige/c'
+  | 'sub_color/beige/h'
   | 'sub_color/beige/bg'
   | 'sub_color/green/p'
   | 'sub_color/green/s'
@@ -74,6 +75,7 @@ const theme = {
     'sub_color/beige/p': '#F2CA94',
     'sub_color/beige/s': '#BBB2A6',
     'sub_color/beige/c': '#F8EBDB',
+    'sub_color/beige/h': '#F2DEC3',
     'sub_color/beige/bg': '#F4F0EB',
     'sub_color/green/p': '#658780',
     'sub_color/green/s': '#81B8A2',
