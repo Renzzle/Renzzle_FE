@@ -8,7 +8,7 @@ export const MenuButton = styled(TouchableOpacity)`
 
 export const ButtonContainer = styled(View)`
   background-color: ${theme.color['gray/grayBG']};
-  gap: 10;
+  gap: 10px;
   flex: 1;
   justify-content: center;
 `;

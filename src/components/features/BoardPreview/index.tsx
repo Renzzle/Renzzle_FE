@@ -1,9 +1,13 @@
 import React from 'react';
 import Preview from './index.styles';
 
-const BoardPreview = () => {
+interface BoardPreviewProps {
+  isLocked?: boolean;
+}
+
+const BoardPreview = ({ isLocked = false }: BoardPreviewProps) => {
   return (
-    <Preview />
+    <Preview isLocked={isLocked} />
   );
 };
 

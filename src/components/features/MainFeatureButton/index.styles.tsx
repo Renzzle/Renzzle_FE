@@ -17,7 +17,7 @@ export const ButtonContainer = styled(TouchableOpacity)<{ buttonWidth: number, c
 export const ButtonText = styled(Text)<{ textColor: ColorType }>`
   font-family: "ChangaOne-Regular";
   color: ${(props) => theme.color[props.textColor]};
-  font-size: 48;
+  font-size: 48px;
 `;
 
 export const ButtonImg = styled(Image)`
