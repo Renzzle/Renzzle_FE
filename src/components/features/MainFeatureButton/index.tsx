@@ -7,7 +7,7 @@ interface MainFeatureButtonProps {
   text: string;
   color: ColorType;
   textColor?: ColorType;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const imageMap: { [key: string]: any } = {

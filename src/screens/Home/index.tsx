@@ -10,7 +10,7 @@ const Home = () => {
     <ButtonContainer>
       <MainFeatureButton text="Lesson" color="sub_color/green/c" onPress={() => navigation.navigate('LessonChapterList')} />
       <MainFeatureButton text="Community" color="sub_color/green/s" onPress={() => navigation.navigate('Community')} />
-      <MainFeatureButton text="AI Puzzle" color="sub_color/green/p" onPress={() => navigation.navigate('Lesson')} />
+      <MainFeatureButton text="AI Puzzle" color="sub_color/green/p" />
     </ButtonContainer>
   );
 };
