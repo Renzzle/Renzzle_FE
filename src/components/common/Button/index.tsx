@@ -4,7 +4,7 @@ import CustomText from '../CustomText';
 
 interface ButtonPropsType {
   children: React.ReactNode;
-  onPress: () => void;
+  onPress?: () => void;
   disabled?: boolean;
   category?: 'primary' | 'secondary';
 }

@@ -21,7 +21,7 @@ const MainFeatureButton = ({ text, color, textColor = 'gray/white', onPress}: Ma
   const defaultImg = require('../../../assets/images/lesson.png');
   const imageSource = imageMap[text] || defaultImg;
   return (
-    <ButtonContainer buttonWidth={width} color={color} onPress={onPress}>
+    <ButtonContainer screenWidth={width} color={color} onPress={onPress}>
       <ButtonText textColor={textColor}>{ text }</ButtonText>
       <ButtonImg source={imageSource} />
     </ButtonContainer>

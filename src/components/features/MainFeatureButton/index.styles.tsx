@@ -3,8 +3,8 @@ import { Image, Text, TouchableOpacity } from 'react-native';
 import theme, { ColorType } from '../../../styles/theme';
 
 
-export const ButtonContainer = styled(TouchableOpacity)<{ buttonWidth: number, color: ColorType }>`
-  width: ${({ buttonWidth }) => buttonWidth - 20}px;
+export const ButtonContainer = styled(TouchableOpacity)<{ screenWidth: number, color: ColorType }>`
+  width: ${({ screenWidth }) => screenWidth - 20}px;
   height: 160px;
   margin: 0 10px;
   padding: 18px 24px;
