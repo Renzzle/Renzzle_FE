@@ -1,17 +1,49 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
+import { ModalCategoryType } from '../../components/common/CustomModal';
+import { CloseActionsType } from './index.types';
 
-interface UseModalReturn {
-  isModalVisible: boolean;
-  openModal: () => void;
-  closeModal: () => void;
-}
-
-const useModal = (): UseModalReturn => {
+const useModal = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [category, setCategory] = useState<ModalCategoryType | null>(null);
+  const [closeActions, setCloseActions] = useState<CloseActionsType>({
+    primaryAction: () => {},
+    secondaryAction: () => {},
+  });
 
-  const openModal = useCallback(() => setIsModalVisible(true), []);
-  const closeModal = useCallback(() => setIsModalVisible(false), []);
-  return { isModalVisible, openModal, closeModal };
+  const { primaryAction, secondaryAction } = closeActions;
+
+  const onToggle = () => {
+    setIsModalVisible((currentIsModalOpen) => !currentIsModalOpen);
+  };
+
+  const activateModal = (
+    newCategory: ModalCategoryType,
+    newCloseActions: CloseActionsType,
+  ) => {
+    setCategory(newCategory);
+    setCloseActions(newCloseActions);
+    onToggle();
+  };
+
+  const closePrimarily = async () => {
+    await primaryAction();
+    onToggle();
+  };
+
+  const closeSecondarily = () => {
+    if (secondaryAction) {
+      secondaryAction();
+    }
+    onToggle();
+  };
+
+  return {
+    isModalVisible,
+    category,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+  };
 };
 
 export default useModal;

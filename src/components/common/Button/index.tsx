@@ -21,7 +21,7 @@ const Button = ({
         <CustomText
           weight="bold"
           lineHeight="sm"
-          color={disabled ? 'gray/gray400' : 'sub_color/green/p'}
+          color={disabled ? 'gray/gray400' : 'gray/white'}
         >
           {children}
         </CustomText>
@@ -34,7 +34,7 @@ const Button = ({
         <CustomText
           weight="bold"
           lineHeight="sm"
-          color={disabled ? 'gray/gray400' : 'gray/white'}
+          color={disabled ? 'gray/gray400' : 'sub_color/green/p'}
         >
           {children}
         </CustomText>

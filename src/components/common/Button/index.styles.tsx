@@ -12,13 +12,13 @@ export const StyledButton = styled(TouchableOpacity)`
   flex: 1;
 `;
 
-export const StyledPrimaryButton = styled(StyledButton)<{ disabled: boolean }>`
+export const StyledSecondaryButton = styled(StyledButton)<{ disabled: boolean }>`
   background-color: ${({ disabled }) =>
     disabled ? theme.color['gray/gray100'] : theme.color['sub_color/green/bg']
   };
 `;
 
-export const StyledSecondaryButton = styled(StyledButton)<{ disabled: boolean }>`
+export const StyledPrimaryButton = styled(StyledButton)<{ disabled: boolean }>`
   background-color: ${({ disabled }) =>
     disabled ? theme.color['gray/gray100'] : theme.color['sub_color/green/s']
   };

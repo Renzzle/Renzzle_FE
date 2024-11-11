@@ -37,7 +37,7 @@ export const ModalExitContainer = styled(TouchableOpacity)`
 `;
 
 export const ModalBodyContainer = styled(View)`
-  margin-bottom: 25px;
+  margin-bottom: 28px;
 `;
 
 export const ModalBottomContainer = styled(View)`
