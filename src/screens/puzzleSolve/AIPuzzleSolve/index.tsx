@@ -1,9 +1,9 @@
 import React from 'react';
-import { Text } from 'react-native';
+import Board from '../../../components/features/Board';
 
 const AIPuzzleSolve = () => {
   return (
-    <Text>AIPuzzleSolve</Text>
+    <Board />
   );
 };
 

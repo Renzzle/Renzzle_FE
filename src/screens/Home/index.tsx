@@ -11,7 +11,6 @@ const Home = () => {
   const {
     isModalVisible,
     category: modalCategory,
-    activateModal,
     closePrimarily,
     closeSecondarily,
   } = useModal();
@@ -20,8 +19,8 @@ const Home = () => {
     <HomeContainer>
       <ButtonContainer>
         <MainFeatureButton text="Lesson" color="sub_color/green/c" onPress={() => navigation.navigate('LessonChapterList')} />
-        <MainFeatureButton text="Community" color="sub_color/green/s" onPress={() => navigation.navigate('Community')} />
-        <MainFeatureButton text="AI Puzzle" color="sub_color/green/p" onPress={() => activateModal('PUZZLE_FAILURE', {primaryAction: () => {}, secondaryAction: () => {}})} />
+        <MainFeatureButton text="Community" color="sub_color/green/s" onPress={() => navigation.navigate('CommunityPuzzleList')} />
+        <MainFeatureButton text="AI Puzzle" color="sub_color/green/p" onPress={() => navigation.navigate('AIPuzzleSolve')} />
       </ButtonContainer>
 
       {isModalVisible && <CustomModal isVisible={isModalVisible} category={modalCategory} onPrimaryAction={closePrimarily} onSecondaryAction={closeSecondarily} />}
