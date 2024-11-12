@@ -5,6 +5,7 @@ import { TextPropsType } from './index.types';
 
 export type StyledTextType = Required<TextPropsType>;
 export const StyledText = styled(Text)<StyledTextType>`
+  font-family: "Pretendard";
   color: ${(props) => theme.color[props.color]};
   font-size: ${(props) => `${props.size}px`};
   font-weight: ${(props) => theme.weight[props.weight]};
