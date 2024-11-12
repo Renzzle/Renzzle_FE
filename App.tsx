@@ -9,8 +9,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import theme from './src/styles/theme';
-import LessonPuzzleList from './src/screens/PuzzleList/LessonPuzzleList';
-import CommunityPuzzleList from './src/screens/PuzzleList/CommunityPuzzleList';
+import LessonPuzzleList from './src/screens/puzzleList/LessonPuzzleList';
+import CommunityPuzzleList from './src/screens/puzzleList/CommunityPuzzleList';
 import DrawerNavigator from './src/screens/DrawerNavigator';
 import LessonChapterList from './src/screens/LessonChapterList';
 

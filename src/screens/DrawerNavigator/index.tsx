@@ -1,11 +1,11 @@
 import { createDrawerNavigator, DrawerNavigationOptions } from '@react-navigation/drawer';
 import React from 'react';
-import LikeList from '../PuzzleList/LikeList';
 import theme from '../../styles/theme';
 import DrawerMenuButton from '../../components/features/DrawerMenuButton';
 import GoBackButton from '../../components/features/GoBackButton';
 import Home from '../Home';
 import HeaderLogoIcon from '../../components/features/HeaderLogoIcon';
+import LikedPuzzleList from '../puzzleList/LikedPuzzleList';
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
@@ -26,6 +26,7 @@ const DrawerNavigator = () => {
           backgroundColor: theme.color['gray/grayBG'],
         },
         headerTitleStyle: {
+          fontFamily: 'Pretendard-Medium',
           fontSize: 18,
         },
       }}
@@ -44,11 +45,14 @@ const DrawerNavigator = () => {
         })}
       />
       <Drawer.Screen
-        name="LikeList"
-        component={LikeList}
-        options={({ navigation }): DrawerNavigationOptions => ({
-          headerLeft: () => <GoBackButton navigation={navigation} />,
-        })}
+        name="LikedPuzzleList"
+        component={LikedPuzzleList}
+        options={
+          ({ navigation }): DrawerNavigationOptions => ({
+            headerLeft: () => <GoBackButton navigation={navigation} />,
+            title: '좋아요',
+          })
+        }
       />
     </Drawer.Navigator>
   );
