@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import CustomText from '../../common/CustomText';
 import { View } from 'react-native';
 import { HeartIcon, HeartOutlineIcon } from '../../common/Icons';
-import { AuthorContainer, HeaderContainer, LikeButton, TitleAndNumber, TitleContainer } from './index.styles';
+import { AuthorContainer, HeaderContainer, LikeButton, TitleAndNumber, TitleTextContainer, TopContainer } from './index.styles';
 import TagSmall from '../../common/TagSmall';
+import useDeviceWidth from '../../../hooks/useDeviceWidth';
 
 interface PuzzleHeaderProps {
   title: string;
@@ -15,6 +16,7 @@ interface PuzzleHeaderProps {
 
 const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: PuzzleHeaderProps) => {
   const [like, setLike] = useState(isLiked);
+  const width = useDeviceWidth();
 
   const handleLikePress = () => {
     if (like === null) {return;}
@@ -24,10 +26,16 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: Puzzle
   return (
     <HeaderContainer>
       <View>
-        <TitleContainer>
+        <TopContainer>
           <TitleAndNumber>
-            <CustomText size={20} weight="bold" lineHeight="lg">{title}</CustomText>
-            <TagSmall>{puzzleNum && `No.${puzzleNum}`}</TagSmall>
+            <TitleTextContainer deviceWidth={width}>
+              <CustomText size={20} weight="bold" lineHeight="lg" numberOfLines={1}>
+                {title}
+              </CustomText>
+            </TitleTextContainer>
+            <TagSmall>
+              {puzzleNum && `No.${puzzleNum}`}
+            </TagSmall>
           </TitleAndNumber>
 
           {like !== null ? (
@@ -37,13 +45,17 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: Puzzle
           ) : (
             <View />
           )}
-        </TitleContainer>
+        </TopContainer>
 
-        <CustomText size={10} lineHeight="sm" color="gray/gray500">{info}</CustomText>
+        <CustomText size={10} lineHeight="sm" color="gray/gray500">
+          {info}
+        </CustomText>
       </View>
 
       <AuthorContainer>
-        <CustomText size={14} lineHeight="sm">{author}</CustomText>
+        <CustomText size={14} lineHeight="sm">
+          {author}
+        </CustomText>
       </AuthorContainer>
     </HeaderContainer>
   );
