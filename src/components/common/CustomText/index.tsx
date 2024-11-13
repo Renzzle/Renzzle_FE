@@ -8,6 +8,7 @@ export default function CustomText({
   size = 16,
   weight = 'normal',
   lineHeight = 'md',
+  numberOfLines,
   ...props
 }: TextPropsType) {
   return (
@@ -16,6 +17,7 @@ export default function CustomText({
       size={size}
       weight={weight}
       lineHeight={lineHeight}
+      numberOfLines={numberOfLines}
       {...props}
     >
       {children}

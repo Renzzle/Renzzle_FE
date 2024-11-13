@@ -10,12 +10,12 @@ export const CardContainer = styled(TouchableOpacity)<{ buttonWidth: number }>`
   background-color: ${theme.color['gray/white']};
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 1);
   elevation: 4;
+  gap: 10px;
 `;
 
 export const CardTop = styled(View)`
   flex-direction: row;
   gap: 10px;
-  margin-bottom: 10px;
 `;
 
 export const CardInfoContainer = styled(View)`
@@ -23,5 +23,5 @@ export const CardInfoContainer = styled(View)`
 `;
 
 export const CardBottom = styled(View)`
-  margin-top: 10px;
+  align-items: flex-start;
 `;
