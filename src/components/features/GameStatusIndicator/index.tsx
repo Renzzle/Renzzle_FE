@@ -9,7 +9,7 @@ interface GameStatusIndicatorProps {
 const GameStatusIndicator = ({ children }: GameStatusIndicatorProps) => {
   return (
     <IndicatorContainer>
-      <CustomText size={12} color="sub_color/beige/d">
+      <CustomText size={12} color="sub_color/beige/d" numberOfLines={1}>
         {children}
       </CustomText>
     </IndicatorContainer>

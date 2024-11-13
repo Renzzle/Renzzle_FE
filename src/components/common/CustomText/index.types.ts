@@ -7,5 +7,6 @@ export interface TextPropsType {
   size?: SizeType;
   weight?: WeightType;
   lineHeight?: LineHeightType;
+  numberOfLines?: number;
   as?: ElementType;
 }
