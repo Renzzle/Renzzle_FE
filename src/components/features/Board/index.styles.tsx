@@ -65,27 +65,3 @@ export const IndicatePoint = styled(View)`
   border-radius: 2.5px;
   background-color: ${theme.color['gray/gray500']};
 `;
-
-// export const FrameNum = styled(Text)`
-//   font-family: 'Pretendard-Medium';
-//   font-size: 8px;
-//   color: ${theme.color['gray/gray500']};
-// `;
-
-// export const VerticalNum = styled(FrameNum)<{ boardWidth: number }>`
-//   height: ${({ boardWidth }) => boardWidth}px;
-//   width: 10px;
-//   position: absolute;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: end;
-//   top: 2px;
-//   left: 1px;
-// `;
-
-// export const HorizontalNum = styled(FrameNum)<{ boardWidth: number }>`
-//   width: ${({ boardWidth }) => boardWidth}px;
-//   position: absolute;
-//   bottom: 2px;
-//   left: 2px;
-// `;
