@@ -3,6 +3,11 @@ import styled from 'styled-components';
 import theme from '../../../styles/theme';
 import { StoneType } from '.';
 
+export const BoardAndPutContainer = styled(View)`
+  align-items: center;
+  gap: 20px;
+`;
+
 export const BoardBackground = styled(View)<{ boardWidth: number }>`
   width: ${({ boardWidth }) => boardWidth}px;
   position: relative;
@@ -64,4 +69,8 @@ export const IndicatePoint = styled(View)`
   height: 5px;
   border-radius: 2.5px;
   background-color: ${theme.color['gray/gray500']};
+`;
+
+export const PutButtonContainer = styled(View)`
+  
 `;
