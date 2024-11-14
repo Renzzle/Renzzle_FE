@@ -11,7 +11,7 @@ const CommunityPuzzleList = () => {
   const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
 
   const handleAddPuzzle = () => {
-    navigation.navigate('LessonChapterList');
+    navigation.navigate('CommunityPuzzleMake');
   };
 
   return (
