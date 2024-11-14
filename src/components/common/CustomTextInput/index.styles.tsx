@@ -15,7 +15,7 @@ export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
   border-radius: 18px;
 
   border-color: ${({ isFocused, hasError }) =>
-    isFocused ? theme.color['main_color/green'] : ( hasError ? theme.color['error/error_color'] : theme.color['gray/gray100'])
+    isFocused ? theme.color['main_color/green'] : ( hasError ? theme.color['error/error_color'] : theme.color['gray/gray150'])
   };
 
   background-color: ${({ isDisabled }) =>
