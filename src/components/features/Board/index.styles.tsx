@@ -5,6 +5,7 @@ import { StoneType } from '.';
 
 export const BoardAndPutContainer = styled(View)`
   align-items: center;
+  gap: 20px;
 `;
 
 export const BoardBackground = styled(View)<{ boardWidth: number }>`

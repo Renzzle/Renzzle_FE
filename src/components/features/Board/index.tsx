@@ -1,5 +1,4 @@
-import React, {useEffect, useState } from 'react';
-import GameStatusIndicator from '../GameStatusIndicator';
+import React, { useState } from 'react';
 import { BoardAndPutContainer, BoardBackground, CellContainer, FramContainer, FrameCell, FrameRow, IndicatePoint, PutButtonContainer, Stone, StoneRow } from './index.styles';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import BoardFrameNumber from './BoardFrameNumber';
@@ -10,7 +9,12 @@ import { BOARD_SIZE, convertToLowercaseAlphabet, convertToReverseNumber } from '
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
-const Board = () => {
+interface BoardProps {
+  sequence: string;
+  setSequence: (sequence: string) => void;
+}
+
+const Board = ({ sequence, setSequence }: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -21,7 +25,6 @@ const Board = () => {
   const [isBlackTurn, setIsBlackTurn] = useState(true);
   const [stoneX, setStoneX] = useState<number | null>();
   const [stoneY, setStoneY] = useState<number | null>();
-  const [sequence, setSequence] = useState<string>('');
 
   const handlePut = () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
@@ -29,7 +32,7 @@ const Board = () => {
 
       const letter = convertToLowercaseAlphabet(stoneY);
       const number = convertToReverseNumber(stoneX).toString();
-      setSequence((prevSequence) => prevSequence + letter + number);
+      setSequence(sequence + letter + number);
 
       const newBoard = board.map((row) => [...row]); // copy row
       newBoard[stoneX][stoneY] = isBlackTurn ? 1 : 2;
@@ -39,10 +42,6 @@ const Board = () => {
       setStoneY(null);
     }
   };
-
-  useEffect(() => {
-    console.log('sequence: ' + sequence);
-  }, [sequence]);
 
   const handlePlaceStone = (x: number, y: number) => {
     setStoneX(x);
@@ -71,7 +70,6 @@ const Board = () => {
           </StoneRow>
         ))}
       </BoardBackground>
-      <GameStatusIndicator>{stoneX}, {stoneY}</GameStatusIndicator>
       <PutButtonContainer>
         <CircleButton onPress={handlePut} category="put" />
       </PutButtonContainer>
