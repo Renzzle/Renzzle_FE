@@ -90,7 +90,7 @@ const Cell = ({ pos, stone, cellWidth, tempX, tempY, onPress }: CellProps) => {
         <Stone stone={stone} cellWidth={cellWidth} />
       ) : (
         (pos === `${tempX}-${tempY}`) ? (
-          <AppIcon name="image-filter-center-focus-weak" size={cellWidth} color={theme.color['error/error_color']} />
+          <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
         ) : (
           (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') && (
             <IndicatePoint />
