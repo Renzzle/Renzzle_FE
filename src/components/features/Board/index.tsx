@@ -19,14 +19,12 @@ const Board = () => {
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0))
   );
   const [isBlackTurn, setIsBlackTurn] = useState(true);
-  const [stoneX, setStoneX] = useState<number>();
-  const [stoneY, setStoneY] = useState<number>();
-  const [previewX, setPreviewX] = useState<number | null>();
-  const [previewY, setPreviewY] = useState<number | null>();
+  const [stoneX, setStoneX] = useState<number | null>();
+  const [stoneY, setStoneY] = useState<number | null>();
   const [sequence, setSequence] = useState<string>('');
 
   const handlePut = () => {
-    if (stoneX !== undefined && stoneY !== undefined) {
+    if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
       if (board[stoneX][stoneY] !== 0) {return;}
 
       const letter = convertToLowercaseAlphabet(stoneY);
@@ -37,8 +35,8 @@ const Board = () => {
       newBoard[stoneX][stoneY] = isBlackTurn ? 1 : 2;
       setBoard(newBoard);
       setIsBlackTurn(!isBlackTurn);
-      setPreviewX(null);
-      setPreviewY(null);
+      setStoneX(null);
+      setStoneY(null);
     }
   };
 
@@ -49,8 +47,6 @@ const Board = () => {
   const handlePlaceStone = (x: number, y: number) => {
     setStoneX(x);
     setStoneY(y);
-    setPreviewX(x);
-    setPreviewY(y);
   };
 
   return (
@@ -70,7 +66,7 @@ const Board = () => {
         {board.map((row, x) => (
           <StoneRow key={x}>
             {row.map((cell, y) => (
-              <Cell key={`${x}-${y}`} pos={`${x}-${y}`} stone={cell} cellWidth={cellWidth} previewX={previewX} previewY={previewY} onPress={() => handlePlaceStone(x, y)} />
+              <Cell key={`${x}-${y}`} pos={`${x}-${y}`} stone={cell} cellWidth={cellWidth} stoneX={stoneX} stoneY={stoneY} onPress={() => handlePlaceStone(x, y)} />
             ))}
           </StoneRow>
         ))}
@@ -87,18 +83,18 @@ interface CellProps {
   pos: string;
   stone: StoneType;
   cellWidth: number;
-  previewX: number | null | undefined;
-  previewY: number | null | undefined;
+  stoneX: number | null | undefined;
+  stoneY: number | null | undefined;
   onPress: () => void;
 }
 
-const Cell = ({ pos, stone, cellWidth, previewX, previewY, onPress }: CellProps) => {
+const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress }: CellProps) => {
   return (
     <CellContainer onPress={onPress} cellWidth={cellWidth}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
       ) : (
-        (pos === `${previewX}-${previewY}`) ? (
+        (pos === `${stoneX}-${stoneY}`) ? (
           <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
         ) : (
           (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') && (
