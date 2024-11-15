@@ -11,14 +11,13 @@ Java_com_renzzle_1fe_VCFSearchJNI_findVCF(JNIEnv *env, jobject obj, jstring java
     const char *nativeBoardData = env->GetStringUTFChars(javaBoardData, 0);
     std::string boardDataStr(nativeBoardData);
     env->ReleaseStringUTFChars(javaBoardData, nativeBoardData);
-
-    // 문자열 데이터를 이용해 Board 객체 초기화
     Board board = getBoard(boardDataStr);
+    SearchMonitor monitor;
+    VCFSearch vcfSearcher(board, monitor);
 
-    VCFSearch vcfSearch(board);
-
-    // findVCF 메서드 호출
-    int result = vcfSearch.findVCF();
-    return result; // int형으로 5 또는 -1 반환
+    bool result = vcfSearcher.findVCF();
+    int depth = monitor.getBestPath().size() - board.getPath().size();
+    if(result) return depth;
+    else return -1;
 }
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-// Enumeration for game results
 enum Result {
     ONGOING,
     BLACK_WIN,
@@ -8,13 +7,11 @@ enum Result {
     DRAW
 };
 
-// Enumeration for stone colors
 enum Color {
     COLOR_BLACK,
     COLOR_WHITE
 };
 
-// Enumeration for board pieces
 enum Piece {
     BLACK,
     WHITE,
@@ -22,7 +19,6 @@ enum Piece {
     WALL
 };
 
-// Enumeration for pattern types
 enum Pattern {
     NONE,       // 00
     DEAD,       // 01. can never make a five
@@ -42,10 +38,25 @@ enum Pattern {
     PATTERN_SIZE
 };
 
-// Direction-related constants
-#define DIRECTION_START HORIZONTAL
+enum CompositePattern {
+    NOT_EMPTY,  // 00
+    ETC,        // 01. etc
+    FORBID,     // 02. forbidden move
+    F2_ANY,     // 03. FREE_2 + etc
+    B3_ANY,     // 04. BLOCKED_3 + etc
+    F2_2X,      // 05. FREE_2 x 2
+    B3_PLUS,    // 06. BLOCKED_3 + FREE_2 or BLOCKED_3
+    F3_ANY,     // 07. FREE_3 + etc
+    F3_PLUS,    // 08. FREE_3 + FREE_2 or BLOCKED_3
+    F3_2X,      // 09. FREE_3 x 2
+    B4_ANY,     // 10. BLOCKED_4 + etc
+    B4_PLUS,    // 11. BLOCKED_4 + FREE_2 or BLOCKED_3
+    B4_F3,      // 12. BLOCKED_4 + FREE_3
+    MATE,       // 13. FREE_4 or BLOCKED_4 x 2
+    WINNING,    // 14. FIVE
+    COMPOSITE_PATTERN_SIZE
+};
 
-// Enumeration for directions
 enum Direction {
     HORIZONTAL,
     VERTICAL,
@@ -54,7 +65,9 @@ enum Direction {
     DIRECTION_SIZE
 };
 
-// Operators for Direction (declared in the header, defined in the source)
+#define DIRECTION_START HORIZONTAL
+
+// Function declarations for operators
 Direction operator++(Direction& dir, int);
 Direction operator--(Direction& dir, int);
 bool operator<(Direction dir1, Direction dir2);

@@ -1,55 +1,37 @@
-#ifndef EVALUATOR_H
-#define EVALUATOR_H
+#pragma once
 
-#include "../game/board.h" // 헤더 파일만 include
+#include "../game/board.h"
 #include <vector>
-#include <tuple>
 #include <algorithm>
+#include <tuple>
 
 #define MAX_VALUE 50000
 #define MIN_VALUE -50000
 #define INITIAL_VALUE -99999
 
+// for sort positions value
 using Score = int;
+// evaluate value
 using Value = int;
 
 class Evaluator {
+
 private:
+    Board& board;
     Piece self = BLACK;
     Piece oppo = WHITE;
 
-    std::vector<Pos> myFive;
-    std::vector<Pos> myMate;
-    std::vector<Pos> myFourThree;
-    std::vector<Pos> myDoubleThree;
+    MoveList patternMap[2][COMPOSITE_PATTERN_SIZE];
 
-    std::vector<std::tuple<Pos, Score>> myFour;
-    std::vector<std::tuple<Pos, Score>> myOpenThree;
-
-    std::vector<Pos> oppoFive;
-    std::vector<std::tuple<Pos, Score>> etc;
-
-    std::vector<Pos> oppoMate;
-    std::vector<Pos> oppoFourThree;
-    std::vector<Pos> oppoDoubleThree;
-    std::vector<Pos> oppoForbidden;
-    std::vector<Pos> oppoFour;
-    std::vector<Pos> oppoOpenThree;
-    std::vector<std::tuple<Pos, Score>> myStrategicMove;
-    std::vector<std::tuple<Pos, Score>> oppoStrategicMove;
-
-    const Score attackScore[PATTERN_SIZE] = {0, 00, 00, 01, 01, 04, 05, 06, 07, 30, 37, 160, 700, 3000};
-    const Score defendScore[PATTERN_SIZE] = {0, 00, 00, 00, 00, 00, 00, 00, 00, 05, 07, 007, 160, 1000};
-
-    void init();
-    void classify(Board& board);
-    void classify(Board& board, Pos pos);
-    Score calculateUtilScore(int myPatternCnt[], int oppoPatternCnt[]);
+    void classify();
 
 public:
-    std::vector<Pos> getCandidates(Board& board);
-    std::vector<Pos> getFours(Board& board);
-    Value evaluate(Board& board);
+    Evaluator(Board& board);
+    MoveList getCandidates();
+    Pos getSureMove();
+    MoveList getFours();
+    MoveList getThreats();
+    MoveList getThreatDefend();
+    bool isOppoMateExist();
+    Value evaluate();
 };
-
-#endif // EVALUATOR_H
