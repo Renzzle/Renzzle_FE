@@ -25,8 +25,8 @@ VCFSearch::VCFSearch(Board& board) : treeManager(board) {
     targetColor = board.isBlackTurn() ? COLOR_BLACK : COLOR_WHITE;
 }
 
-bool VCFSearch::findVCF() {
-    if (isWin()) return true;
+int VCFSearch::findVCF() {
+    if (isWin()) return 5; // true일 때 5를 반환
 
     MoveList moves;
     if (isTargetTurn())
@@ -34,17 +34,18 @@ bool VCFSearch::findVCF() {
     else
         moves = evaluator.getCandidates(treeManager.getBoard());
 
-    if (moves.empty()) return false;
+    if (moves.empty()) return -1; // false일 때 -1을 반환
 
     for (auto move : moves) {
         if(treeManager.isVisited(move))
             continue;
         treeManager.move(move);
-        if (findVCF()) return true;
+        int result = findVCF();
+        if (result == 5) return 5; // 재귀 호출에서 true를 반환하면 5를 반환
         treeManager.undo();
     }
 
-    return false;
+    return -1; // 끝까지 탐색 후에도 조건이 충족되지 않으면 -1을 반환
 }
 
 bool VCFSearch::isWin() {
