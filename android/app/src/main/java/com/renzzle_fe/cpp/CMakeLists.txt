@@ -13,7 +13,7 @@ add_subdirectory(tree)
 add_library(
         native-lib
         SHARED
-        com/renzzle_fe/cpp/jni/RenzzleJNI.cpp
+        jni/RenzzleJNI.cpp
 )
 
 # 서브 디렉토리 내 타겟 라이브러리들과 연결
