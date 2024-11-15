@@ -31,21 +31,29 @@ const CommunityPuzzleList = () => {
       <ScrollView>
         <CardsContainer>
           {puzzleList?.isSuccess && (
-            puzzleList.response.map((puzzle) => (
-              <PuzzleListCard
-                key={puzzle.id}
-                title={puzzle.title}
-                author={puzzle.authorName}
-                description={`해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
-                isLocked={false}
-                bottom={() => (
-                  <TagSmall>No.{`${puzzle.id}`}</TagSmall>
-                )}
-                onPress={() => {
-
-                }}
-              />
-            ))
+            puzzleList.response.map((puzzle) => {
+              return (
+                <PuzzleListCard
+                  key={puzzle.id}
+                  title={puzzle.title}
+                  author={puzzle.authorName}
+                  description={`해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
+                  isLocked={false}
+                  bottom={() => (
+                    <TagSmall>No.{`${puzzle.id}`}</TagSmall>
+                  )}
+                  onPress={() => {
+                    navigation.navigate('CommunityPuzzleSolve', {
+                      id: puzzle.id,
+                      boardStatus: puzzle.boardStatus,
+                      title: puzzle.title,
+                      author: puzzle.authorName,
+                      description: `해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`,
+                    });
+                  }}
+                />
+              );
+            })
           )}
         </CardsContainer>
       </ScrollView>

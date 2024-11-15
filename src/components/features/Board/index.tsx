@@ -14,7 +14,7 @@ interface BoardProps {
   setSequence: (sequence: string) => void;
 }
 
-const Board = ({ sequence, setSequence }: BoardProps) => {
+const Board = ({ sequence = '', setSequence }: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;

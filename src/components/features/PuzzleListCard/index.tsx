@@ -9,14 +9,15 @@ interface PuzzleListCardProps {
   title: string;
   author: string;
   description: string;
-  bottom: () => React.ReactNode;
   isLocked?: boolean;
+  bottom: () => React.ReactNode;
+  onPress: () => void;
 }
 
-const PuzzleListCard = ({title, author = 'Renzzle', description, bottom, isLocked = false}: PuzzleListCardProps) => {
+const PuzzleListCard = ({title, author = 'Renzzle', description, isLocked = false, bottom, onPress}: PuzzleListCardProps) => {
   const { width } = useWindowDimensions();
   return (
-    <CardContainer buttonWidth={width}>
+    <CardContainer onPress={onPress} buttonWidth={width}>
       <CardTop>
         <BoardPreview isLocked={isLocked} />
         <CardInfoContainer>
