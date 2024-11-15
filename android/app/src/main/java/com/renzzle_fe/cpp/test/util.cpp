@@ -1,17 +1,4 @@
-#pragma once
-
-#include <iostream>
-#include <chrono>
-#include <cassert>
-#include <vector>
-#include <string>
-#include "../game/board.cpp"
-
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
-using namespace std;
+#include "util.h"
 
 vector<pair<int, int>> processString(const string& input) {
     vector<pair<int, int>> result;
@@ -26,13 +13,12 @@ vector<pair<int, int>> processString(const string& input) {
         }
 
         int letterValue = letter - 'a' + 1;
-
         result.emplace_back(number, letterValue);
     }
     return result;
 }
 
-Board getBoard(string moves) {
+Board getBoard(const string& moves) {
     vector<pair<int, int>> v = processString(moves);
     Board board;
     for (auto p : v) {
@@ -66,14 +52,11 @@ void printBoard(Board& board) {
                     cout << "─┼";
                     break;
                 default:
-                    // Handle unexpected cases
                     break;
             }
         }
         cout << endl;
     }
-
-    return;
 }
 
 void printPatternCells(CellArray& cells, Piece p, Direction k) {

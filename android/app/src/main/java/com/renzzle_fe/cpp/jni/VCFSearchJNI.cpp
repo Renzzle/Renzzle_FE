@@ -1,5 +1,6 @@
 #include <jni.h>
-#include "../search/VCF_search.cpp" // VCFSearch 클래스 포함
+#include "../search/VCF_search.h"
+#include "../test/util.h"
 
 extern "C" {
 

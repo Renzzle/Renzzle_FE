@@ -1,25 +1,4 @@
-#pragma once
-
-#include "../evaluate/evaluator.cpp"
-#include "../tree/tree_manager.cpp"
-#include "../test/test.cpp"
-#include <vector>
-
-class VCFSearch {
-
-    PRIVATE
-    TreeManager treeManager;
-    Evaluator evaluator;
-    Color targetColor;
-    bool isWin();
-    bool isTargetTurn();
-
-    PUBLIC
-    VCFSearch(Board& board);
-    bool findVCF();
-    MoveList getVCFPath();
-
-};
+#include "VCF_search.h"
 
 VCFSearch::VCFSearch(Board& board) : treeManager(board) {
     targetColor = board.isBlackTurn() ? COLOR_BLACK : COLOR_WHITE;
@@ -37,7 +16,7 @@ int VCFSearch::findVCF() {
     if (moves.empty()) return -1; // false일 때 -1을 반환
 
     for (auto move : moves) {
-        if(treeManager.isVisited(move))
+        if (treeManager.isVisited(move))
             continue;
         treeManager.move(move);
         int result = findVCF();
@@ -59,11 +38,9 @@ bool VCFSearch::isWin() {
 
 bool VCFSearch::isTargetTurn() {
     if (treeManager.getBoard().isBlackTurn()) {
-        if (targetColor == COLOR_BLACK) return true;
-        else return false;
+        return targetColor == COLOR_BLACK;
     } else {
-        if (targetColor == COLOR_BLACK) return false;
-        else return true;
+        return targetColor == COLOR_WHITE;
     }
 }
 
