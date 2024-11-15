@@ -35,10 +35,15 @@ Java_com_renzzle_1fe_UserAgainstActionJNI_reactUserMove(JNIEnv *env, jobject obj
     env->ReleaseStringUTFChars(javaBoardData, nativeBoardData);
 
     Board board = getBoard(boardDataStr);
+    if (board.getResult() != ONGOING) return 1000;
+
     SearchMonitor monitor;
     Search moveGenerator(board, monitor);
 
     Pos nextMove = moveGenerator.findNextMove(board);
+    if (nextMove.isDefault()) return -1;
+    board.move(nextMove);
+    if (board.getResult() != ONGOING) return -1;
     int result = nextMove.getY() * 15 + nextMove.getX();
     return result;
 }
