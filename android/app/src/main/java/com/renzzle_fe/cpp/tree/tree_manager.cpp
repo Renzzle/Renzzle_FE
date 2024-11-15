@@ -1,24 +1,4 @@
-#pragma once
-
-#include "tree.cpp"
-#include "../test/test.cpp"
-#include <stack>
-
-class TreeManager {
-
-    PRIVATE
-    static Tree tree;
-    shared_ptr<Node> currentNode;
-    stack<shared_ptr<Node>> nodeHistory;
-
-    PUBLIC
-    TreeManager(Board initialBoard);
-    bool move(Pos p);
-    void undo();
-    bool isVisited(Pos p);
-    Board& getBoard();
-
-};
+#include "tree_manager.h"
 
 Tree TreeManager::tree;
 
@@ -30,11 +10,11 @@ TreeManager::TreeManager(Board initialBoard) {
 }
 
 bool TreeManager::move(Pos p) {
-    shared_ptr<Node> previousNode = currentNode;
+    std::shared_ptr<Node> previousNode = currentNode;
 
-    // if child node exist
-    for(const auto& pair : previousNode->childNodes) {
-        shared_ptr<Node> node = pair.second;
+    // if child node exists
+    for (const auto& pair : previousNode->childNodes) {
+        std::shared_ptr<Node> node = pair.second;
         if (node->board.getPath().back() == p) {
             currentNode = node;
             nodeHistory.push(currentNode);
@@ -45,7 +25,7 @@ bool TreeManager::move(Pos p) {
     // new child node
     Board newBoard = previousNode->board;
     bool result = newBoard.move(p);
-    if(!result) return result; // move failed
+    if (!result) return result; // move failed
 
     currentNode = tree.createNode(newBoard);
     tree.addNode(previousNode, currentNode);
@@ -62,11 +42,11 @@ void TreeManager::undo() {
 }
 
 bool TreeManager::isVisited(Pos p) {
-    if(currentNode->childNodes.empty())
+    if (currentNode->childNodes.empty())
         return false;
 
-    for(const auto& pair : currentNode->childNodes) {
-        shared_ptr<Node> node = pair.second;
+    for (const auto& pair : currentNode->childNodes) {
+        std::shared_ptr<Node> node = pair.second;
         if (node->board.getPath().back() == p) {
             return true;
         }

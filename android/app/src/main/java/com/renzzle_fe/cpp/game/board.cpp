@@ -1,47 +1,6 @@
-#pragma once
+#include "board.h"
 
-#include "line.cpp"
-#include "pos.cpp"
-#include "zobrist.cpp"
-#include "../test/test.cpp"
-#include <array>
-#include <vector>
-
-#define BOARD_SIZE 15
-#define STATIC_WALL &cells[0][0];
-
-using namespace std;
-using CellArray = array<array<Cell, BOARD_SIZE + 2>, BOARD_SIZE + 2>;
-using MoveList = vector<Pos>;
-
-class Board {
-
-    PRIVATE
-        CellArray cells;
-        MoveList path;
-        Result result;
-        size_t currentHash;
-
-        void clearPattern(Cell& cell);
-        void setPatterns(Pos& p);
-        void setResult(Pos& p);
-        Line getLine(Pos& p);
-        Pattern getPattern(Line& line, Color color);
-
-    PUBLIC
-        Board();
-        bool isBlackTurn();
-        CellArray& getBoardStatus();
-        Cell& getCell(const Pos p);
-        bool move(Pos p);
-        void undo();
-        Result getResult();
-        bool isForbidden(Pos p);
-        MoveList getPath();
-        size_t getCurrentHash() const;
-
-};
-
+// Constructor
 Board::Board() {
     currentHash = 0;
     result = ONGOING;
@@ -58,6 +17,7 @@ Board::Board() {
     }
 }
 
+// Public methods
 bool Board::isBlackTurn() {
     return path.size() % 2 == 0;
 }
@@ -76,7 +36,6 @@ bool Board::move(Pos p) {
     if (path.size() == BOARD_SIZE * BOARD_SIZE) return false;
 
     path.push_back(p);
-
     setResult(p);
 
     Piece piece = isBlackTurn() ? WHITE : BLACK;
@@ -97,11 +56,9 @@ void Board::undo() {
     currentHash ^= getZobristValue(p.x, p.y, piece);
 
     getCell(p).setPiece(EMPTY);
-
     path.pop_back();
 
     setPatterns(p);
-
     result = ONGOING;
 }
 
@@ -117,7 +74,7 @@ bool Board::isForbidden(Pos p) {
     int winByThree = 0;
     int pThreeCnt = 0;
 
-    // five, overline, 4-4
+    // Five, overline, 4-4 logic
     for (Direction dir = DIRECTION_START; dir < DIRECTION_SIZE; dir++) {
         p.dir = dir;
         Pattern pattern = c.getPattern(BLACK, p.dir);
@@ -134,12 +91,10 @@ bool Board::isForbidden(Pos p) {
             pThreeCnt++;
     }
 
-    // if there is not open three more than two
+    // Additional logic for forbidden moves
     if (pThreeCnt < 2)
         return false;
 
-    // recursive 3-3
-    // move
     getCell(p).setPiece(BLACK);
     setPatterns(p);
 
@@ -147,7 +102,6 @@ bool Board::isForbidden(Pos p) {
         p.dir = dir;
         Pattern pattern = c.getPattern(BLACK, p.dir);
 
-        // double three forbidden type
         if (pattern != FREE_3 && pattern != FREE_3A)
             continue;
 
@@ -156,7 +110,7 @@ bool Board::isForbidden(Pos p) {
             if (!(posi + (i - (LINE_LENGTH / 2))))
                 continue;
 
-            Cell &c = getCell(posi);
+            Cell& c = getCell(posi);
             if (c.getPiece() == EMPTY) {
                 bool isFive = false;
                 if (c.getPattern(BLACK, dir) == FREE_4 && !isForbidden(posi)) {
@@ -165,7 +119,6 @@ bool Board::isForbidden(Pos p) {
                         if (pattern == FIVE)
                             isFive = true;
                     }
-                    // made 5 with an empty space -> not a forbidden position
                     if (!isFive) {
                         winByThree++;
                         break;
@@ -180,7 +133,6 @@ bool Board::isForbidden(Pos p) {
         }
     }
 
-    // undo
     getCell(p).setPiece(EMPTY);
     setPatterns(p);
 
@@ -195,8 +147,9 @@ size_t Board::getCurrentHash() const {
     return currentHash;
 }
 
+// Private methods
 void Board::clearPattern(Cell& cell) {
-    for(Direction dir = DIRECTION_START; dir < DIRECTION_SIZE; dir++) {
+    for (Direction dir = DIRECTION_START; dir < DIRECTION_SIZE; dir++) {
         cell.setPattern(BLACK, dir, PATTERN_SIZE);
         cell.setPattern(WHITE, dir, PATTERN_SIZE);
     }
@@ -225,7 +178,6 @@ void Board::setPatterns(Pos& p) {
 
 Line Board::getLine(Pos& p) {
     Line line;
-
     for (int i = 0; i < LINE_LENGTH; i++) {
         if (!(p + (i - (LINE_LENGTH / 2)))) {
             line[i] = STATIC_WALL;
@@ -234,7 +186,6 @@ Line Board::getLine(Pos& p) {
         line[i] = &getCell(p);
         p - (i - (LINE_LENGTH / 2));
     }
-
     return line;
 }
 
@@ -313,7 +264,7 @@ void Board::setResult(Pos& p) {
 
     Piece self = isBlackTurn ? WHITE : BLACK;
     for (Direction dir = DIRECTION_START; dir < DIRECTION_SIZE; dir++) {
-        if(getCell(p).getPattern(self, dir) == FIVE) {
+        if (getCell(p).getPattern(self, dir) == FIVE) {
             result = isBlackTurn ? WHITE_WIN : BLACK_WIN;
             return;
         }

@@ -1,38 +1,19 @@
-#pragma once
+#include "line.h"
 
-#include "cell.cpp"
-#include <array>
-#include <tuple>
+// Constructor: Initialize deadCell as WALL
+Line::Line() {
+    deadCell.setPiece(WALL);
+}
 
-#define LINE_LENGTH 11
+// Index operator implementation
+Cell*& Line::operator[](size_t idx) {
+    return this->cells[idx];
+}
 
-class Line {
-
-private:
-    array<Cell*, LINE_LENGTH> cells;
-    Cell deadCell;
-
-public:
-    Line() {
-        deadCell.setPiece(WALL);
-    }
-    Cell*& operator[](size_t idx) {
-        return this->cells[idx];
-    }
-    tuple<int, int, int, int> countLine();
-    Line shiftLine(Line& line, int n);
-
-};
-
+// Count properties of the line
 tuple<int, int, int, int> Line::countLine() {
     constexpr auto mid = LINE_LENGTH / 2;
 
-    /*
-    realLen: length of the continuous stone including the starting stone
-    fullLen: between the other side
-    start: start index of fullLen
-    end: end index of fullLen
-    */
     int realLen = 1, fullLen = 1;
     int realLenInc = 1;
     int start = mid, end = mid;
@@ -41,7 +22,7 @@ tuple<int, int, int, int> Line::countLine() {
     int oppo = !self;
     Piece piece;
 
-    for (int i = mid - 1; i >=0; i--) {
+    for (int i = mid - 1; i >= 0; i--) {
         piece = cells[i]->getPiece();
         if (piece == self)
             realLen += realLenInc;
@@ -72,6 +53,7 @@ tuple<int, int, int, int> Line::countLine() {
     return make_tuple(realLen, fullLen, start, end);
 }
 
+// Shift the line to a new position
 Line Line::shiftLine(Line& line, int n) {
     constexpr auto len = LINE_LENGTH;
 

@@ -1,15 +1,12 @@
-#pragma once
+#include "zobrist.h"
+#include <limits>
 
-#include "board.cpp"
-#include <random>
-#include <mutex>
-
-#define NUM_PIECE_TYPES 4
-
+// Static variables for Zobrist hashing
 static size_t zobristTable[BOARD_SIZE + 2][BOARD_SIZE + 2][NUM_PIECE_TYPES];
 static std::once_flag zobristInitFlag;
 
-static void initializeZobristTable() {
+// Initialize the Zobrist table with random values
+void initializeZobristTable() {
     std::random_device rd;
     std::mt19937_64 rng(rd());
     std::uniform_int_distribution<size_t> dist(0, std::numeric_limits<size_t>::max());
@@ -23,7 +20,8 @@ static void initializeZobristTable() {
     }
 }
 
-static size_t getZobristValue(int x, int y, Piece piece) {
+// Retrieve the Zobrist value for a specific position and piece
+size_t getZobristValue(int x, int y, Piece piece) {
     std::call_once(zobristInitFlag, initializeZobristTable);
     return zobristTable[x][y][piece];
 }
