@@ -1,4 +1,5 @@
 #include "tree_manager.h"
+//#include "tree.h"
 
 Tree TreeManager::tree;
 
@@ -10,11 +11,11 @@ TreeManager::TreeManager(Board initialBoard) {
 }
 
 bool TreeManager::move(Pos p) {
-    std::shared_ptr<Node> previousNode = currentNode;
+    shared_ptr<Node> previousNode = currentNode;
 
     // if child node exists
     for (const auto& pair : previousNode->childNodes) {
-        std::shared_ptr<Node> node = pair.second;
+        shared_ptr<Node> node = pair.second;
         if (node->board.getPath().back() == p) {
             currentNode = node;
             nodeHistory.push(currentNode);
@@ -22,7 +23,7 @@ bool TreeManager::move(Pos p) {
         }
     }
 
-    // new child node
+    // create new child node
     Board newBoard = previousNode->board;
     bool result = newBoard.move(p);
     if (!result) return result; // move failed
@@ -34,26 +35,31 @@ bool TreeManager::move(Pos p) {
 }
 
 void TreeManager::undo() {
-    // remain root node
+    // remain at root node
     if (nodeHistory.size() > 1) {
         nodeHistory.pop();
         currentNode = nodeHistory.top();
     }
 }
 
-bool TreeManager::isVisited(Pos p) {
-    if (currentNode->childNodes.empty())
-        return false;
-
-    for (const auto& pair : currentNode->childNodes) {
-        std::shared_ptr<Node> node = pair.second;
-        if (node->board.getPath().back() == p) {
-            return true;
-        }
-    }
-    return false;
+void TreeManager::cleanCache() {
+    tree.cleanTree();
 }
 
 Board& TreeManager::getBoard() {
     return currentNode->board;
+}
+
+shared_ptr<Node> TreeManager::getChildNode(Pos p) {
+    for (const auto& pair : currentNode->childNodes) {
+        shared_ptr<Node> node = pair.second;
+        if (node->board.getPath().back() == p) {
+            return node;
+        }
+    }
+    return nullptr; // if cannot find
+}
+
+shared_ptr<Node> TreeManager::getNode() {
+    return currentNode;
 }

@@ -1,19 +1,22 @@
 #include "line.h"
 
-// Constructor: Initialize deadCell as WALL
 Line::Line() {
     deadCell.setPiece(WALL);
 }
 
-// Index operator implementation
 Cell*& Line::operator[](size_t idx) {
     return this->cells[idx];
 }
 
-// Count properties of the line
-tuple<int, int, int, int> Line::countLine() {
+std::tuple<int, int, int, int> Line::countLine() {
     constexpr auto mid = LINE_LENGTH / 2;
 
+    /*
+    realLen: length of the continuous stone including the starting stone
+    fullLen: between the other side
+    start: start index of fullLen
+    end: end index of fullLen
+    */
     int realLen = 1, fullLen = 1;
     int realLenInc = 1;
     int start = mid, end = mid;
@@ -50,10 +53,9 @@ tuple<int, int, int, int> Line::countLine() {
         end = i;
     }
 
-    return make_tuple(realLen, fullLen, start, end);
+    return std::make_tuple(realLen, fullLen, start, end);
 }
 
-// Shift the line to a new position
 Line Line::shiftLine(Line& line, int n) {
     constexpr auto len = LINE_LENGTH;
 

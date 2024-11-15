@@ -7,14 +7,14 @@
 #include <array>
 #include <vector>
 
-#define BOARD_SIZE 15
-#define STATIC_WALL &cells[0][0]
+#define STATIC_WALL &cells[0][0];
 
 using namespace std;
-using CellArray = array<array<Cell, BOARD_SIZE + 2>, BOARD_SIZE + 2>;
 using MoveList = vector<Pos>;
+using CellArray = array<array<Cell, BOARD_SIZE + 2>, BOARD_SIZE + 2>;
 
 class Board {
+
 private:
     CellArray cells;
     MoveList path;
@@ -36,6 +36,6 @@ public:
     void undo();
     Result getResult();
     bool isForbidden(Pos p);
-    MoveList getPath();
+    MoveList& getPath();
     size_t getCurrentHash() const;
 };
