@@ -5,13 +5,13 @@ import TagSmall from '../../../components/common/TagSmall';
 import { ScrollView } from 'react-native';
 import CircleButton from '../../../components/features/CircleButton';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { getPuzzle } from '../../../apis/community';
 import { CommunityPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleList = () => {
-  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [puzzleList, setPuzzleList] = useState<CommunityPuzzleListResponse>();
 
   const handleAddPuzzle = () => {
@@ -37,10 +37,13 @@ const CommunityPuzzleList = () => {
                 title={puzzle.title}
                 author={puzzle.authorName}
                 description={`해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
+                isLocked={false}
                 bottom={() => (
                   <TagSmall>No.{`${puzzle.id}`}</TagSmall>
                 )}
-                isLocked={false}
+                onPress={() => {
+
+                }}
               />
             ))
           )}

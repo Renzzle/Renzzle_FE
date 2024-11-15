@@ -8,10 +8,10 @@ import { uploadPuzzle } from '../../../apis/community';
 import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleMake = () => {
-  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [title, setTitle] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [sequence, setSequence] = useState<string>('');
