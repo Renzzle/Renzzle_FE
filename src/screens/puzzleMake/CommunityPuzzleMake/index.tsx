@@ -11,6 +11,14 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NativeModules } from 'react-native';
 
+declare module 'react-native' {
+  interface NativeModulesStatic {
+    VCFSearchJNI: {
+      findVCFWrapper: (sequence: string) => Promise<number>;
+    };
+  }
+}
+
 const CommunityPuzzleMake = async () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [title, setTitle] = useState<string>('');
@@ -22,6 +30,18 @@ const CommunityPuzzleMake = async () => {
   const { VCFSearchJNI } = NativeModules;
   const [depth, setDepth] = useState<number>(-1);
 
+  const verifySequence = async () => {
+    console.log('start');
+    try {
+      const result = await VCFSearchJNI.findVCFWrapper(sequence);
+      console.log('VCF Wrapper Result: ', result);
+      console.log('Depth: ' + depth);
+      setDepth(result);
+    } catch (error) {
+      console.error('VCF search failed: ', error);
+    }
+  };
+
   const transition = [
     {
       text: '출제',
@@ -29,15 +49,15 @@ const CommunityPuzzleMake = async () => {
         console.log('Current sequence: ', sequence);
         setIsDisabled(true);
 
-        const verifySequence = async () => {
-          try {
-            const result = await VCFSearchJNI.findVCFWrapper(sequence);
-            console.log('Depth: ' + depth);
-            setDepth(result);
-          } catch (error) {
-            console.error('VCF search failed: ', error);
-          }
-        };
+        // const verifySequence = async () => {
+        //   try {
+        //     const result = await VCFSearchJNI.findVCFWrapper(sequence);
+        //     console.log('Depth: ' + depth);
+        //     setDepth(result);
+        //   } catch (error) {
+        //     console.error('VCF search failed: ', error);
+        //   }
+        // };
         await verifySequence();
 
         if (depth === -1) { // 검증 실패
@@ -61,9 +81,8 @@ const CommunityPuzzleMake = async () => {
   ];
 
   useEffect(() => {
-    if (sequence !== '' && title !== '') {
-      setIsDisabled(false);
-    }
+    console.log('sequence: ', sequence, 'title', title);
+    setIsDisabled(sequence === '' || title === '');
   }, [sequence, title]);
 
   useEffect(() => {
@@ -93,7 +112,7 @@ const CommunityPuzzleMake = async () => {
         <GameStatusIndicator />
       </IndicatorContainer>
 
-      <Board sequence={sequence} setSequence={setSequence} />
+      <Board mode="make" sequence={sequence} setSequence={setSequence} />
 
       <BottomButtonBar transitions={transition} />
     </MakeContainer>

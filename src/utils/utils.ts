@@ -23,6 +23,13 @@ export const convertToLowercaseAlphabet = (num: number): string => {
   return String.fromCharCode(97 + num);
 };
 
+export const convertLowercaseAlphabetToNumber = (char: string): number => {
+  if (char.length !== 1 || char < 'a' || char > 'o') {
+    throw new Error('Input character must be a single lowercase letter between a and o');
+  }
+  return char.charCodeAt(0) - 97;
+};
+
 export const toDifficultyEnum = (key: string): Difficulty | undefined => {
   switch (key) {
     case 'HIGH':

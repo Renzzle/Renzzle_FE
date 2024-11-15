@@ -19,7 +19,7 @@ const AIPuzzleSolve = () => {
         <GameStatusIndicator />
       </IndicatorContainer>
 
-      <Board />
+      <Board mode="solve" sequence="" setSequence={() => {}} />
     </SolveContainer>
   );
 };
