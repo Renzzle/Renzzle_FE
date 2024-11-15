@@ -1,74 +1,66 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PuzzleListCard from '../../../components/features/PuzzleListCard';
-import { AddButtonContainer, CardsContainer } from './index.styles';
+import { AddButtonContainer, CardsContainer, PuzzleListContainer } from './index.styles';
 import TagSmall from '../../../components/common/TagSmall';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import CircleButton from '../../../components/features/CircleButton';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { getPuzzle } from '../../../apis/community';
+import { CommunityPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
+import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleList = () => {
-  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const [puzzleList, setPuzzleList] = useState<CommunityPuzzleListResponse>();
 
   const handleAddPuzzle = () => {
     navigation.navigate('CommunityPuzzleMake');
   };
 
+  useEffect(() => {
+    const loadPuzzleList = async () => {
+      const data = await getPuzzle(`${process.env.ACCESS_TOKEN}`, 100);
+      setPuzzleList(data);
+    };
+    loadPuzzleList();
+  });
+
   return (
-    <View>
+    <PuzzleListContainer>
       <ScrollView>
         <CardsContainer>
-          <PuzzleListCard
-            title="흑선승 VCF"
-            author="isoo"
-            description="해결 130 | 정답률 86%"
-            bottom={() => (
-              <TagSmall>No.1329</TagSmall>
-            )}
-            isLocked={false}
-          />
-          <PuzzleListCard
-            title="백선승 VCF"
-            author="isoo"
-            description="해결 13 | 정답률 66%"
-            bottom={() => (
-              <TagSmall>No.1329</TagSmall>
-            )}
-            isLocked={false}
-          />
-          <PuzzleListCard
-            title="백선승 VCF"
-            author="isoo"
-            description="해결 13 | 정답률 66%"
-            bottom={() => (
-              <TagSmall>No.1329</TagSmall>
-            )}
-            isLocked={false}
-          />
-          <PuzzleListCard
-            title="백선승 VCF"
-            author="isoo"
-            description="해결 13 | 정답률 66%"
-            bottom={() => (
-              <TagSmall>No.1329</TagSmall>
-            )}
-            isLocked={false}
-          />
-          <PuzzleListCard
-            title="백선승 VCF"
-            author="isoo"
-            description="해결 13 | 정답률 66%"
-            bottom={() => (
-              <TagSmall>No.1329</TagSmall>
-            )}
-            isLocked={false}
-          />
+          {puzzleList?.isSuccess && (
+            puzzleList.response.map((puzzle) => {
+              return (
+                <PuzzleListCard
+                  key={puzzle.id}
+                  title={puzzle.title}
+                  author={puzzle.authorName}
+                  description={`해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
+                  isLocked={false}
+                  bottom={() => (
+                    <TagSmall>No.{`${puzzle.id}`}</TagSmall>
+                  )}
+                  onPress={() => {
+                    navigation.navigate('CommunityPuzzleSolve', {
+                      id: puzzle.id,
+                      boardStatus: puzzle.boardStatus,
+                      title: puzzle.title,
+                      author: puzzle.authorName,
+                      description: `해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`,
+                    });
+                  }}
+                />
+              );
+            })
+          )}
         </CardsContainer>
       </ScrollView>
       <AddButtonContainer>
         <CircleButton category="add" onPress={handleAddPuzzle} />
       </AddButtonContainer>
-    </View>
+    </PuzzleListContainer>
 
   );
 };

@@ -7,8 +7,11 @@ import BottomButtonBar from '../../../components/common/BottomButtonBar';
 import { uploadPuzzle } from '../../../apis/community';
 import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleMake = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [title, setTitle] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [sequence, setSequence] = useState<string>('');
@@ -20,6 +23,7 @@ const CommunityPuzzleMake = () => {
       text: '출제',
       onAction: () => {
         console.log('Current sequence: ', sequence);
+        setIsDisabled(true);
         // TODO: AI 검증 연결
         // AI가 성공하면
         activateModal('VALIDATION_COMPLETE', {
@@ -44,10 +48,11 @@ const CommunityPuzzleMake = () => {
       if (isVerified) {
         console.log('title: ' + title + ', sequence: ' + sequence);
         await uploadPuzzle(title, sequence, 3, 'LOW', 'BLACK', `${process.env.ACCESS_TOKEN}`);
+        navigation.navigate('CommunityPuzzleList');
       }
     };
     verifyAndUpload();
-  }, [isVerified, title, sequence]);
+  }, [isVerified, title, sequence, navigation]);
 
   return (
     <MakeContainer>

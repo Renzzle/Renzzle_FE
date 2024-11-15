@@ -1,23 +1,29 @@
 import { HTTP_HEADERS, HTTP_HEADERS_VALUES, HTTP_METHODS } from './constants';
 
 export const getPuzzle = async (
-  id: number,
-  size: number,
-  sort: string,
   authStore: string,
+  size?: number,
+  sort?: string,
+  id?: number,
 ) => {
   try {
-    const response = await fetch(`${process.env.API_URL}/api/community/puzzle?id=${id}&size=${size}&sort=${sort}`, {
+    const params = new URLSearchParams();
+    if (id !== undefined) {params.append('id', id.toString());}
+    if (size !== undefined) {params.append('size', size.toString());}
+    if (sort !== undefined) {params.append('sort', sort);}
+
+    const response = await fetch(`${process.env.API_URL}/api/community/puzzle?${params.toString()}`, {
       method: HTTP_METHODS.GET,
       headers: {
         [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
         [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
       },
-      body: JSON.stringify({ id, size, sort }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      const errorMessage = errorData?.errorResponse?.message || 'An unknown error occurred.';
+      throw new Error(`HTTP error! status: ${response.status} / message: ${errorMessage}`);
     }
 
     const data = await response.json();
@@ -47,7 +53,10 @@ export const uploadPuzzle = async (
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      const errorMessage = errorData?.errorResponse?.message || 'An unknown error occurred.';
+      const errorCode = errorData?.errorResponse?.code || 'An unknown error occurred.';
+      throw new Error(`HTTP error! status: ${response.status} / code: ${errorCode} / message: ${errorMessage}`);
     }
 
     const data = await response.json();
