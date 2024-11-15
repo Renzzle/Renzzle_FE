@@ -5,7 +5,7 @@ import Button from '../Button';
 type BottomButtonBarType = {
   transitions: {
     text: string;
-    onAction: () => void | (() => Promise<void>);
+    onAction: () => void | Promise<void>;
     disabled?: boolean;
   }[];
 };

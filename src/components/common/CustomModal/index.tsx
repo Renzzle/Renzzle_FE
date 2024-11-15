@@ -10,7 +10,8 @@ export type ModalCategoryType =
   | 'COMMUNITY_PUZZLE_SUCCESS'
   | 'AI_PUZZLE_SUCCESS'
   | 'PUZZLE_FAILURE'
-  | 'VALIDATION_COMPLETE';
+  | 'VALIDATION_COMPLETE'
+  | 'VALIDATION_FAILED';
 
 export const MODAL_TEXTS = {
   LESSON_PUZZLE_SUCCESS: {
@@ -37,6 +38,11 @@ export const MODAL_TEXTS = {
     TITLE: '검증이 완료되었습니다.',
     BODY: '업로드하시겠습니까?',
     FOOTER: ['취소', '업로드'],
+  },
+  VALIDATION_FAILED: {
+    TITLE: '검증이 실패하였습니다.',
+    BODY: '다시 시도해 주세요.',
+    FOOTER: '확인',
   },
 };
 

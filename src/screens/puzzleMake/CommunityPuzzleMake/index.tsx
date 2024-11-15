@@ -9,8 +9,9 @@ import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeModules } from 'react-native';
 
-const CommunityPuzzleMake = () => {
+const CommunityPuzzleMake = async () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [title, setTitle] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
@@ -18,14 +19,36 @@ const CommunityPuzzleMake = () => {
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
 
+  const { VCFSearchJNI } = NativeModules;
+  const [depth, setDepth] = useState<number>(-1);
+
   const transition = [
     {
       text: '출제',
-      onAction: () => {
+      onAction: async () => {
         console.log('Current sequence: ', sequence);
         setIsDisabled(true);
-        // TODO: AI 검증 연결
-        // AI가 성공하면
+
+        const verifySequence = async () => {
+          try {
+            const result = await VCFSearchJNI.findVCFWrapper(sequence);
+            console.log('Depth: ' + depth);
+            setDepth(result);
+          } catch (error) {
+            console.error('VCF search failed: ', error);
+          }
+        };
+        await verifySequence();
+
+        if (depth === -1) { // 검증 실패
+          activateModal('VALIDATION_FAILED', {
+            primaryAction: () => {},
+          });
+          setIsDisabled(false);
+          return;
+        }
+
+        // 검증 성공
         activateModal('VALIDATION_COMPLETE', {
           primaryAction: () => {
             setIsVerified(true);
@@ -47,12 +70,12 @@ const CommunityPuzzleMake = () => {
     const verifyAndUpload = async () => {
       if (isVerified) {
         console.log('title: ' + title + ', sequence: ' + sequence);
-        await uploadPuzzle(title, sequence, 3, 'LOW', 'BLACK', `${process.env.ACCESS_TOKEN}`);
+        await uploadPuzzle(title, sequence, depth, 'LOW', 'BLACK', `${process.env.ACCESS_TOKEN}`);
         navigation.navigate('CommunityPuzzleList');
       }
     };
     verifyAndUpload();
-  }, [isVerified, title, sequence, navigation]);
+  }, [isVerified, title, sequence, navigation, depth]);
 
   return (
     <MakeContainer>
