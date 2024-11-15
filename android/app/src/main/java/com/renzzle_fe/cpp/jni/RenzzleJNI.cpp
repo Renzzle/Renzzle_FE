@@ -39,7 +39,7 @@ Java_com_renzzle_1fe_UserAgainstActionJNI_reactUserMove(JNIEnv *env, jobject obj
     Search moveGenerator(board, monitor);
 
     Pos nextMove = moveGenerator.findNextMove(board);
-    int result = nextMove.getY() * 15 + nextMove.getX();
+    int result = (nextMove.getY() - 1) * 15 + nextMove.getX() - 1;
     return result;
 }
 

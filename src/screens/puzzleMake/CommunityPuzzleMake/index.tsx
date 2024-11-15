@@ -35,7 +35,6 @@ const CommunityPuzzleMake = () => {
     try {
       const result = await VCFSearchJNI.findVCFWrapper(sequence);
       console.log('VCF Wrapper Result: ', result);
-      console.log('Depth: ' + depth);
       setDepth(result);
     } catch (error) {
       console.error('VCF search failed: ', error);

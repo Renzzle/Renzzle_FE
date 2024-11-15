@@ -6,7 +6,8 @@ import BoardFrameNumber from './BoardFrameNumber';
 import CircleButton from '../CircleButton';
 import { AppIcon } from '../../common/Icons';
 import theme from '../../../styles/theme';
-import { BOARD_SIZE, convertLowercaseAlphabetToNumber, convertToLowercaseAlphabet, convertToReverseNumber } from '../../../utils/utils';
+import { BOARD_SIZE, convertLowercaseAlphabetToNumber, convertToLowercaseAlphabet, convertToReverseNumber, valueToCoordinates } from '../../../utils/utils';
+import { NativeModules } from 'react-native';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -14,9 +15,10 @@ interface BoardProps {
   mode: 'make' | 'solve';
   sequence: string;
   setSequence: (sequence: string) => void;
+  setIsWin?: (isWin: boolean | null) => void;
 }
 
-const Board = ({ mode, sequence = '', setSequence }: BoardProps) => {
+const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -28,9 +30,11 @@ const Board = ({ mode, sequence = '', setSequence }: BoardProps) => {
   const [stoneX, setStoneX] = useState<number | null>();
   const [stoneY, setStoneY] = useState<number | null>();
 
-  const [aiX, setAiX] = useState<number | null>();
-  const [aiY, setAiY] = useState<number | null>();
+  const [aiAnswer, setAiAnswer] = useState<number>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const { UserAgainstActionJNI } = NativeModules;
+  const [localSequence, setLocalSequence] = useState(sequence);
+  const [confirmPut, setConfirmPut] = useState<boolean>(false);
 
   const updateBoard = (x: number, y: number,) => {
     const newBoard = board.map((row) => [...row]); // copy row
@@ -38,26 +42,85 @@ const Board = ({ mode, sequence = '', setSequence }: BoardProps) => {
     setBoard(newBoard);
   };
 
-  const handlePut = () => {
+  const handlePut = async () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
       if (board[stoneX][stoneY] !== 0) {return;}
 
       const letter = convertToLowercaseAlphabet(stoneY);
       const number = convertToReverseNumber(stoneX).toString();
-      setSequence(sequence + letter + number);
+      setSequence(localSequence + letter + number); // make용
+      // sequence = sequence + letter + number;
+
+
+      await new Promise<void>((resolve) => {
+        setLocalSequence((prevSequence) => {
+          const updatedSequence = prevSequence + letter + number;
+          resolve(); // 상태 업데이트 완료 후 resolve
+          return updatedSequence;
+        });
+      });
+      console.log('Sequence1: ' + localSequence);
 
       updateBoard(stoneX, stoneY);
 
       setIsBlackTurn(!isBlackTurn);
       setStoneX(null);
       setStoneY(null);
-      if (mode === 'solve') {setIsDisabled(true);}
+      if (mode === 'solve') {
+        console.log('solve!!!');
+        setConfirmPut(true);
+        setIsDisabled(true);
+      }
     }
   };
 
-  const handleAiPut = () => {
-    setIsDisabled(false);
+  useEffect(() => {
+    if (confirmPut === true && mode === 'solve') {
+      console.log('AI 작업 시작: ' + localSequence);
+      handleAiPut();
+    }
+  }, [confirmPut]);
+
+  const handleAiPut = async () => {
+    await getAiAnswer();
   };
+
+  const getAiAnswer = async () => {
+    try {
+      setConfirmPut(false);
+      console.log('Sequence2: ' + localSequence);
+      const result = await UserAgainstActionJNI.calculateSomethingWrapper(localSequence);
+      if (result === -1 && setIsWin !== undefined) {setIsWin(false);}
+      if (result === 1000 && setIsWin !== undefined) {setIsWin(true);}
+      console.log('AI Answer Result: ', result);
+      setAiAnswer(result);
+    } catch (error) {
+      console.error('AI Answer failed: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if (aiAnswer !== undefined) {
+      console.log('세팅들어옴!!!!');
+      const coordinates = valueToCoordinates(aiAnswer);
+
+      if (coordinates) {
+        const { x, y } = coordinates;
+        console.log('setX: ' + x + ' | setY: ' + y);
+
+        updateBoard(x, y);
+        const letter = convertToLowercaseAlphabet(y);
+        const number = convertToReverseNumber(x).toString();
+
+        setLocalSequence((prevSequence) => prevSequence + letter + number);
+        console.log('Sequence3ai:' + localSequence);
+        // sequence = sequence + letter + number;
+      }
+
+      setIsDisabled(false);
+      setIsBlackTurn(!isBlackTurn);
+    }
+  }, [aiAnswer]);
 
   const handlePlaceStone = (x: number, y: number) => {
     setStoneX(x);
