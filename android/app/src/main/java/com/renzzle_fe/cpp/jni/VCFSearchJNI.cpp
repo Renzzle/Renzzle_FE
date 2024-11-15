@@ -21,6 +21,6 @@ Java_com_renzzle_1fe_VCFSearchJNI_findVCF(JNIEnv *env, jobject obj, jstring java
 
     // findVCF 메서드 호출
     int result = vcfSearch.findVCF();
-    return 5; // int형으로 5 또는 -1 반환
+    return result; // int형으로 5 또는 -1 반환
 }
 }

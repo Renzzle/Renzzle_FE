@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { IndicatorContainer, MakeContainer, TextInputContainer } from './index.styles';
 import Board from '../../../components/features/Board';
@@ -28,14 +29,11 @@ const CommunityPuzzleMake = () => {
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
 
   const { VCFSearchJNI } = NativeModules;
-  const [depth, setDepth] = useState<number>(-1);
+  const [depth, setDepth] = useState<number>();
 
   const verifySequence = async () => {
-    console.log('start');
     try {
-      console.log('검증시작');
       const result = await VCFSearchJNI.findVCFWrapper(sequence);
-      console.log('검증끝');
       console.log('VCF Wrapper Result: ', result);
       console.log('Depth: ' + depth);
       setDepth(result);
@@ -48,35 +46,11 @@ const CommunityPuzzleMake = () => {
     {
       text: '출제',
       onAction: async () => {
+        setDepth(undefined);
         console.log('Current sequence: ', sequence);
         setIsDisabled(true);
 
-        // const verifySequence = async () => {
-        //   try {
-        //     const result = await VCFSearchJNI.findVCFWrapper(sequence);
-        //     console.log('Depth: ' + depth);
-        //     setDepth(result);
-        //   } catch (error) {
-        //     console.error('VCF search failed: ', error);
-        //   }
-        // };
         await verifySequence();
-
-        if (depth === -1) { // 검증 실패
-          activateModal('VALIDATION_FAILED', {
-            primaryAction: () => {},
-          });
-          setIsDisabled(false);
-          return;
-        }
-
-        // 검증 성공
-        activateModal('VALIDATION_COMPLETE', {
-          primaryAction: () => {
-            setIsVerified(true);
-          },
-          secondaryAction: () => {},
-        });
       },
       disabled: isDisabled,
     },
@@ -88,8 +62,34 @@ const CommunityPuzzleMake = () => {
   }, [sequence, title]);
 
   useEffect(() => {
+    if (depth !== undefined) {
+      if (depth === -1) {
+        // 검증 실패
+        activateModal('VALIDATION_FAILED', {
+          primaryAction: () => {
+            setIsDisabled(false);
+          },
+        });
+        setIsDisabled(false);
+        return;
+      } else {
+        // 검증 성공
+        activateModal('VALIDATION_COMPLETE', {
+          primaryAction: () => {
+            console.log('Depth!!: ' + depth);
+            setIsVerified(true);
+          },
+          secondaryAction: () => {
+            setIsDisabled(false);
+          },
+        });
+      }
+    }
+  }, [depth]);
+
+  useEffect(() => {
     const verifyAndUpload = async () => {
-      if (isVerified) {
+      if (isVerified && depth !== undefined) {
         console.log('title: ' + title + ', sequence: ' + sequence);
         await uploadPuzzle(title, sequence, depth, 'LOW', 'BLACK', `${process.env.ACCESS_TOKEN}`);
         navigation.navigate('CommunityPuzzleList');
