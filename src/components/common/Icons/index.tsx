@@ -69,8 +69,8 @@ export const LockIcon = (props: Omit<IconProps, 'name' | 'color'>) => (
   <AppIcon name="lock" color={theme.color['gray/white']} {...props} />
 );
 
-export const PlusIcon = (props: Omit<IconProps, 'name' | 'color'>) => (
-  <AppIcon name="plus" color={theme.color['gray/white']} {...props} />
+export const PlusIcon = (props: Omit<IconProps, 'name' | 'color' | 'size'>) => (
+  <AppIcon name="plus" color={theme.color['gray/white']} size={36} {...props} />
 );
 
 export const MenuIcon = (props: Omit<IconProps, 'name'>) => (

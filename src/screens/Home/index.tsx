@@ -1,13 +1,13 @@
-import { DrawerNavigationProp } from '@react-navigation/drawer';
 import React from 'react';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import MainFeatureButton from '../../components/features/MainFeatureButton';
 import { ButtonContainer, HomeContainer } from './index.styles';
 import useModal from '../../hooks/useModal';
 import CustomModal from '../../components/common/CustomModal';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const Home = () => {
-  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
     isModalVisible,
     category: modalCategory,
