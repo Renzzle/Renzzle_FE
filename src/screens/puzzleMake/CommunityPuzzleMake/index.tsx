@@ -19,7 +19,7 @@ declare module 'react-native' {
   }
 }
 
-const CommunityPuzzleMake = async () => {
+const CommunityPuzzleMake = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [title, setTitle] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
@@ -33,7 +33,9 @@ const CommunityPuzzleMake = async () => {
   const verifySequence = async () => {
     console.log('start');
     try {
+      console.log('검증시작');
       const result = await VCFSearchJNI.findVCFWrapper(sequence);
+      console.log('검증끝');
       console.log('VCF Wrapper Result: ', result);
       console.log('Depth: ' + depth);
       setDepth(result);

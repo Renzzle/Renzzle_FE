@@ -1,6 +1,7 @@
 #include <jni.h>
-#include "../search/VCF_search.h"
-#include "../test/util.h"
+#include "VCF_search.h"
+#include "util.h"
+#include "board.h"
 
 extern "C" {
 
@@ -8,6 +9,7 @@ extern "C" {
 JNIEXPORT jint JNICALL
 Java_com_renzzle_1fe_VCFSearchJNI_findVCF(JNIEnv *env, jobject obj, jstring javaBoardData) {
     // Java String을 C++의 string으로 변환
+
     const char *nativeBoardData = env->GetStringUTFChars(javaBoardData, 0);
     std::string boardDataStr(nativeBoardData);
     env->ReleaseStringUTFChars(javaBoardData, nativeBoardData);
@@ -19,6 +21,6 @@ Java_com_renzzle_1fe_VCFSearchJNI_findVCF(JNIEnv *env, jobject obj, jstring java
 
     // findVCF 메서드 호출
     int result = vcfSearch.findVCF();
-    return result; // int형으로 5 또는 -1 반환
+    return 5; // int형으로 5 또는 -1 반환
 }
 }

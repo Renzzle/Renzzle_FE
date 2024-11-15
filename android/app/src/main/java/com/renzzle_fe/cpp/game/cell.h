@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.cpp"
+#include "types.h"
 #include <cassert>
 
 // Class representing a single cell in the board
