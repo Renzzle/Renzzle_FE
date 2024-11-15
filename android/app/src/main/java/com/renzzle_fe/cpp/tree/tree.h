@@ -8,21 +8,25 @@
 
 struct Node {
     Board board;
-    Value value;
+    Value actualValue;
+    Value evaluatedValue;
     Result result;
-    std::unordered_map<size_t, std::shared_ptr<Node>> childNodes;
+    unordered_map<size_t, shared_ptr<Node>> childNodes;
+    int height;
 
-    Node(Board b) : board(b), value(INITIAL_VALUE), result(ONGOING) {}
+    Node(Board b) : board(b), actualValue(INITIAL_VALUE), evaluatedValue(INITIAL_VALUE), result(ONGOING), height(0) {}
 };
 
 class Tree {
 
 private:
-    std::unordered_map<size_t, std::shared_ptr<Node>> nodeMap;
+    unordered_map<size_t, shared_ptr<Node>> nodeMap;
 
 public:
-    void addNodeAsRoot(std::shared_ptr<Node> node);
-    void addNode(std::shared_ptr<Node> parentNode, std::shared_ptr<Node> node);
-    std::shared_ptr<Node> createNode(Board board);
+    void addNodeAsRoot(shared_ptr<Node> node);
+    void addNode(shared_ptr<Node> parentNode, shared_ptr<Node> node);
+    void cleanTree();
+    shared_ptr<Node> createNode(Board board);
     bool exist(Board& board);
+
 };

@@ -1,5 +1,9 @@
 # search-lib 라이브러리 추가 및 소스 파일 지정
-add_library(search-lib vcf_search.cpp)
+add_library(search-lib
+        search.cpp
+        search_monitor.cpp
+        VCF_search.cpp
+)
 
 # include 디렉터리 설정
 target_include_directories(search-lib PUBLIC

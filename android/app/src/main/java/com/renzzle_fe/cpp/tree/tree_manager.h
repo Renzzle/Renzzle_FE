@@ -8,14 +8,15 @@ class TreeManager {
 
 private:
     static Tree tree;
-    std::shared_ptr<Node> currentNode;
-    std::stack<std::shared_ptr<Node>> nodeHistory;
+    shared_ptr<Node> currentNode;
+    std::stack<shared_ptr<Node>> nodeHistory;
 
 public:
     TreeManager(Board initialBoard);
     bool move(Pos p);
     void undo();
-    bool isVisited(Pos p);
+    void cleanCache();
     Board& getBoard();
+    shared_ptr<Node> getChildNode(Pos p);
+    shared_ptr<Node> getNode();
 };
-
