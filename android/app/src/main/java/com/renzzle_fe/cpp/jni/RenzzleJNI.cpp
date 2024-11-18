@@ -44,7 +44,7 @@ Java_com_renzzle_1fe_UserAgainstActionJNI_reactUserMove(JNIEnv *env, jobject obj
     if (nextMove.isDefault()) return -1;
     board.move(nextMove);
     if (board.getResult() != ONGOING) return -1;
-    int result = nextMove.getY() * 15 + nextMove.getX();
+    int result = (nextMove.getY() - 1) * 15 + nextMove.getX() - 1;
     return result;
 }
 

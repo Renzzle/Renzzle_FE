@@ -32,7 +32,7 @@ export const MODAL_TEXTS = {
   PUZZLE_FAILURE: {
     TITLE: '퍼즐 풀기 실패',
     BODY: '수 제한 이내에 오목을 만들지 못하였습니다.',
-    FOOTER: ['재시도', '나가기'],
+    FOOTER: '나가기',
   },
   VALIDATION_COMPLETE: {
     TITLE: '검증이 완료되었습니다.',

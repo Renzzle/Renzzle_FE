@@ -48,7 +48,9 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
 
       const letter = convertToLowercaseAlphabet(stoneY);
       const number = convertToReverseNumber(stoneX).toString();
-      setSequence(localSequence + letter + number); // make용
+      if (mode === 'make') {
+        setSequence(localSequence + letter + number); // make용
+      }
       // sequence = sequence + letter + number;
 
 

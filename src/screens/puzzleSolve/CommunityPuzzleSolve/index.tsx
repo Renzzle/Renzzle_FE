@@ -7,8 +7,11 @@ import GameStatusIndicator from '../../../components/features/GameStatusIndicato
 import Board from '../../../components/features/Board';
 import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { id, boardStatus, title, author, description } = route.params;
   const [isWin, setIsWin] = useState<boolean | null>(null);
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
@@ -16,13 +19,16 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   useEffect(() => {
     if (isWin) {
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
-        primaryAction: () => {},
+        primaryAction: () => {
+          navigation.navigate('CommunityPuzzleList');
+        },
       });
     }
     if (isWin === false) {
       activateModal('PUZZLE_FAILURE', {
-        primaryAction: () => {},
-        secondaryAction: () => {},
+        primaryAction: () => {
+          navigation.navigate('CommunityPuzzleList');
+        },
       });
     }
   }, [isWin]);
