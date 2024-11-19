@@ -20,6 +20,7 @@ const CommunityPuzzleList = () => {
 
   useEffect(() => {
     const loadPuzzleList = async () => {
+      // console.log(`token: ${process.env.ACCESS_TOKEN}`);
       const data = await getPuzzle(`${process.env.ACCESS_TOKEN}`, 100);
       setPuzzleList(data);
     };

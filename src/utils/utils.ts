@@ -30,6 +30,17 @@ export const convertLowercaseAlphabetToNumber = (char: string): number => {
   return char.charCodeAt(0) - 97;
 };
 
+export const valueToCoordinates = (value: number): { x: number; y: number } | null => {
+  if (value < 0 || value >= BOARD_SIZE * BOARD_SIZE) {
+    return null;
+  }
+
+  const y = Math.floor(value / BOARD_SIZE);
+  const x = BOARD_SIZE - 1 - (value % BOARD_SIZE);
+
+  return { x, y };
+};
+
 export const toDifficultyEnum = (key: string): Difficulty | undefined => {
   switch (key) {
     case 'HIGH':

@@ -1,5 +1,7 @@
 package com.renzzle_fe;
 
+import android.util.Log;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -25,6 +27,7 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
     @ReactMethod
     public void calculateSomethingWrapper(String boardData, Promise promise) {
         try {
+            Log.d("JNI", "calculateSomethingWrapper: boardData" + boardData);
             int result = reactUserMove(boardData); // 전달받은 값을 네이티브로 전달
             promise.resolve(result);
         } catch (Exception e) {
