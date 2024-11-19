@@ -34,6 +34,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const { UserAgainstActionJNI } = NativeModules;
   const [localSequence, setLocalSequence] = useState(sequence);
+  const [confirmPut, setConfirmPut] = useState<boolean>(false);
 
   const updateBoard = (x: number, y: number) => {
     const newBoard = board.map((row) => [...row]); // copy row
@@ -50,14 +51,13 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
     if (mode === 'make') {
       setSequence(updatedSequence);
     }
-    return updatedSequence;
   };
 
   const handlePut = async () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
       if (board[stoneX][stoneY] !== 0) {return;}
 
-      const updatedSequence = addToSequence(stoneX, stoneY);
+      addToSequence(stoneX, stoneY);
       updateBoard(stoneX, stoneY);
       setIsBlackTurn(!isBlackTurn);
       setStoneX(null);
@@ -65,7 +65,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
 
       if (mode === 'solve') {
         setIsDisabled(true);
-        await handleAiTurn(updatedSequence);
+        setConfirmPut(true); // user put ok
       }
     }
   };
@@ -91,12 +91,22 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
         addToSequence(x,y);
         updateBoard(x, y);
         setIsBlackTurn(!isBlackTurn);
+        setConfirmPut(false);
         setIsDisabled(false);
       }
     };
 
     processAiAnswer();
   }, [aiAnswer]);
+
+  useEffect(() => {
+    const userPutComplete = async () => {
+      await handleAiTurn(localSequence);
+    };
+    if (confirmPut && mode === 'solve') {
+      userPutComplete();
+    }
+  }, [localSequence, confirmPut]);
 
   const initializeBoard = () => {
     const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
