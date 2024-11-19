@@ -34,112 +34,78 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const { UserAgainstActionJNI } = NativeModules;
   const [localSequence, setLocalSequence] = useState(sequence);
-  const [confirmPut, setConfirmPut] = useState<boolean>(false);
 
-  const updateBoard = (x: number, y: number,) => {
+  const updateBoard = (x: number, y: number) => {
     const newBoard = board.map((row) => [...row]); // copy row
     newBoard[x][y] = isBlackTurn ? 1 : 2;
     setBoard(newBoard);
+  };
+
+  const addToSequence = (x: number, y: number) => {
+    const letter = convertToLowercaseAlphabet(y);
+    const number = convertToReverseNumber(x).toString();
+    const updatedSequence = localSequence + letter + number;
+    setLocalSequence(updatedSequence);
+
+    if (mode === 'make') {
+      setSequence(updatedSequence);
+    }
+    return updatedSequence;
   };
 
   const handlePut = async () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
       if (board[stoneX][stoneY] !== 0) {return;}
 
-      const letter = convertToLowercaseAlphabet(stoneY);
-      const number = convertToReverseNumber(stoneX).toString();
-      if (mode === 'make') {
-        setSequence(localSequence + letter + number); // make용
-      }
-      // sequence = sequence + letter + number;
-
-
-      await new Promise<void>((resolve) => {
-        setLocalSequence((prevSequence) => {
-          const updatedSequence = prevSequence + letter + number;
-          resolve(); // 상태 업데이트 완료 후 resolve
-          return updatedSequence;
-        });
-      });
-      console.log('Sequence1: ' + localSequence);
-
+      const updatedSequence = addToSequence(stoneX, stoneY);
       updateBoard(stoneX, stoneY);
-
       setIsBlackTurn(!isBlackTurn);
       setStoneX(null);
       setStoneY(null);
+
       if (mode === 'solve') {
-        console.log('solve!!!');
-        setConfirmPut(true);
         setIsDisabled(true);
+        await handleAiTurn(updatedSequence);
       }
     }
   };
 
-  useEffect(() => {
-    if (confirmPut === true && mode === 'solve') {
-      console.log('AI 작업 시작: ' + localSequence);
-      handleAiPut();
-    }
-  }, [confirmPut]);
-
-  const handleAiPut = async () => {
-    await getAiAnswer();
-  };
-
-  const getAiAnswer = async () => {
+  const handleAiTurn = async (userSequence: string) => {
     try {
-      setConfirmPut(false);
-      console.log('Sequence2: ' + localSequence);
-      const result = await UserAgainstActionJNI.calculateSomethingWrapper(localSequence);
-      if (result === -1 && setIsWin !== undefined) {setIsWin(false);}
-      if (result === 1000 && setIsWin !== undefined) {setIsWin(true);}
-      console.log('AI Answer Result: ', result);
+      const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
+      if (result === -1) {setIsWin?.(false);}
+      if (result === 1000) {setIsWin?.(true);}
       setAiAnswer(result);
     } catch (error) {
-      console.error('AI Answer failed: ', error);
+      console.error('AI computation failed: ', error);
     }
   };
 
   useEffect(() => {
-    if (aiAnswer !== undefined) {
-      console.log('세팅들어옴!!!!');
-      const coordinates = valueToCoordinates(aiAnswer);
+    const processAiAnswer = async () => {
+      if (aiAnswer !== null && aiAnswer !== undefined) {
+        const coordinates = valueToCoordinates(aiAnswer);
+        if (!coordinates) {return;}
 
-      if (coordinates) {
         const { x, y } = coordinates;
-        console.log('setX: ' + x + ' | setY: ' + y);
-
+        addToSequence(x,y);
         updateBoard(x, y);
-        const letter = convertToLowercaseAlphabet(y);
-        const number = convertToReverseNumber(x).toString();
-
-        setLocalSequence((prevSequence) => prevSequence + letter + number);
-        console.log('Sequence3ai:' + localSequence);
-        // sequence = sequence + letter + number;
+        setIsBlackTurn(!isBlackTurn);
+        setIsDisabled(false);
       }
+    };
 
-      setIsDisabled(false);
-      setIsBlackTurn(!isBlackTurn);
-    }
+    processAiAnswer();
   }, [aiAnswer]);
 
-  const handlePlaceStone = (x: number, y: number) => {
-    setStoneX(x);
-    setStoneY(y);
-  };
+  const initializeBoard = () => {
+    const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
+    let turn = true;
 
-  const applySequenceToBoard = () => {
-    const newBoard = Array.from({ length: BOARD_SIZE }, () =>
-      Array(BOARD_SIZE).fill(0)
-    );
-
-    let localIsBlackTurn = true; // 로컬 변수로 관리
     let i = 0;
     while (i < sequence.length) {
       const letter = sequence[i];
       const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/);
-
       if (!numberMatch) {
         console.error(`Invalid sequence format at index ${i}: ${sequence}`);
         break;
@@ -149,25 +115,20 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
       const x = convertToReverseNumber(parseInt(number, 10));
       const y = convertLowercaseAlphabetToNumber(letter);
 
-      // Skip invalid coordinates
-      if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) {
-        console.warn(`Skipping invalid coordinate: (${letter}${number})`);
-        i += 1 + number.length;
-        continue;
+      if (x >= 0 || x < BOARD_SIZE || y >= 0 || y < BOARD_SIZE) {
+        newBoard[x][y] = turn ? 1 : 2;
+        turn = !turn;
       }
-
-      newBoard[x][y] = localIsBlackTurn ? 1 : 2; // Black = 1, White = 2
-      localIsBlackTurn = !localIsBlackTurn; // Switch turn
       i += 1 + number.length;
     }
 
     setBoard(newBoard);
-    setIsBlackTurn(localIsBlackTurn); // 최종 값 상태에 반영
+    setIsBlackTurn(turn);
   };
 
   useEffect(() => {
-    applySequenceToBoard();
-  }, []);
+    initializeBoard();
+  }, [sequence]);
 
   return (
     <BoardAndPutContainer>
@@ -186,7 +147,18 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
         {board.map((row, x) => (
           <StoneRow key={x}>
             {row.map((cell, y) => (
-              <Cell key={`${x}-${y}`} pos={`${x}-${y}`} stone={cell} cellWidth={cellWidth} stoneX={stoneX} stoneY={stoneY} onPress={() => handlePlaceStone(x, y)} />
+              <Cell
+                key={`${x}-${y}`}
+                pos={`${x}-${y}`}
+                stone={cell}
+                cellWidth={cellWidth}
+                stoneX={stoneX}
+                stoneY={stoneY}
+                onPress={() => {
+                  setStoneX(x);
+                  setStoneY(y);
+                }}
+              />
             ))}
           </StoneRow>
         ))}
@@ -212,13 +184,10 @@ const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress }: CellProps) => 
     <CellContainer onPress={onPress} cellWidth={cellWidth}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
+      ) : pos === `${stoneX}-${stoneY}` ? (
+        <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
       ) : (
-        (pos === `${stoneX}-${stoneY}`) ? (
-          <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
-        ) : (
-          (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') && (
-            <IndicatePoint />
-          ))
+        (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') && <IndicatePoint />
       )}
     </CellContainer>
   );
