@@ -99,7 +99,12 @@ const CommunityPuzzleMake = () => {
 
   return (
     <MakeContainer>
-      {isModalVisible && <CustomModal isVisible={isModalVisible} category={modalCategory} onPrimaryAction={closePrimarily} onSecondaryAction={closeSecondarily} />}
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}
+      />
 
       <TextInputContainer>
         <CustomTextInput

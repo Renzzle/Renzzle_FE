@@ -35,7 +35,12 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
 
   return (
     <SolveContainer>
-      {isModalVisible && <CustomModal isVisible={isModalVisible} category={modalCategory} onPrimaryAction={closePrimarily} onSecondaryAction={closeSecondarily} />}
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}
+      />
 
       <PuzzleHeader
         title={title}
