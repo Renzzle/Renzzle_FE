@@ -7,7 +7,7 @@ import CircleButton from '../CircleButton';
 import { AppIcon } from '../../common/Icons';
 import theme from '../../../styles/theme';
 import { BOARD_SIZE, convertLowercaseAlphabetToNumber, convertToLowercaseAlphabet, convertToReverseNumber, valueToCoordinates } from '../../../utils/utils';
-import { NativeModules } from 'react-native';
+import { NativeModules, ViewStyle } from 'react-native';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -188,11 +188,12 @@ interface CellProps {
   stoneY: number | null | undefined;
   onPress: () => void;
   showHighlights?: boolean;
+  style?: ViewStyle;
 }
 
-export const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress, showHighlights = true }: CellProps) => {
+export const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress, showHighlights = true, style }: CellProps) => {
   return (
-    <CellContainer onPress={onPress} cellWidth={cellWidth}>
+    <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (

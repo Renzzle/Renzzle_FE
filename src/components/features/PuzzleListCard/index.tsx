@@ -37,4 +37,4 @@ const PuzzleListCard = ({title, author = 'Renzzle', description, sequence, isLoc
   );
 };
 
-export default PuzzleListCard;
+export default React.memo(PuzzleListCard);
