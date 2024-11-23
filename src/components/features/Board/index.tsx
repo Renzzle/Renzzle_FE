@@ -1,3 +1,4 @@
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { BoardAndPutContainer, BoardBackground, CellContainer, FramContainer, FrameCell, FrameRow, IndicatePoint, PutButtonContainer, Stone, StoneRow } from './index.styles';
@@ -7,7 +8,7 @@ import CircleButton from '../CircleButton';
 import { AppIcon } from '../../common/Icons';
 import theme from '../../../styles/theme';
 import { BOARD_SIZE, convertLowercaseAlphabetToNumber, convertToLowercaseAlphabet, convertToReverseNumber, valueToCoordinates } from '../../../utils/utils';
-import { NativeModules } from 'react-native';
+import { NativeModules, ViewStyle } from 'react-native';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -16,9 +17,11 @@ interface BoardProps {
   sequence: string;
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
+  setIsLoading?: (isLoading: boolean | null) => void;
+  winDepth?: number;
 }
 
-const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
+const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDepth }: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -35,6 +38,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
   const { UserAgainstActionJNI } = NativeModules;
   const [localSequence, setLocalSequence] = useState(sequence);
   const [confirmPut, setConfirmPut] = useState<boolean>(false);
+  const [depth, setDepth] = useState(0);
 
   const updateBoard = (x: number, y: number) => {
     const newBoard = board.map((row) => [...row]); // copy row
@@ -64,7 +68,9 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
       setStoneY(null);
 
       if (mode === 'solve') {
+        setDepth((prevDepth) => prevDepth + 1);
         setIsDisabled(true);
+        setIsLoading?.(true);
         setConfirmPut(true); // user put ok
       }
     }
@@ -93,6 +99,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
         setIsBlackTurn(!isBlackTurn);
         setConfirmPut(false);
         setIsDisabled(false);
+        setIsLoading?.(false);
       }
     };
 
@@ -105,8 +112,15 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
     };
     if (confirmPut && mode === 'solve') {
       userPutComplete();
+      setDepth((prevDepth) => prevDepth + 1);
     }
   }, [localSequence, confirmPut]);
+
+  useEffect(() => {
+    if (winDepth !== undefined && depth >= winDepth) {
+      setIsWin?.(false);
+    }
+  }, [depth, winDepth]);
 
   const initializeBoard = () => {
     const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
@@ -134,6 +148,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
 
     setBoard(newBoard);
     setIsBlackTurn(turn);
+    setDepth(0);
   };
 
   useEffect(() => {
@@ -187,18 +202,21 @@ interface CellProps {
   stoneX: number | null | undefined;
   stoneY: number | null | undefined;
   onPress: () => void;
+  showHighlights?: boolean;
+  style?: ViewStyle;
 }
 
-const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress }: CellProps) => {
+export const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress, showHighlights = true, style }: CellProps) => {
   return (
-    <CellContainer onPress={onPress} cellWidth={cellWidth}>
+    <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
-      ) : pos === `${stoneX}-${stoneY}` ? (
+      ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
         <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
-      ) : (
-        (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') && <IndicatePoint />
-      )}
+      ) : showHighlights &&
+        (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') ? (
+        <IndicatePoint />
+      ) : null}
     </CellContainer>
   );
 };

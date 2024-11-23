@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { CommunityPuzzleSolveProps } from '../../../components/features/ParamList/index.types';
 import { IndicatorContainer, SolveContainer } from './index.styles';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
-import GameStatusIndicator from '../../../components/features/GameStatusIndicator';
+import GameStatusIndicator, { IndicatorCategoryType } from '../../../components/features/GameStatusIndicator';
 import Board from '../../../components/features/Board';
 import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
@@ -12,9 +12,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const { id, boardStatus, title, author, description } = route.params;
+  const { id, boardStatus, title, author, description, depth } = route.params;
   const [isWin, setIsWin] = useState<boolean | null>(null);
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
+  const [isLoading, setIsLoading] = useState<boolean | null>(null);
+  const [category, setCategory] = useState<IndicatorCategoryType>();
 
   useEffect(() => {
     if (isWin) {
@@ -33,9 +35,19 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
     }
   }, [isWin]);
 
+  useEffect(() => {
+    console.log('isLoading!!!:', isLoading);
+    isLoading ? setCategory('AI_MOVE_IN_PROGRESS') : setCategory(undefined);
+  }, [isLoading]);
+
   return (
     <SolveContainer>
-      {isModalVisible && <CustomModal isVisible={isModalVisible} category={modalCategory} onPrimaryAction={closePrimarily} onSecondaryAction={closeSecondarily} />}
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}
+      />
 
       <PuzzleHeader
         title={title}
@@ -46,10 +58,17 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
       />
 
       <IndicatorContainer>
-        <GameStatusIndicator />
+        <GameStatusIndicator category={category} />
       </IndicatorContainer>
 
-      <Board mode="solve" sequence={boardStatus} setSequence={() => {}} setIsWin={setIsWin} />
+      <Board
+        mode="solve"
+        sequence={boardStatus}
+        setSequence={() => {}}
+        setIsWin={setIsWin}
+        setIsLoading={setIsLoading}
+        winDepth={depth}
+      />
     </SolveContainer>
   );
 };

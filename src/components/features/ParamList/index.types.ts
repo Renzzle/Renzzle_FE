@@ -8,6 +8,7 @@ type RootStackParamList = {
     title: string;
     author: string;
     description: string;
+    depth: number;
   };
   OtherScreen: undefined;
 };
