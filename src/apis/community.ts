@@ -1,4 +1,5 @@
-import { HTTP_HEADERS, HTTP_HEADERS_VALUES, HTTP_METHODS } from './constants';
+import { HTTP_HEADERS } from './constants';
+import { apiClient } from './interceptor';
 
 export const getPuzzle = async (
   authStore: string,
@@ -7,29 +8,23 @@ export const getPuzzle = async (
   id?: number,
 ) => {
   try {
-    const params = new URLSearchParams();
-    if (id !== undefined) {params.append('id', id.toString());}
-    if (size !== undefined) {params.append('size', size.toString());}
-    if (sort !== undefined) {params.append('sort', sort);}
+    const params: Record<string, string | number> = {};
+    if (id !== undefined) {params.id = id;}
+    if (size !== undefined) {params.size = size;}
+    if (sort !== undefined) {params.sort = sort;}
 
-    const response = await fetch(`${process.env.API_URL}/api/community/puzzle?${params.toString()}`, {
-      method: HTTP_METHODS.GET,
+    const response = await apiClient.get('/api/community/puzzle', {
       headers: {
-        [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
         [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
       },
+      params,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData?.errorResponse?.message || 'An unknown error occurred.';
-      throw new Error(`HTTP error! status: ${response.status} / message: ${errorMessage}`);
-    }
+    console.log('Request URL:', `${process.env.API_URL}/api/community/puzzle`);
+    console.log('Request Params:', params);
 
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
-    console.error('Error fetching data: ', error);
     throw error;
   }
 };
@@ -43,26 +38,18 @@ export const uploadPuzzle = async (
   authStore: string,
 ) => {
   try {
-    const response = await fetch(`${process.env.API_URL}/api/community/puzzle`, {
-      method: HTTP_METHODS.POST,
-      headers: {
-        [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
-        [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
-      },
-      body: JSON.stringify({ title, boardStatus, depth, difficulty, winColor }),
-    });
+    const response = await apiClient.post(
+      '/api/community/puzzle',
+      { title, boardStatus, depth, difficulty, winColor },
+      {
+        headers: {
+          [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
+        },
+      }
+    );
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData?.errorResponse?.message || 'An unknown error occurred.';
-      const errorCode = errorData?.errorResponse?.code || 'An unknown error occurred.';
-      throw new Error(`HTTP error! status: ${response.status} / code: ${errorCode} / message: ${errorMessage}`);
-    }
-
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
-    console.error('Error fetching data: ', error);
     throw error;
   }
 };

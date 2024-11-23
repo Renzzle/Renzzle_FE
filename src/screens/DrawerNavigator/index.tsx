@@ -1,14 +1,26 @@
 import { createDrawerNavigator, DrawerNavigationOptions } from '@react-navigation/drawer';
-import React from 'react';
+import React, { useEffect } from 'react';
 import theme from '../../styles/theme';
 import DrawerMenuButton from '../../components/features/DrawerMenuButton';
 import GoBackButton from '../../components/features/GoBackButton';
 import Home from '../Home';
 import HeaderLogoIcon from '../../components/features/HeaderLogoIcon';
 import LikedPuzzleList from '../puzzleList/LikedPuzzleList';
+import useAuthStore from '../../store/useAuthStore';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
+  const { accessToken } = useAuthStore();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigation.navigate('Signin');
+    }
+  });
+
   return (
     <Drawer.Navigator
       screenOptions={{
