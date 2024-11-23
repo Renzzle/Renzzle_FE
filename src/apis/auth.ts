@@ -22,7 +22,7 @@ export const updateEmailAuthCode = async (email: string) => {
   }
 };
 
-export const login = async (email: string, password: string) => {
+export const getAuth = async (email: string, password: string) => {
   try {
     const response = await fetch(`${process.env.API_URL}/api/auth/login` , {
       method: HTTP_METHODS.POST,
@@ -33,10 +33,13 @@ export const login = async (email: string, password: string) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      const errorMessage = errorData?.errorResponse?.message || 'An unknown error occurred.';
+      throw new Error(`HTTP error! status: ${response.status} / message: ${errorMessage}`);
     }
 
     const data = await response.json();
+    console.log('로그인데이터:', data);
     return data;
   } catch (error) {
     console.error('Error fetching data: ', error);

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import PuzzleListCard from '../../../components/features/PuzzleListCard';
 import { AddButtonContainer, CardsContainer, PuzzleListContainer } from './index.styles';
@@ -9,10 +10,12 @@ import { getPuzzle } from '../../../apis/community';
 import { CommunityPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import useAuthStore from '../../../store/useAuthStore';
 
 const CommunityPuzzleList = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [puzzleList, setPuzzleList] = useState<CommunityPuzzleListResponse>();
+  const { accessToken } = useAuthStore();
 
   const handleAddPuzzle = () => {
     navigation.navigate('CommunityPuzzleMake');
@@ -21,11 +24,18 @@ const CommunityPuzzleList = () => {
   useEffect(() => {
     const loadPuzzleList = async () => {
       // console.log(`token: ${process.env.ACCESS_TOKEN}`);
-      const data = await getPuzzle(`${process.env.ACCESS_TOKEN}`, 100);
-      setPuzzleList(data);
+      if (accessToken === undefined) {
+        alert('accesstoken 없음');
+        navigation.navigate('Signin');
+      }
+      else {
+        const data = await getPuzzle(accessToken, 100);
+        setPuzzleList(data);
+      }
+
     };
     loadPuzzleList();
-  });
+  }, []);
 
   return (
     <PuzzleListContainer>
