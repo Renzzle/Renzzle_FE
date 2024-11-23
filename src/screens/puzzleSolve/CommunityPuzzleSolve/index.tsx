@@ -12,7 +12,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const { id, boardStatus, title, author, description } = route.params;
+  const { id, boardStatus, title, author, description, depth } = route.params;
   const [isWin, setIsWin] = useState<boolean | null>(null);
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
@@ -61,7 +61,14 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
         <GameStatusIndicator category={category} />
       </IndicatorContainer>
 
-      <Board mode="solve" sequence={boardStatus} setSequence={() => {}} setIsWin={setIsWin} setIsLoading={setIsLoading} />
+      <Board
+        mode="solve"
+        sequence={boardStatus}
+        setSequence={() => {}}
+        setIsWin={setIsWin}
+        setIsLoading={setIsLoading}
+        winDepth={depth}
+      />
     </SolveContainer>
   );
 };

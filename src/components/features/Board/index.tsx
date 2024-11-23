@@ -1,3 +1,4 @@
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { BoardAndPutContainer, BoardBackground, CellContainer, FramContainer, FrameCell, FrameRow, IndicatePoint, PutButtonContainer, Stone, StoneRow } from './index.styles';
@@ -17,9 +18,10 @@ interface BoardProps {
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
   setIsLoading?: (isLoading: boolean | null) => void;
+  winDepth?: number;
 }
 
-const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading }: BoardProps) => {
+const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDepth }: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -36,6 +38,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading }: Boa
   const { UserAgainstActionJNI } = NativeModules;
   const [localSequence, setLocalSequence] = useState(sequence);
   const [confirmPut, setConfirmPut] = useState<boolean>(false);
+  const [depth, setDepth] = useState(0);
 
   const updateBoard = (x: number, y: number) => {
     const newBoard = board.map((row) => [...row]); // copy row
@@ -65,6 +68,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading }: Boa
       setStoneY(null);
 
       if (mode === 'solve') {
+        setDepth((prevDepth) => prevDepth + 1);
         setIsDisabled(true);
         setIsLoading?.(true);
         setConfirmPut(true); // user put ok
@@ -108,8 +112,15 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading }: Boa
     };
     if (confirmPut && mode === 'solve') {
       userPutComplete();
+      setDepth((prevDepth) => prevDepth + 1);
     }
   }, [localSequence, confirmPut]);
+
+  useEffect(() => {
+    if (winDepth !== undefined && depth >= winDepth) {
+      setIsWin?.(false);
+    }
+  }, [depth, winDepth]);
 
   const initializeBoard = () => {
     const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
@@ -137,6 +148,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading }: Boa
 
     setBoard(newBoard);
     setIsBlackTurn(turn);
+    setDepth(0);
   };
 
   useEffect(() => {

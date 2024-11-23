@@ -24,7 +24,6 @@ const CommunityPuzzleList = () => {
   useFocusEffect(
     useCallback(() => {
       const loadPuzzleList = async () => {
-        // console.log(`token: ${process.env.ACCESS_TOKEN}`);
         if (accessToken === undefined) {
           alert('accesstoken 없음');
           navigation.navigate('Signin');
@@ -68,6 +67,7 @@ const CommunityPuzzleList = () => {
                       title: puzzle.title,
                       author: puzzle.authorName,
                       description: `해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`,
+                      depth: puzzle.depth,
                     });
                   }}
                 />
