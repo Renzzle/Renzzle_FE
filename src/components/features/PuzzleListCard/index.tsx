@@ -9,17 +9,18 @@ interface PuzzleListCardProps {
   title: string;
   author: string;
   description: string;
+  sequence: string;
   isLocked?: boolean;
   bottom: () => React.ReactNode;
   onPress: () => void;
 }
 
-const PuzzleListCard = ({title, author = 'Renzzle', description, isLocked = false, bottom, onPress}: PuzzleListCardProps) => {
+const PuzzleListCard = ({title, author = 'Renzzle', description, sequence, isLocked = false, bottom, onPress}: PuzzleListCardProps) => {
   const { width } = useWindowDimensions();
   return (
     <CardContainer onPress={onPress} buttonWidth={width}>
       <CardTop>
-        <BoardPreview isLocked={isLocked} />
+        <BoardPreview isLocked={isLocked} sequence={sequence} />
         <CardInfoContainer>
           <View>
             <CustomText size={20} weight="bold" lineHeight="lg">{title}</CustomText>

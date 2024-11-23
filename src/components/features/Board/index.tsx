@@ -187,18 +187,20 @@ interface CellProps {
   stoneX: number | null | undefined;
   stoneY: number | null | undefined;
   onPress: () => void;
+  showHighlights?: boolean;
 }
 
-const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress }: CellProps) => {
+export const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress, showHighlights = true }: CellProps) => {
   return (
     <CellContainer onPress={onPress} cellWidth={cellWidth}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
-      ) : pos === `${stoneX}-${stoneY}` ? (
+      ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
         <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
-      ) : (
-        (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') && <IndicatePoint />
-      )}
+      ) : showHighlights &&
+        (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') ? (
+        <IndicatePoint />
+      ) : null}
     </CellContainer>
   );
 };
