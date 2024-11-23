@@ -16,9 +16,10 @@ interface BoardProps {
   sequence: string;
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
+  setIsLoading?: (isLoading: boolean | null) => void;
 }
 
-const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
+const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading }: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -65,6 +66,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
 
       if (mode === 'solve') {
         setIsDisabled(true);
+        setIsLoading?.(true);
         setConfirmPut(true); // user put ok
       }
     }
@@ -93,6 +95,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin }: BoardProps) => {
         setIsBlackTurn(!isBlackTurn);
         setConfirmPut(false);
         setIsDisabled(false);
+        setIsLoading?.(false);
       }
     };
 

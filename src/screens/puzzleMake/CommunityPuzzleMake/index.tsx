@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { IndicatorContainer, MakeContainer, TextInputContainer } from './index.styles';
 import Board from '../../../components/features/Board';
-import GameStatusIndicator from '../../../components/features/GameStatusIndicator';
+import GameStatusIndicator, { IndicatorCategoryType } from '../../../components/features/GameStatusIndicator';
 import CustomTextInput from '../../../components/common/CustomTextInput';
 import BottomButtonBar from '../../../components/common/BottomButtonBar';
 import { uploadPuzzle } from '../../../apis/community';
@@ -31,10 +31,14 @@ const CommunityPuzzleMake = () => {
   const { VCFSearchJNI } = NativeModules;
   const [depth, setDepth] = useState<number>();
 
+  const [category, setCategory] = useState<IndicatorCategoryType>();
+
   const verifySequence = async () => {
     try {
+      setCategory('AI_VALIDATION_IN_PROGRESS');
       const result = await VCFSearchJNI.findVCFWrapper(sequence);
       console.log('VCF Wrapper Result: ', result);
+      setCategory(undefined);
       setDepth(result);
     } catch (error) {
       console.error('VCF search failed: ', error);
@@ -115,7 +119,7 @@ const CommunityPuzzleMake = () => {
       </TextInputContainer>
 
       <IndicatorContainer>
-        <GameStatusIndicator />
+        <GameStatusIndicator category={category} />
       </IndicatorContainer>
 
       <Board mode="make" sequence={sequence} setSequence={setSequence} />
