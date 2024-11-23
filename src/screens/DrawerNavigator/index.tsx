@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createDrawerNavigator, DrawerNavigationOptions } from '@react-navigation/drawer';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import theme from '../../styles/theme';
 import DrawerMenuButton from '../../components/features/DrawerMenuButton';
 import GoBackButton from '../../components/features/GoBackButton';
@@ -12,14 +13,26 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
-  const { accessToken } = useAuthStore();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const { accessToken, restoreCredentials } = useAuthStore();
+  const [isRestoring, setIsRestoring] = useState(true);
 
   useEffect(() => {
-    if (!accessToken) {
-      navigation.navigate('Signin');
+    const initialize = async () => {
+      await restoreCredentials();
+      setIsRestoring(false);
+    };
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (!isRestoring) {
+      console.log('홈진입! 액세스토큰: ', accessToken);
+      if (accessToken === undefined) {
+        navigation.navigate('Signin');
+      }
     }
-  });
+  }, [isRestoring, accessToken]);
 
   return (
     <Drawer.Navigator
