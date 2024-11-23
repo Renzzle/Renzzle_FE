@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+
+import React, { useCallback, useState } from 'react';
 import PuzzleListCard from '../../../components/features/PuzzleListCard';
 import { AddButtonContainer, CardsContainer, PuzzleListContainer } from './index.styles';
 import TagSmall from '../../../components/common/TagSmall';
 import { ScrollView } from 'react-native';
 import CircleButton from '../../../components/features/CircleButton';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getPuzzle } from '../../../apis/community';
 import { CommunityPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
@@ -21,21 +21,28 @@ const CommunityPuzzleList = () => {
     navigation.navigate('CommunityPuzzleMake');
   };
 
-  useEffect(() => {
-    const loadPuzzleList = async () => {
-      // console.log(`token: ${process.env.ACCESS_TOKEN}`);
-      if (accessToken === undefined) {
-        alert('accesstoken 없음');
-        navigation.navigate('Signin');
-      }
-      else {
-        const data = await getPuzzle(accessToken, 100);
-        setPuzzleList(data);
-      }
+  useFocusEffect(
+    useCallback(() => {
+      const loadPuzzleList = async () => {
+        // console.log(`token: ${process.env.ACCESS_TOKEN}`);
+        if (accessToken === undefined) {
+          alert('accesstoken 없음');
+          navigation.navigate('Signin');
+        }
+        else {
+          try {
+            const data = await getPuzzle(accessToken, 100);
+            setPuzzleList(data);
+          } catch (error) {
+            throw error;
+          }
+        }
+      };
+      loadPuzzleList();
 
-    };
-    loadPuzzleList();
-  }, []);
+      return () => {};
+    }, [accessToken, navigation])
+  );
 
   return (
     <PuzzleListContainer>
