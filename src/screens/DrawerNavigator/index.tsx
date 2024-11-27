@@ -10,6 +10,7 @@ import LikedPuzzleList from '../puzzleList/LikedPuzzleList';
 import useAuthStore from '../../store/useAuthStore';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import CustomDrawerContent from '../../components/common/CustomDrawerContent';
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
@@ -36,6 +37,7 @@ const DrawerNavigator = () => {
 
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerPosition: 'right',
         drawerStyle: {
