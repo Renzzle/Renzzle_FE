@@ -33,9 +33,11 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: Puzzle
                 {title}
               </CustomText>
             </TitleTextContainer>
-            <TagSmall>
-              {puzzleNum && `No.${puzzleNum}`}
-            </TagSmall>
+            {puzzleNum &&
+              <TagSmall>
+                {`No.${puzzleNum}`}
+              </TagSmall>
+            }
           </TitleAndNumber>
 
           {like !== null ? (
@@ -47,9 +49,12 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: Puzzle
           )}
         </TopContainer>
 
-        <CustomText size={10} lineHeight="sm" color="gray/gray500">
-          {info}
-        </CustomText>
+        {info !== '' &&
+          <CustomText size={10} lineHeight="sm" color="gray/gray500">
+            {info}
+          </CustomText>
+        }
+
       </View>
 
       <AuthorContainer>
