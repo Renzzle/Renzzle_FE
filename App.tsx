@@ -26,7 +26,7 @@ function App(): React.JSX.Element {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="Signin"
         screenOptions={{
           headerStyle: {
             backgroundColor: theme.color['gray/grayBG'],

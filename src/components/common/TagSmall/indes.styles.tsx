@@ -4,6 +4,6 @@ import theme from '../../../styles/theme';
 
 export const TagContainer = styled(View)`
   background-color: ${theme.color['gray/gray50']};
-  padding: 1px 3px 2px;
+  padding: 2px 3px 1px;
   border-radius: 2px;
 `;

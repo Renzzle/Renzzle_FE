@@ -100,6 +100,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
         setConfirmPut(false);
         setIsDisabled(false);
         setIsLoading?.(false);
+        setDepth((prevDepth) => prevDepth + 1);
       }
     };
 
@@ -112,12 +113,11 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
     };
     if (confirmPut && mode === 'solve') {
       userPutComplete();
-      setDepth((prevDepth) => prevDepth + 1);
     }
   }, [localSequence, confirmPut]);
 
   useEffect(() => {
-    if (winDepth !== undefined && depth >= winDepth) {
+    if (winDepth !== undefined && depth > winDepth) {
       setIsWin?.(false);
     }
   }, [depth, winDepth]);
