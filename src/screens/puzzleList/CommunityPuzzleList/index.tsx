@@ -6,7 +6,7 @@ import TagSmall from '../../../components/common/TagSmall';
 import { ScrollView } from 'react-native';
 import CircleButton from '../../../components/features/CircleButton';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
-import { getPuzzle } from '../../../apis/community';
+import { getCommunityPuzzle } from '../../../apis/community';
 import { CommunityPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -30,7 +30,7 @@ const CommunityPuzzleList = () => {
         }
         else {
           try {
-            const data = await getPuzzle(accessToken, 100);
+            const data = await getCommunityPuzzle(accessToken, 100);
             setPuzzleList(data);
           } catch (error) {
             throw error;

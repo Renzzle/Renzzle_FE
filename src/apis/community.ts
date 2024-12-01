@@ -1,7 +1,7 @@
 import { HTTP_HEADERS } from './constants';
 import { apiClient } from './interceptor';
 
-export const getPuzzle = async (
+export const getCommunityPuzzle = async (
   authStore: string,
   size?: number,
   sort?: string,

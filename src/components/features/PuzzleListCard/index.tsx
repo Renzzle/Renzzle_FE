@@ -18,7 +18,7 @@ interface PuzzleListCardProps {
 const PuzzleListCard = ({title, author = 'Renzzle', description, sequence, isLocked = false, bottom, onPress}: PuzzleListCardProps) => {
   const { width } = useWindowDimensions();
   return (
-    <CardContainer onPress={onPress} buttonWidth={width}>
+    <CardContainer onPress={onPress} disabled={isLocked} buttonWidth={width}>
       <CardTop>
         <BoardPreview isLocked={isLocked} sequence={sequence} />
         <CardInfoContainer>
