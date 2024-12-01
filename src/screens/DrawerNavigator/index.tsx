@@ -11,6 +11,7 @@ import useAuthStore from '../../store/useAuthStore';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import CustomDrawerContent from '../../components/common/CustomDrawerContent';
+import SubscribePuzzleList from '../puzzleList/SubscribePuzzleList';
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
@@ -78,6 +79,26 @@ const DrawerNavigator = () => {
           ({ navigation }): DrawerNavigationOptions => ({
             headerLeft: () => <GoBackButton navigation={navigation} />,
             title: '좋아요',
+          })
+        }
+      />
+      <Drawer.Screen
+        name="SubscribePuzzleList"
+        component={SubscribePuzzleList}
+        options={
+          ({ navigation }): DrawerNavigationOptions => ({
+            headerLeft: () => <GoBackButton navigation={navigation} />,
+            title: '구독목록',
+          })
+        }
+      />
+      <Drawer.Screen
+        name="LevelSetting"
+        component={SubscribePuzzleList}
+        options={
+          ({ navigation }): DrawerNavigationOptions => ({
+            headerLeft: () => <GoBackButton navigation={navigation} />,
+            title: '내 수준 설정',
           })
         }
       />
