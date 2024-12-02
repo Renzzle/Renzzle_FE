@@ -24,3 +24,24 @@ export const getLessonPuzzle = async (
     throw error;
   }
 };
+
+export const updateLessonSolve = async (
+  authStore: string,
+  puzzleId: number,
+) => {
+  try {
+    const response = await apiClient.post(
+      '/api/lesson/solve',
+      { puzzleId },
+      {
+        headers: {
+          [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

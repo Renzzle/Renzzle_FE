@@ -9,6 +9,8 @@ import CustomModal from '../../../components/common/CustomModal';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
 import Board from '../../../components/features/Board';
 import useModal from '../../../hooks/useModal';
+import { updateLessonSolve } from '../../../apis/lesson';
+import useAuthStore from '../../../store/useAuthStore';
 
 const LessonPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -17,20 +19,23 @@ const LessonPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [category, setCategory] = useState<IndicatorCategoryType>();
+  const { refreshToken } = useAuthStore();
 
   useEffect(() => {
     if (isWin) {
       activateModal('LESSON_PUZZLE_SUCCESS', {
-        primaryAction: () => {
-          // TODO: lesson solve api
-          navigation.navigate('LessonPuzzleList', {chapter: 1}); // TODO: chapter 다양하게 고치기
+        primaryAction: async () => {
+          if (refreshToken !== undefined) {
+            await updateLessonSolve(refreshToken, id);
+          }
+          navigation.goBack();
         },
       });
     }
     if (isWin === false) {
       activateModal('PUZZLE_FAILURE', {
         primaryAction: () => {
-          navigation.navigate('LessonPuzzleList', {chapter: 1});
+          navigation.goBack();
         },
       });
     }
