@@ -5,6 +5,7 @@
 #include <cassert>
 #include <vector>
 #include <string>
+#include <sstream>
 #include "../game/board.h"
 
 #ifdef _WIN32
@@ -24,3 +25,5 @@ void printPatternCells(CellArray& cells, Piece p, Direction k);
 void printBoardPattern(Board& board, Piece p);
 
 void printPath(MoveList path);
+
+string pathToString(const MoveList& path);

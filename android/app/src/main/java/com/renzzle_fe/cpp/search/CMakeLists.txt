@@ -2,7 +2,7 @@
 add_library(search-lib
         search.cpp
         search_monitor.cpp
-        VCF_search.cpp
+        search_win.cpp
 )
 
 # include 디렉터리 설정
