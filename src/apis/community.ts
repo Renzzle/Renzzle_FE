@@ -20,9 +20,6 @@ export const getCommunityPuzzle = async (
       params,
     });
 
-    console.log('Request URL:', `${process.env.API_URL}/api/community/puzzle`);
-    console.log('Request Params:', params);
-
     return response.data;
   } catch (error) {
     throw error;

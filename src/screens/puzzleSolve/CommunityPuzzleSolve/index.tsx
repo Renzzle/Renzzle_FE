@@ -48,14 +48,14 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
     if (isWin) {
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
         primaryAction: () => {
-          navigation.navigate('CommunityPuzzleList');
+          navigation.goBack();
         },
       });
     }
     if (isWin === false) {
       activateModal('PUZZLE_FAILURE', {
         primaryAction: () => {
-          navigation.navigate('CommunityPuzzleList');
+          navigation.goBack();
         },
       });
     }

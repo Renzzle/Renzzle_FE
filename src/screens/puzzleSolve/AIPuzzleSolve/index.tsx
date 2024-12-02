@@ -75,7 +75,7 @@ const AIPuzzleSolve = () => {
       <PuzzleHeader
         title="AI Puzzle Challenge"
         info=""
-        author="Team Renzzle"
+        author="Renzzle"
         puzzleNum={undefined}
       />
 

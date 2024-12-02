@@ -19,9 +19,6 @@ export const getLessonPuzzle = async (
       params,
     });
 
-    console.log('Request URL:', `${process.env.API_URL}/api/lesson/${chapter}`);
-    console.log('Request Params:', params);
-
     return response.data;
   } catch (error) {
     throw error;
