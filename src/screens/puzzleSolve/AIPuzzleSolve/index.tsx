@@ -19,13 +19,14 @@ const AIPuzzleSolve = () => {
   const [category, setCategory] = useState<IndicatorCategoryType>();
 
   // TODO: ai api
-  // const { JNIModuleName } = NativeModules;
+  const { PuzzleGenerateJNI } = NativeModules;
   const [boardStatus, setBoardStatus] = useState('h8h9i8g8i10i9h11g12j9i11j11k10h7i7');
-  const [depth, setDepth] = useState(7);
+  const [depth, setDepth] = useState(100);
 
   const generatePuzzle = async () => {
     try {
-      // const sequence = await JNIModuleName.JNIfunctionName();
+      const sequence = await PuzzleGenerateJNI.generatePuzzleWrapper();
+      setBoardStatus(sequence);
     } catch (error) {
       console.error('Puzzle generate failed: ', error);
     }
@@ -86,7 +87,7 @@ const AIPuzzleSolve = () => {
       <Board
         mode="solve"
         sequence={boardStatus}
-        setSequence={() => {}}
+        setSequence={setBoardStatus}
         setIsWin={setIsWin}
         setIsLoading={setIsLoading}
         winDepth={depth}

@@ -27,12 +27,12 @@ export const getCommunityPuzzle = async (
 };
 
 export const uploadPuzzle = async (
+  authStore: string,
   title: string,
   boardStatus: string,
   depth: number,
   difficulty: string,
   winColor: string,
-  authStore: string,
 ) => {
   try {
     const response = await apiClient.post(

@@ -13,17 +13,26 @@ export const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('Error!!: ' + error);
+    const errorResponse = error.response?.data?.errorResponse;
+    const errorMessage = errorResponse?.message || error.message || 'An unknown error occurred.';
+    const errorStatus = errorResponse?.status || 'Unknown Status';
+    const errorCode = errorResponse?.code || error.code || 'Unknown Code';
+    console.error('errorMessage: ' + errorMessage);
+    console.error('errorStatus: ' + errorStatus);
+    console.error('errorCode: ' + errorCode);
+
     if (axios.isAxiosError(error)) {
       const errorResponse = error.response?.data?.errorResponse;
 
       const errorMessage = errorResponse?.message || error.message || 'An unknown error occurred.';
       const errorStatus = errorResponse?.status || 'Unknown Status';
       const errorCode = errorResponse?.code || error.code || 'Unknown Code';
-      const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+      // const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
       if (errorCode === 'J4010') {
         console.log('Access Token 만료!!');
-        navigation.navigate('Signin');
+        // navigation.navigate('Signin');
         return Promise.resolve({
           data: null,
           status: 401,
