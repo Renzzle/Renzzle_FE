@@ -53,7 +53,7 @@ const LessonPuzzleList = ({ route }: LessonPuzzleListProps) => {
                   author="Renzzle"
                   description={`깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
                   sequence={puzzle.boardStatus}
-                  isLocked={puzzle.isLocked}
+                  isLocked={!puzzle.isLocked}  // TODO: 잠금 - 심각!!!!! 서버에서 locked T/F 바꾸면 바꿔주기
                   bottom={() => (
                     <CustomText size={10} lineHeight="sm" color="gray/gray500">{puzzle.description}</CustomText>
                   )}
