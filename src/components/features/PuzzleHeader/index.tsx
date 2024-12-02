@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CustomText from '../../common/CustomText';
 import { View } from 'react-native';
 import { HeartIcon, HeartOutlineIcon } from '../../common/Icons';
@@ -12,16 +12,11 @@ interface PuzzleHeaderProps {
   author: string;
   puzzleNum?: string;
   isLiked?: boolean | null;
+  handleLikePress?: () => void;
 }
 
-const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: PuzzleHeaderProps) => {
-  const [like, setLike] = useState(isLiked);
+const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null, handleLikePress }: PuzzleHeaderProps) => {
   const width = useDeviceWidth();
-
-  const handleLikePress = () => {
-    if (like === null) {return;}
-    setLike(!like);
-  };
 
   return (
     <HeaderContainer>
@@ -33,23 +28,28 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null }: Puzzle
                 {title}
               </CustomText>
             </TitleTextContainer>
-            <TagSmall>
-              {puzzleNum && `No.${puzzleNum}`}
-            </TagSmall>
+            {puzzleNum &&
+              <TagSmall>
+                {`No.${puzzleNum}`}
+              </TagSmall>
+            }
           </TitleAndNumber>
 
-          {like !== null ? (
+          {isLiked !== null ? (
             <LikeButton onPress={handleLikePress}>
-              {like ? <HeartIcon /> : <HeartOutlineIcon />}
+              {isLiked ? <HeartIcon /> : <HeartOutlineIcon />}
             </LikeButton>
           ) : (
             <View />
           )}
         </TopContainer>
 
-        <CustomText size={10} lineHeight="sm" color="gray/gray500">
-          {info}
-        </CustomText>
+        {info !== '' &&
+          <CustomText size={10} lineHeight="sm" color="gray/gray500">
+            {info}
+          </CustomText>
+        }
+
       </View>
 
       <AuthorContainer>

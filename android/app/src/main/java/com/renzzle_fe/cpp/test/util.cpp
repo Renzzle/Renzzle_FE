@@ -104,3 +104,11 @@ void printPath(MoveList path) {
     }
     cout << endl;
 }
+
+string pathToString(const MoveList& path) {
+    std::ostringstream oss;
+    for (const auto& pos : path) {
+        oss << static_cast<char>(pos.getY() + 96) << pos.getX();
+    }
+    return oss.str();
+}

@@ -5,20 +5,24 @@
 #include "../test/test.h"
 #include "search_monitor.h"
 
-class VCFSearch {
+class SearchWin {
 
 private:
     TreeManager treeManager;
     SearchMonitor& monitor;
     Color targetColor;
-    bool isInitTime = false;
+    Result targetResult;
+    bool isRunning = false;
 
     bool isWin();
     bool isTargetTurn();
+    void visit(Pos& p);
+    void sortChildNodes(MoveList& moves, bool isTarget);
 
 public:
-    VCFSearch(Board& board, SearchMonitor& monitor);
+    SearchWin(Board& board, SearchMonitor& monitor);
     bool findVCF();
     bool findVCT();
     bool findVCT(int limit);
+    void stop();
 };

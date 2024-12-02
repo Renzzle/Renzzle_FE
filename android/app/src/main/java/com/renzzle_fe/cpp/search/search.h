@@ -3,7 +3,7 @@
 #include "../evaluate/evaluator.h"
 #include "../tree/tree_manager.h"
 #include "../test/test.h"
-#include "VCF_search.h"
+#include "search_win.h"
 #include "search_monitor.h"
 #include <limits>
 

@@ -5,6 +5,7 @@ project(MyNDKProject)
 # 각 모듈 디렉토리 추가
 add_subdirectory(evaluate)
 add_subdirectory(game)
+add_subdirectory(generator)
 add_subdirectory(search)
 add_subdirectory(test)
 add_subdirectory(tree)
@@ -21,6 +22,7 @@ target_link_libraries(
         native-lib
         evaluate-lib
         game-lib
+        generator-lib
         search-lib
         test-lib
         tree-lib
@@ -30,6 +32,7 @@ target_link_libraries(
 target_include_directories(native-lib PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/evaluate
         ${CMAKE_CURRENT_SOURCE_DIR}/game
+        ${CMAKE_CURRENT_SOURCE_DIR}/generator
         ${CMAKE_CURRENT_SOURCE_DIR}/search
         ${CMAKE_CURRENT_SOURCE_DIR}/test
         ${CMAKE_CURRENT_SOURCE_DIR}/tree

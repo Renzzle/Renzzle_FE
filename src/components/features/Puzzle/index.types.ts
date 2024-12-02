@@ -20,6 +20,7 @@ export interface LessonPuzzle {
   depth: number;
   difficulty: 'HIGH' | 'MIDDLE' | 'LOW';
   winColor: 'BLACK' | 'WHITE';
+  description: string;
   isLocked: boolean;
 }
 

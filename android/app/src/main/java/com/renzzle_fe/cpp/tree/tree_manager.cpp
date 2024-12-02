@@ -1,8 +1,6 @@
 #include "tree_manager.h"
 //#include "tree.h"
 
-Tree TreeManager::tree;
-
 TreeManager::TreeManager(Board initialBoard) {
     auto rootNode = tree.createNode(initialBoard);
     tree.addNodeAsRoot(rootNode);

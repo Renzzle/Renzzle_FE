@@ -37,6 +37,10 @@ MoveList Evaluator::getCandidates() {
         return result;
     }
 
+    if (isOppoMateExist()) {
+        return getThreatDefend();
+    }
+
     result.insert(result.end(), patternMap[self][B4_F3].begin(), patternMap[self][B4_F3].end());
     result.insert(result.end(), patternMap[oppo][MATE].begin(), patternMap[oppo][MATE].end());
     result.insert(result.end(), patternMap[self][F3_2X].begin(), patternMap[self][F3_2X].end());
@@ -135,6 +139,35 @@ MoveList Evaluator::getThreatDefend() {
     }
 
     result.insert(result.end(), patternMap[oppo][MATE].begin(), patternMap[oppo][MATE].end());
+
+    // check every mate move (free 3)
+    for (auto p : patternMap[oppo][MATE]) {
+        // check which direction has free 3
+        for (Direction dir = DIRECTION_START; dir < DIRECTION_SIZE; dir++) {
+            Cell& c = board.getCell(p);
+            if (c.getPiece() == EMPTY && c.getPattern(oppo, dir) == FREE_4) {
+                p.setDirection(dir);
+                MoveList defendB4;
+                int f4Cnt = 0;
+                // check the number of free 4 move and if 1, blocked 4 move also can defend
+                for (int i = 0; i < LINE_LENGTH; i++) {
+                    if (!(p + (i - (LINE_LENGTH / 2)))) continue;
+
+                    if (board.getCell(p).getPattern(oppo, dir) == BLOCKED_4)
+                        defendB4.push_back(p);
+                    else if (board.getCell(p).getPattern(oppo, dir) == FREE_4)
+                        f4Cnt++;
+
+                    p - (i - (LINE_LENGTH / 2));
+                }
+
+                if (f4Cnt == 1) {
+                    result.insert(result.end(), defendB4.begin(), defendB4.end());
+                }
+            }
+        }
+    }
+
     return result;
 }
 
@@ -145,12 +178,61 @@ bool Evaluator::isOppoMateExist() {
 }
 
 Value Evaluator::evaluate() {
-    // Evaluate logic
-    // case 1: game over
+    // case 1: finish
     Result result = board.getResult();
     if (result != ONGOING) {
         if (result == DRAW) return 0;
-        return (result == (self == BLACK ? BLACK_WIN : WHITE_WIN)) ? MAX_VALUE : MIN_VALUE;
+        if (self == BLACK && result == BLACK_WIN)
+            return MAX_VALUE;
+        if (self == BLACK && result == WHITE_WIN)
+            return MIN_VALUE;
+        if (self == WHITE && result == BLACK_WIN)
+            return MIN_VALUE;
+        if (self == WHITE && result == WHITE_WIN)
+            return MAX_VALUE;
     }
-    return 0; // Simplified for brevity
+
+    // case 2: there is sure winning path
+    // 1 step before win
+    if (!patternMap[self][WINNING].empty()) {
+        return MAX_VALUE - 1;
+    }
+    // 1 step before lose
+    if (patternMap[oppo][WINNING].size() > 1) {
+        return MIN_VALUE + 1;
+    }
+    // 3 step before win
+    if (!patternMap[self][MATE].empty()) {
+        return MAX_VALUE - 3;
+    }
+
+    Value val = 0;
+    val += patternMap[self][B4_F3].size() * 150;
+    val += patternMap[self][B4_PLUS].size() * 25;
+    val += patternMap[self][F3_2X].size() * 35;
+    val += patternMap[self][F3_PLUS].size() * 25;
+
+    val += patternMap[self][B4_ANY].size() * 25;
+    val += patternMap[self][F3_ANY].size() * 25;
+    val += patternMap[self][B3_PLUS].size() * 10;
+    val += patternMap[self][F2_2X].size() * 9;
+    val += patternMap[self][B3_ANY].size() * 5;
+    val += patternMap[self][F2_ANY].size() * 4;
+
+    val -= patternMap[oppo][WINNING].size() * 200;
+    val -= patternMap[oppo][MATE].size() * 200;
+
+    val -= patternMap[oppo][B4_F3].size() * 130;
+    val -= patternMap[oppo][B4_PLUS].size() * 20;
+    val -= patternMap[oppo][B4_ANY].size() * 20;
+    val -= patternMap[oppo][F3_2X].size() * 20;
+    val -= patternMap[oppo][F3_PLUS].size() * 20;
+    val -= patternMap[oppo][F3_ANY].size() * 20;
+
+    val -= patternMap[oppo][B3_PLUS].size() * 8;
+    val -= patternMap[oppo][F2_2X].size() * 7;
+    val -= patternMap[oppo][B3_ANY].size() * 3;
+    val -= patternMap[oppo][F2_ANY].size() * 2;
+
+    return val;
 }

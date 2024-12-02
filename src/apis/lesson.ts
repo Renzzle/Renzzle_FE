@@ -1,19 +1,18 @@
 import { HTTP_HEADERS } from './constants';
-import { apiClient } from './interceptor';
+import apiClient from './interceptor';
 
-export const getCommunityPuzzle = async (
+export const getLessonPuzzle = async (
   authStore: string,
+  chapter: number,
   size?: number,
-  sort?: string,
-  id?: number,
+  page?: number,
 ) => {
   try {
     const params: Record<string, string | number> = {};
-    if (id !== undefined) {params.id = id;}
     if (size !== undefined) {params.size = size;}
-    if (sort !== undefined) {params.sort = sort;}
+    if (page !== undefined) {params.page = page;}
 
-    const response = await apiClient.get('/api/community/puzzle', {
+    const response = await apiClient.get(`/api/lesson/${chapter}`, {
       headers: {
         [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
       },
@@ -26,23 +25,19 @@ export const getCommunityPuzzle = async (
   }
 };
 
-export const uploadPuzzle = async (
+export const updateLessonSolve = async (
   authStore: string,
-  title: string,
-  boardStatus: string,
-  depth: number,
-  difficulty: string,
-  winColor: string,
+  puzzleId: number,
 ) => {
   try {
     const response = await apiClient.post(
-      '/api/community/puzzle',
-      { title, boardStatus, depth, difficulty, winColor },
+      '/api/lesson/solve',
+      { puzzleId },
       {
         headers: {
           [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
         },
-      }
+      },
     );
 
     return response.data;

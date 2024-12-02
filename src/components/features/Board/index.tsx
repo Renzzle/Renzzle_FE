@@ -123,6 +123,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
   }, [depth, winDepth]);
 
   const initializeBoard = () => {
+    console.log('보드 초기화 - 시퀀스: ' + sequence);
     const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
     let turn = true;
 
@@ -146,6 +147,7 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
       i += 1 + number.length;
     }
 
+    setLocalSequence(sequence);
     setBoard(newBoard);
     setIsBlackTurn(turn);
     setDepth(0);

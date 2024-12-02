@@ -11,6 +11,7 @@ import CustomModal from '../../../components/common/CustomModal';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NativeModules } from 'react-native';
+import useAuthStore from '../../../store/useAuthStore';
 
 declare module 'react-native' {
   interface NativeModulesStatic {
@@ -27,6 +28,7 @@ const CommunityPuzzleMake = () => {
   const [sequence, setSequence] = useState<string>('');
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
+  const { accessToken } = useAuthStore();
 
   const { VCFSearchJNI } = NativeModules;
   const [depth, setDepth] = useState<number>();
@@ -94,7 +96,9 @@ const CommunityPuzzleMake = () => {
     const verifyAndUpload = async () => {
       if (isVerified && depth !== undefined) {
         console.log('title: ' + title + ', sequence: ' + sequence);
-        await uploadPuzzle(title, sequence, depth, 'LOW', 'BLACK', `${process.env.ACCESS_TOKEN}`);
+        if (accessToken !== undefined) {
+          await uploadPuzzle(accessToken, title, sequence, depth, 'LOW', 'BLACK');
+        }
         navigation.navigate('CommunityPuzzleList');
       }
     };

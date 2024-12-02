@@ -14,3 +14,49 @@ export const getUser = async (authStore: string) => {
     throw error;
   }
 };
+
+export const updateLike = async (
+  authStore: string,
+  puzzleId: number,
+) => {
+  try {
+    const response = await apiClient.post(
+      '/api/user/like',
+      { puzzleId },
+      {
+        headers: {
+          [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
+        },
+      }
+    );
+
+    console.log('like api:' + response.data.response);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLikePuzzle = async (
+  authStore: string,
+  size?: number,
+  id?: number,
+) => {
+  try {
+    const params: Record<string, string | number> = {};
+    if (id !== undefined) {params.id = id;}
+    if (size !== undefined) {params.size = size;}
+
+    const response = await apiClient.get('/api/user/like', {
+      headers: {
+        [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
+      },
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -7,7 +7,7 @@
 class TreeManager {
 
 private:
-    static Tree tree;
+    Tree tree;
     shared_ptr<Node> currentNode;
     std::stack<shared_ptr<Node>> nodeHistory;
 

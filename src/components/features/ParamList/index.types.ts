@@ -10,13 +10,23 @@ type RootStackParamList = {
     description: string;
     depth: number;
   };
+  LessonPuzzleList: {
+    chapter: number;
+  };
   OtherScreen: undefined;
 };
 
 type CommunityPuzzleSolveRouteProp = RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>;
 type CommunityPuzzleSolveNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CommunityPuzzleSolve'>;
+type LessonPuzzleListRouteProp = RouteProp<RootStackParamList, 'LessonPuzzleList'>;
+type LessonPuzzleListNavigationProp = NativeStackNavigationProp<RootStackParamList, 'LessonPuzzleList'>;
 
 export type CommunityPuzzleSolveProps = {
   route: CommunityPuzzleSolveRouteProp;
   navigation: CommunityPuzzleSolveNavigationProp;
+};
+
+export type LessonPuzzleListProps = {
+  route: LessonPuzzleListRouteProp;
+  navigation: LessonPuzzleListNavigationProp;
 };
