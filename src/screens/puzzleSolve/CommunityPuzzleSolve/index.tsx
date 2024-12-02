@@ -9,6 +9,8 @@ import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { updateLike } from '../../../apis/user';
+import useAuthStore from '../../../store/useAuthStore';
 
 const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -17,6 +19,30 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [category, setCategory] = useState<IndicatorCategoryType>();
+
+  const [like, setLike] = useState(null);
+  const { accessToken } = useAuthStore();
+
+  const handleLikePress = async () => {
+    if (like === null) {return;}
+    if (accessToken !== undefined) {
+      const isLiked = await updateLike(accessToken, id);
+      setLike(isLiked);
+    }
+  };
+
+  const checkIfLiked = async () => {
+    if (accessToken !== undefined) {
+      // TODO: like 확인 api가 없어서 임의로 구현함. 수정필요
+      await updateLike(accessToken, id);
+      const isLiked = await updateLike(accessToken, id);
+      setLike(isLiked);
+    }
+  };
+
+  useEffect(() => {
+    checkIfLiked();
+  }, []);
 
   useEffect(() => {
     if (isWin) {
@@ -54,7 +80,8 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
         info={description}
         author={author}
         puzzleNum={`${id}`}
-        isLiked={false}
+        isLiked={like}
+        handleLikePress={handleLikePress}
       />
 
       <IndicatorContainer>

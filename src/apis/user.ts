@@ -14,3 +14,24 @@ export const getUser = async (authStore: string) => {
     throw error;
   }
 };
+
+export const updateLike = async (
+  authStore: string,
+  puzzleId: number,
+) => {
+  try {
+    const response = await apiClient.post(
+      '/api/user/like',
+      { puzzleId },
+      {
+        headers: {
+          [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
+        },
+      }
+    );
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
