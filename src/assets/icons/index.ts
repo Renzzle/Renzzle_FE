@@ -1,46 +1,100 @@
-export {default as AlertIcon} from './ico-alert.svg';
-export {default as ArchiveIcon} from './ico-archive.svg';
-export {default as AuthenticatedUserIcon} from './ico-authenticated-user.svg';
-export {default as AuthenticatedIcon} from './ico-authenticated.svg';
-export {default as BestUserIcon} from './ico-best-user.svg';
-export {default as BookShelfIcon} from './ico-book-shelf.svg';
-export {default as ChevronDoubleLeftIcon} from './ico-chevron-double-left.svg';
-export {default as ChevronDoubleRightIcon} from './ico-chevron-double-right.svg';
-export {default as ChevronLeftIcon} from './ico-chevron-left.svg';
-export {default as ChevronRightIcon} from './ico-chevron-right.svg';
-export {default as CommunityIcon} from './ico-community.svg';
-export {default as ConfusedActiveIcon} from './ico-confused-active.svg';
-export {default as ConfusedInactiveIcon} from './ico-confused-inactive.svg';
-export {default as CorrectIcon} from './ico-correct.svg';
-export {default as DepthIcon} from './ico-depth.svg';
-export {default as HashTagIcon} from './ico-hashtag.svg';
-export {default as HeartActiveIcon} from './ico-heart-active.svg';
-export {default as HeartInactiveIcon} from './ico-heart-inactive.svg';
-export {default as HeartMediumIcon} from './ico-heart-m.svg';
-export {default as HeartSmallIcon} from './ico-heart-s.svg';
-export {default as HotIcon} from './ico-hot.svg';
-export {default as IncorrectIcon} from './ico-incorrect.svg';
-export {default as LightbulbAlertIcon} from './ico-lightbulb-alert.svg';
-export {default as LightbulbIcon} from './ico-lightbulb.svg';
-export {default as LightningIcon} from './ico-lightning.svg';
-export {default as LockIcon} from './ico-lock.svg';
-export {default as NormalUserIcon} from './ico-normal-user.svg';
-export {default as NoticeIcon} from './ico-notice.svg';
-export {default as ProUserIcon} from './ico-pro-user.svg';
-export {default as PuzzlePlusIcon} from './ico-puzzle-plus.svg';
-export {default as PuzzleSquareIcon} from './ico-puzzle-square.svg';
-export {default as PuzzleXSmallIcon} from './ico-puzzle-xs.svg';
-export {default as Ranking1stIcon} from './ico-ranking-1st.svg';
-export {default as Ranking2ndIcon} from './ico-ranking-2nd.svg';
-export {default as Ranking3rdIcon} from './ico-ranking-3rd.svg';
-export {default as RankingPuzzleIcon} from './ico-ranking-puzzle.svg';
-export {default as RankingRatingIcon} from './ico-ranking-rating.svg';
-export {default as RankingIcon} from './ico-ranking.svg';
-export {default as SettingIcon} from './ico-setting.svg';
-export {default as StoneBlackIcon} from './ico-stone-black.svg';
-export {default as StoneWhiteIcon} from './ico-stone-white.svg';
-export {default as TimerIcon} from './ico-timer.svg';
-export {default as TrainingIcon} from './ico-traning.svg';
-export {default as UnauthenticatedIcon} from './ico-unauthenticated.svg';
-export {default as ViewIcon} from './ico-view.svg';
-export {default as WasteBinIcon} from './ico-waste-bin.svg';
+import AlertIcon from './ico-alert.svg';
+import ArchiveIcon from './ico-archive.svg';
+import AuthenticatedUserIcon from './ico-authenticated-user.svg';
+import AuthenticatedIcon from './ico-authenticated.svg';
+import BestUserIcon from './ico-best-user.svg';
+import BookShelfIcon from './ico-book-shelf.svg';
+import ChevronDoubleLeftIcon from './ico-chevron-double-left.svg';
+import ChevronDoubleRightIcon from './ico-chevron-double-right.svg';
+import ChevronLeftIcon from './ico-chevron-left.svg';
+import ChevronRightIcon from './ico-chevron-right.svg';
+import CommunityIcon from './ico-community.svg';
+import ConfusedActiveIcon from './ico-confused-active.svg';
+import ConfusedInactiveIcon from './ico-confused-inactive.svg';
+import CorrectIcon from './ico-correct.svg';
+import DepthIcon from './ico-depth.svg';
+import HashTagIcon from './ico-hashtag.svg';
+import HeartActiveIcon from './ico-heart-active.svg';
+import HeartInactiveIcon from './ico-heart-inactive.svg';
+import HeartMediumIcon from './ico-heart-m.svg';
+import HeartSmallIcon from './ico-heart-s.svg';
+import HotIcon from './ico-hot.svg';
+import IncorrectIcon from './ico-incorrect.svg';
+import LightbulbAlertIcon from './ico-lightbulb-alert.svg';
+import LightbulbIcon from './ico-lightbulb.svg';
+import LightningIcon from './ico-lightning.svg';
+import LockIcon from './ico-lock.svg';
+import NormalUserIcon from './ico-normal-user.svg';
+import NoticeIcon from './ico-notice.svg';
+import ProUserIcon from './ico-pro-user.svg';
+import PuzzlePlusIcon from './ico-puzzle-plus.svg';
+import PuzzleSquareIcon from './ico-puzzle-square.svg';
+import PuzzleXSmallIcon from './ico-puzzle-xs.svg';
+import Ranking1stIcon from './ico-ranking-1st.svg';
+import Ranking2ndIcon from './ico-ranking-2nd.svg';
+import Ranking3rdIcon from './ico-ranking-3rd.svg';
+import RankingPuzzleIcon from './ico-ranking-puzzle.svg';
+import RankingRatingIcon from './ico-ranking-rating.svg';
+import RankingIcon from './ico-ranking.svg';
+import RefreshIcon from './ico-refresh.svg';
+import SettingIcon from './ico-setting.svg';
+import StoneBlackIcon from './ico-stone-black.svg';
+import StoneWhiteIcon from './ico-stone-white.svg';
+import TimerIcon from './ico-timer.svg';
+import TrainingIcon from './ico-training.svg';
+import UnauthenticatedIcon from './ico-unauthenticated.svg';
+import ViewIcon from './ico-view.svg';
+import WasteBinIcon from './ico-waste-bin.svg';
+
+const Icons = {
+  AlertIcon,
+  ArchiveIcon,
+  AuthenticatedUserIcon,
+  AuthenticatedIcon,
+  BestUserIcon,
+  BookShelfIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CommunityIcon,
+  ConfusedActiveIcon,
+  ConfusedInactiveIcon,
+  CorrectIcon,
+  DepthIcon,
+  HashTagIcon,
+  HeartActiveIcon,
+  HeartInactiveIcon,
+  HeartMediumIcon,
+  HeartSmallIcon,
+  HotIcon,
+  IncorrectIcon,
+  LightbulbAlertIcon,
+  LightbulbIcon,
+  LightningIcon,
+  LockIcon,
+  NormalUserIcon,
+  NoticeIcon,
+  ProUserIcon,
+  PuzzlePlusIcon,
+  PuzzleSquareIcon,
+  PuzzleXSmallIcon,
+  Ranking1stIcon,
+  Ranking2ndIcon,
+  Ranking3rdIcon,
+  RankingPuzzleIcon,
+  RankingRatingIcon,
+  RankingIcon,
+  RefreshIcon,
+  SettingIcon,
+  StoneBlackIcon,
+  StoneWhiteIcon,
+  TimerIcon,
+  TrainingIcon,
+  UnauthenticatedIcon,
+  ViewIcon,
+  WasteBinIcon,
+} as const;
+
+export default Icons;
+export type IconName = keyof typeof Icons;
