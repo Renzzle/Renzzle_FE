@@ -1,14 +1,16 @@
 import React from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import * as Icons from '../../../assets/icons';
+import Icons, {IconName} from '../../../assets/icons';
+import theme, {ColorType} from '../../../styles/theme';
 
 type IconProps = SvgProps & {
-  name: keyof typeof Icons;
+  name: IconName;
   size?: number;
+  color?: ColorType;
 };
 
-const Icon = ({name, size, ...props}: IconProps) => {
+const Icon = ({name, size, color = 'gray/gray900', ...props}: IconProps) => {
   const SvgIcon = Icons[name];
 
   const width = size;
@@ -19,7 +21,9 @@ const Icon = ({name, size, ...props}: IconProps) => {
     ...(height !== undefined ? {height} : {}),
   };
 
-  return <SvgIcon {...sizeProps} {...props} />;
+  const fillColor = theme.color[color];
+
+  return <SvgIcon {...sizeProps} color={fillColor} {...props} />;
 };
 
 export default Icon;
