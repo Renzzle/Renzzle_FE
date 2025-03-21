@@ -6,6 +6,26 @@
       "sha1": "dfff9e183884ea3ee599e9f493ad832299931e02"
     },
     {
+      "path": "src/assets/fonts/NanumSquareNeoOTF-Bd.otf",
+      "sha1": "43addb3b33278f6c3a9e85d169dd946542fa1431"
+    },
+    {
+      "path": "src/assets/fonts/NanumSquareNeoOTF-Eb.otf",
+      "sha1": "2ec7bcab1d48cf48f25dd1c131cf7e5b9ed0f140"
+    },
+    {
+      "path": "src/assets/fonts/NanumSquareNeoOTF-Hv.otf",
+      "sha1": "5e7399fbb3450f7d045acb6167f72be4692b584d"
+    },
+    {
+      "path": "src/assets/fonts/NanumSquareNeoOTF-Lt.otf",
+      "sha1": "8ebad80b4e127f63cf1f30b0bf89a2e483ef27fe"
+    },
+    {
+      "path": "src/assets/fonts/NanumSquareNeoOTF-Rg.otf",
+      "sha1": "ba6dc93a1f184fb80a6f39dc1ef8b7b586cc20f4"
+    },
+    {
       "path": "src/assets/fonts/Pretendard-Black.otf",
       "sha1": "b9162985d25a21b393185c6139d283fba46fd739"
     },
