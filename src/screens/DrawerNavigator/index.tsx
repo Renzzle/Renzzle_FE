@@ -47,7 +47,7 @@ const DrawerNavigator = () => {
         drawerContentStyle: {
           backgroundColor: theme.color['gray/grayBG'],
         },
-        drawerActiveTintColor: theme.color['main_color/green'],
+        drawerActiveTintColor: theme.color['main_color/blue_p'],
         drawerInactiveTintColor: theme.color['gray/gray500'],
         drawerActiveBackgroundColor: theme.color['sub_color/green/bg'],
         headerStyle: {
@@ -57,8 +57,7 @@ const DrawerNavigator = () => {
           fontFamily: 'Pretendard-Medium',
           fontSize: 18,
         },
-      }}
-    >
+      }}>
       <Drawer.Screen
         name="Renzzle"
         component={Home}
@@ -69,38 +68,32 @@ const DrawerNavigator = () => {
             fontFamily: 'ChangaOne-Regular',
             fontSize: 24,
           },
-          headerTintColor: theme.color['main_color/green'],
+          headerTintColor: theme.color['main_color/blue_p'],
         })}
       />
       <Drawer.Screen
         name="LikedPuzzleList"
         component={LikedPuzzleList}
-        options={
-          ({ navigation }): DrawerNavigationOptions => ({
-            headerLeft: () => <GoBackButton navigation={navigation} />,
-            title: '좋아요',
-          })
-        }
+        options={({ navigation }): DrawerNavigationOptions => ({
+          headerLeft: () => <GoBackButton navigation={navigation} />,
+          title: '좋아요',
+        })}
       />
       <Drawer.Screen
         name="SubscribePuzzleList"
         component={SubscribePuzzleList}
-        options={
-          ({ navigation }): DrawerNavigationOptions => ({
-            headerLeft: () => <GoBackButton navigation={navigation} />,
-            title: '구독목록',
-          })
-        }
+        options={({ navigation }): DrawerNavigationOptions => ({
+          headerLeft: () => <GoBackButton navigation={navigation} />,
+          title: '구독목록',
+        })}
       />
       <Drawer.Screen
         name="LevelSetting"
         component={SubscribePuzzleList}
-        options={
-          ({ navigation }): DrawerNavigationOptions => ({
-            headerLeft: () => <GoBackButton navigation={navigation} />,
-            title: '내 수준 설정',
-          })
-        }
+        options={({ navigation }): DrawerNavigationOptions => ({
+          headerLeft: () => <GoBackButton navigation={navigation} />,
+          title: '내 수준 설정',
+        })}
       />
     </Drawer.Navigator>
   );

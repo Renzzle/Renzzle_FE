@@ -8,10 +8,9 @@ export const Preview = styled(View)<{ isLocked: boolean }>`
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  
+
   background-color: ${({ isLocked }) =>
-    isLocked ? theme.color['sub_color/beige/s'] : theme.color['sub_color/beige/c']
-  };
+    isLocked ? theme.color['sub_color/beige/c'] : theme.color['sub_color/beige/c']};
 `;
 
 export default Preview;
