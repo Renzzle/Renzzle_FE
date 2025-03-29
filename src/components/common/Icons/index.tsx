@@ -62,7 +62,7 @@ export const RadioBlankIcon = (props: Omit<IconProps, 'name' | 'color'>) => (
 );
 
 export const RadioMarkedIcon = (props: Omit<IconProps, 'name' | 'color'>) => (
-  <AppIcon name="radiobox-marked" color={theme.color['main_color/green']} {...props} />
+  <AppIcon name="radiobox-marked" color={theme.color['main_color/blue_p']} {...props} />
 );
 
 export const LockIcon = (props: Omit<IconProps, 'name' | 'color'>) => (
@@ -73,9 +73,7 @@ export const PlusIcon = (props: Omit<IconProps, 'name' | 'color' | 'size'>) => (
   <AppIcon name="plus" color={theme.color['gray/white']} size={36} {...props} />
 );
 
-export const MenuIcon = (props: Omit<IconProps, 'name'>) => (
-  <AppIcon name="menu" {...props} />
-);
+export const MenuIcon = (props: Omit<IconProps, 'name'>) => <AppIcon name="menu" {...props} />;
 
 export const ErrorIcon = (props: Omit<IconProps, 'name'>) => (
   <AppIcon name="alert-circle" {...props} />

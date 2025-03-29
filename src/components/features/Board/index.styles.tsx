@@ -49,22 +49,23 @@ export const CellContainer = styled(TouchableOpacity)<{ cellWidth: number }>`
   justify-content: center;
   align-items: center;
   /* border-width: 0.5px; */
-  /* border-color: ${theme.color['main_color/green']}; */
+  /* border-color: ${theme.color['main_color/blue_p']}; */
 `;
 
-export const Stone = styled(View)<{ stone: StoneType, cellWidth: number }>`
+export const Stone = styled(View)<{ stone: StoneType; cellWidth: number }>`
   width: ${({ cellWidth }) => cellWidth - 1}px;
   height: ${({ cellWidth }) => cellWidth - 1}px;
   border-radius: ${({ cellWidth }) => (cellWidth - 1) / 2}px;
   border-color: ${theme.color['gray/gray500']};
 
-  border-width: ${({ cellWidth }) =>
-    cellWidth < 10 ? 0.4 : 1
-  }px;
+  border-width: ${({ cellWidth }) => (cellWidth < 10 ? 0.4 : 1)}px;
 
   background-color: ${({ stone }) =>
-    stone === 1 ? theme.color['gray/black'] : stone === 2 ? theme.color['gray/white'] : 'transparent'
-  };
+    stone === 1
+      ? theme.color['gray/black']
+      : stone === 2
+      ? theme.color['gray/white']
+      : 'transparent'};
 `;
 
 export const IndicatePoint = styled(View)`
@@ -74,6 +75,4 @@ export const IndicatePoint = styled(View)`
   background-color: ${theme.color['gray/gray500']};
 `;
 
-export const PutButtonContainer = styled(View)`
-  
-`;
+export const PutButtonContainer = styled(View)``;

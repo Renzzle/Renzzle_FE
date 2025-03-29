@@ -16,10 +16,12 @@ export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
   border-radius: 18px;
 
   border-color: ${({ isFocused, hasError }) =>
-    isFocused ? theme.color['main_color/green'] : ( hasError ? theme.color['error/error_color'] : theme.color['gray/gray150'])
-  };
+    isFocused
+      ? theme.color['main_color/blue_p']
+      : hasError
+      ? theme.color['error/error_color']
+      : theme.color['gray/gray150']};
 
   background-color: ${({ isDisabled }) =>
-    isDisabled ? theme.color['gray/gray100'] : theme.color['gray/white']
-  };
+    isDisabled ? theme.color['gray/gray100'] : theme.color['gray/white']};
 `;
