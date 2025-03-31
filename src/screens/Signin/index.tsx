@@ -6,8 +6,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SigninContainer, SigninInfoContainer, TextInputContainer } from './index.styles';
 import BottomButtonBar from '../../components/common/BottomButtonBar';
 import CustomText from '../../components/common/CustomText';
+import { useTranslation } from 'react-i18next';
 
 const Signin = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [password, setPassword] = useState<string>(''); //login용
@@ -16,7 +18,9 @@ const Signin = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const handleLogin = async () => {
-    if (!email) {return;}
+    if (!email) {
+      return;
+    }
 
     try {
       setLoading(true);
@@ -32,7 +36,7 @@ const Signin = () => {
 
   const transition = [
     {
-      text: '로그인',
+      text: t('auth.login'),
       onAction: async () => {
         handleLogin();
       },
@@ -43,7 +47,9 @@ const Signin = () => {
   return (
     <SigninContainer>
       <SigninInfoContainer>
-        <CustomText size={22} weight="bold" lineHeight="lg">로그인</CustomText>
+        <CustomText size={22} weight="bold" lineHeight="lg">
+          {t('auth.login')}
+        </CustomText>
         <TextInputContainer>
           <CustomTextInput
             placeholder="Enter your email"

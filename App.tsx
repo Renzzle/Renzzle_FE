@@ -8,6 +8,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import './src/locales/i18n.ts';
 import theme from './src/styles/theme';
 import LessonPuzzleList from './src/screens/puzzleList/LessonPuzzleList';
 import CommunityPuzzleList from './src/screens/puzzleList/CommunityPuzzleList';
@@ -34,18 +35,9 @@ function App(): React.JSX.Element {
           headerTitleStyle: {
             fontSize: 18,
           },
-        }}
-      >
-        <Stack.Screen
-          name="Home"
-          component={DrawerNavigator}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Signin"
-          component={Signin}
-          options={{ headerShown: false }}
-        />
+        }}>
+        <Stack.Screen name="Home" component={DrawerNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
         <Stack.Screen
           name="LessonChapterList"
           component={LessonChapterList}
@@ -76,16 +68,8 @@ function App(): React.JSX.Element {
           component={CommunityPuzzleMake}
           options={{ title: 'Community' }}
         />
-        <Stack.Screen
-          name="AIPuzzleSolve"
-          component={AIPuzzleSolve}
-          options={{ title: 'AI' }}
-        />
-        <Stack.Screen
-          name="AIPuzzleMake"
-          component={AIPuzzleMake}
-          options={{ title: 'AI' }}
-        />
+        <Stack.Screen name="AIPuzzleSolve" component={AIPuzzleSolve} options={{ title: 'AI' }} />
+        <Stack.Screen name="AIPuzzleMake" component={AIPuzzleMake} options={{ title: 'AI' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
