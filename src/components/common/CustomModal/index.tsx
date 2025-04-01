@@ -1,8 +1,16 @@
 import React from 'react';
 import { Modal, useWindowDimensions, View } from 'react-native';
-import { CenteredView, ModalBodyContainer, ModalBottomContainer, ModalContainer, ModalExitContainer, ModalTitleContainer, ModalTopContainer } from './index.styles';
+import {
+  CenteredView,
+  ModalBodyContainer,
+  ModalBottomContainer,
+  ModalContainer,
+  ModalExitContainer,
+  ModalTitleContainer,
+  ModalTopContainer,
+} from './index.styles';
 import CustomText from '../CustomText';
-import Button from '../Button';
+import CustomButton from '../CustomButton';
 import { BellIcon, LogoutIcon } from '../Icons';
 
 export type ModalCategoryType =
@@ -64,11 +72,7 @@ export const ModalCard = ({
   if (!category) {
     return <View />;
   }
-  const {
-    TITLE: titleText,
-    BODY: bodyText,
-    FOOTER: footerTexts,
-  } = MODAL_TEXTS[category];
+  const { TITLE: titleText, BODY: bodyText, FOOTER: footerTexts } = MODAL_TEXTS[category];
 
   const title = (
     <ModalTopContainer>
@@ -89,17 +93,12 @@ export const ModalCard = ({
       ) : (
         <View />
       )}
-
     </ModalTopContainer>
   );
 
   const body = (
     <ModalBodyContainer>
-      <CustomText
-        size={14}
-        lineHeight="lg"
-        color="gray/gray600"
-      >
+      <CustomText size={14} lineHeight="lg" color="gray/gray600">
         {bodyText}
       </CustomText>
     </ModalBodyContainer>
@@ -108,18 +107,18 @@ export const ModalCard = ({
   const footer =
     typeof footerTexts === 'string' ? (
       <ModalBottomContainer>
-        <Button category="primary" onPress={onPrimaryClose}>
+        <CustomButton category="primary" onPress={onPrimaryClose}>
           {footerTexts}
-        </Button>
+        </CustomButton>
       </ModalBottomContainer>
     ) : (
       <ModalBottomContainer>
-        <Button category="secondary" onPress={onSecondaryClose}>
+        <CustomButton category="secondary" onPress={onSecondaryClose}>
           {footerTexts[0]}
-        </Button>
-        <Button category="primary" onPress={onPrimaryClose}>
+        </CustomButton>
+        <CustomButton category="primary" onPress={onPrimaryClose}>
           {footerTexts[1]}
-        </Button>
+        </CustomButton>
       </ModalBottomContainer>
     );
 
@@ -136,14 +135,8 @@ export const ModalCard = ({
 
 const CustomModal = ({ isVisible, ...props }: CustomModalProps) => {
   return (
-    <Modal
-      visible={isVisible}
-      transparent={true}
-      animationType="fade"
-    >
-      {isVisible && (
-        <ModalCard {...props} />
-      )}
+    <Modal visible={isVisible} transparent={true} animationType="fade">
+      {isVisible && <ModalCard {...props} />}
     </Modal>
   );
 };

@@ -12,14 +12,12 @@ export const StyledButton = styled(TouchableOpacity)`
   flex: 1;
 `;
 
-export const StyledSecondaryButton = styled(StyledButton)<{ disabled: boolean }>`
-  background-color: ${({ disabled }) =>
-    disabled ? theme.color['gray/gray100'] : theme.color['sub_color/green/bg']
-  };
-`;
-
 export const StyledPrimaryButton = styled(StyledButton)<{ disabled: boolean }>`
   background-color: ${({ disabled }) =>
-    disabled ? theme.color['gray/gray100'] : theme.color['sub_color/green/s']
-  };
+    disabled ? theme.color['gray/gray100'] : theme.color['main_color/blue_p']};
+`;
+
+export const StyledSecondaryButton = styled(StyledButton)<{ disabled: boolean }>`
+  background-color: ${({ disabled }) =>
+    disabled ? theme.color['gray/gray100'] : theme.color['sub_color/indigo/bg']};
 `;

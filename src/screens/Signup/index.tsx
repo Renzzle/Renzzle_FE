@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import CustomTextInput from '../../components/common/CustomTextInput';
 import { updateEmailAuthCode } from '../../apis/auth';
 import { View } from 'react-native';
-import Button from '../../components/common/Button';
+import CustomButton from '../../components/common/CustomButton';
 
 const Signup = () => {
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSendAuthCode = async () => {
-    if (!email) {return;}
+    if (!email) {
+      return;
+    }
 
     try {
       setLoading(true);
@@ -37,7 +39,9 @@ const Signup = () => {
         onChangeText={setEmail}
         keyboardType="email-address"
       />
-      <Button onPress={handleSendAuthCode} category="primary" disabled={loading}>인증번호 발급</Button>
+      <CustomButton onPress={handleSendAuthCode} category="primary" disabled={loading}>
+        인증번호 발급
+      </CustomButton>
     </View>
   );
 };
