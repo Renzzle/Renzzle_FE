@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import Board from '../../../components/features/Board';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
-import GameStatusIndicator, { IndicatorCategoryType } from '../../../components/features/GameStatusIndicator';
-import {IndicatorContainer, SolveContainer } from './index.styles';
+import GameStatusIndicator, {
+  IndicatorCategoryType,
+} from '../../../components/features/GameStatusIndicator';
+import { IndicatorContainer, SolveContainer } from './index.styles';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useModal from '../../../hooks/useModal';
@@ -14,7 +16,13 @@ import { NativeModules } from 'react-native';
 const AIPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [isWin, setIsWin] = useState<boolean | null>(null);
-  const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [category, setCategory] = useState<IndicatorCategoryType>();
 
@@ -43,7 +51,7 @@ const AIPuzzleSolve = () => {
 
   useEffect(() => {
     if (isWin) {
-      activateModal('AI_PUZZLE_SUCCESS', {
+      activateModal('RANKING_PUZZLE_SUCCESS', {
         primaryAction: () => {
           navigation.navigate('Home');
         },
@@ -73,12 +81,7 @@ const AIPuzzleSolve = () => {
         onSecondaryAction={closeSecondarily}
       />
 
-      <PuzzleHeader
-        title="AI Puzzle Challenge"
-        info=""
-        author="Renzzle"
-        puzzleNum={undefined}
-      />
+      <PuzzleHeader title="AI Puzzle Challenge" info="" author="Renzzle" puzzleNum={undefined} />
 
       <IndicatorContainer>
         <GameStatusIndicator category={category} />

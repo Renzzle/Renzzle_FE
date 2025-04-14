@@ -3,7 +3,9 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { CommunityPuzzleSolveProps } from '../../../components/features/ParamList/index.types';
-import GameStatusIndicator, { IndicatorCategoryType } from '../../../components/features/GameStatusIndicator';
+import GameStatusIndicator, {
+  IndicatorCategoryType,
+} from '../../../components/features/GameStatusIndicator';
 import { IndicatorContainer, SolveContainer } from './index.styles';
 import CustomModal from '../../../components/common/CustomModal';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
@@ -16,14 +18,20 @@ const LessonPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { id, boardStatus, title, author, description, depth } = route.params;
   const [isWin, setIsWin] = useState<boolean | null>(null);
-  const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [category, setCategory] = useState<IndicatorCategoryType>();
   const { refreshToken } = useAuthStore();
 
   useEffect(() => {
     if (isWin) {
-      activateModal('LESSON_PUZZLE_SUCCESS', {
+      activateModal('TRAINING_PUZZLE_SUCCESS', {
         primaryAction: async () => {
           if (refreshToken !== undefined) {
             await updateLessonSolve(refreshToken, id);
@@ -55,12 +63,7 @@ const LessonPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
         onSecondaryAction={closeSecondarily}
       />
 
-      <PuzzleHeader
-        title={title}
-        info={description}
-        author={author}
-        puzzleNum={`${id}`}
-      />
+      <PuzzleHeader title={title} info={description} author={author} puzzleNum={`${id}`} />
 
       <IndicatorContainer>
         <GameStatusIndicator category={category} />
