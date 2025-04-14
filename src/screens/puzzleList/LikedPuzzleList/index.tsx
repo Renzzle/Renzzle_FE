@@ -7,7 +7,6 @@ import useAuthStore from '../../../store/useAuthStore';
 import { getLikePuzzle } from '../../../apis/user';
 import { CardsContainer, PuzzleListContainer } from './index.styles';
 import PuzzleListCard from '../../../components/features/PuzzleListCard';
-import TagSmall from '../../../components/common/TagSmall';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 
 const LikedPuzzleList = () => {
@@ -21,8 +20,7 @@ const LikedPuzzleList = () => {
         if (accessToken === undefined) {
           alert('accesstoken 없음');
           navigation.navigate('Signin');
-        }
-        else {
+        } else {
           try {
             const data = await getLikePuzzle(accessToken, 100);
             setPuzzleList(data);
@@ -34,40 +32,45 @@ const LikedPuzzleList = () => {
       loadPuzzleList();
 
       return () => {};
-    }, [accessToken, navigation])
+    }, [accessToken, navigation]),
   );
 
   return (
     <PuzzleListContainer>
       <ScrollView>
         <CardsContainer>
-          {puzzleList?.isSuccess && (
+          {puzzleList?.isSuccess &&
             puzzleList.response.map((puzzle) => {
               return (
                 <PuzzleListCard
                   key={puzzle.id}
                   title={puzzle.title}
                   author={puzzle.authorName}
-                  description={`해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
+                  description={`해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${
+                    puzzle.depth
+                  } • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(
+                    puzzle.winColor,
+                  )}선승`}
                   sequence={puzzle.boardStatus}
                   isLocked={false}
-                  bottom={() => (
-                    <TagSmall>No.{`${puzzle.id}`}</TagSmall>
-                  )}
+                  bottom={() => <></>}
                   onPress={() => {
                     navigation.navigate('CommunityPuzzleSolve', {
                       id: puzzle.id,
                       boardStatus: puzzle.boardStatus,
                       title: puzzle.title,
                       author: puzzle.authorName,
-                      description: `해결 ${puzzle.solvedCount} • 정답률 ${puzzle.correctRate}% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`,
+                      description: `해결 ${puzzle.solvedCount} • 정답률 ${
+                        puzzle.correctRate
+                      }% • 깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(
+                        puzzle.difficulty,
+                      )} • ${toWinColorEnum(puzzle.winColor)}선승`,
                       depth: puzzle.depth,
                     });
                   }}
                 />
               );
-            })
-          )}
+            })}
         </CardsContainer>
       </ScrollView>
     </PuzzleListContainer>

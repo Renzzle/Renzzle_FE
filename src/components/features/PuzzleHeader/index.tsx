@@ -2,8 +2,14 @@ import React from 'react';
 import CustomText from '../../common/CustomText';
 import { View } from 'react-native';
 import { HeartIcon, HeartOutlineIcon } from '../../common/Icons';
-import { AuthorContainer, HeaderContainer, LikeButton, TitleAndNumber, TitleTextContainer, TopContainer } from './index.styles';
-import TagSmall from '../../common/TagSmall';
+import {
+  AuthorContainer,
+  HeaderContainer,
+  LikeButton,
+  TitleAndNumber,
+  TitleTextContainer,
+  TopContainer,
+} from './index.styles';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 
 interface PuzzleHeaderProps {
@@ -15,7 +21,14 @@ interface PuzzleHeaderProps {
   handleLikePress?: () => void;
 }
 
-const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null, handleLikePress }: PuzzleHeaderProps) => {
+const PuzzleHeader = ({
+  title,
+  info,
+  author,
+  puzzleNum,
+  isLiked = null,
+  handleLikePress,
+}: PuzzleHeaderProps) => {
   const width = useDeviceWidth();
 
   return (
@@ -28,11 +41,6 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null, handleLi
                 {title}
               </CustomText>
             </TitleTextContainer>
-            {puzzleNum &&
-              <TagSmall>
-                {`No.${puzzleNum}`}
-              </TagSmall>
-            }
           </TitleAndNumber>
 
           {isLiked !== null ? (
@@ -44,12 +52,11 @@ const PuzzleHeader = ({ title, info, author, puzzleNum, isLiked = null, handleLi
           )}
         </TopContainer>
 
-        {info !== '' &&
+        {info !== '' && (
           <CustomText size={10} lineHeight="sm" color="gray/gray500">
             {info}
           </CustomText>
-        }
-
+        )}
       </View>
 
       <AuthorContainer>
