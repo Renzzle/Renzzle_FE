@@ -9,7 +9,7 @@ interface ButtonPropsType {
   category?: 'primary' | 'secondary';
 }
 
-const Button = ({
+const CustomButton = ({
   children,
   onPress = () => {},
   disabled = false,
@@ -18,11 +18,7 @@ const Button = ({
   if (category === 'primary') {
     return (
       <StyledPrimaryButton onPress={onPress} disabled={disabled}>
-        <CustomText
-          weight="bold"
-          lineHeight="sm"
-          color={disabled ? 'gray/gray400' : 'gray/white'}
-        >
+        <CustomText weight="bold" lineHeight="sm" color={disabled ? 'gray/gray400' : 'gray/white'}>
           {children}
         </CustomText>
       </StyledPrimaryButton>
@@ -34,8 +30,7 @@ const Button = ({
         <CustomText
           weight="bold"
           lineHeight="sm"
-          color={disabled ? 'gray/gray400' : 'sub_color/green/p'}
-        >
+          color={disabled ? 'gray/gray400' : 'main_color/blue_p'}>
           {children}
         </CustomText>
       </StyledSecondaryButton>
@@ -43,4 +38,4 @@ const Button = ({
   }
 };
 
-export default Button;
+export default CustomButton;

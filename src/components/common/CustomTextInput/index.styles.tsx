@@ -13,7 +13,7 @@ export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
   padding: 5px 50px 5px 16px;
   color: ${theme.color['gray/gray900']};
   border-width: 1px;
-  border-radius: 18px;
+  border-radius: 13px;
 
   border-color: ${({ isFocused, hasError }) =>
     isFocused

@@ -28,9 +28,36 @@
         "solvedStatus": "풀이여부"
       }
     },
+    "trainingPuzzleSuccess": {
+      "title": "퍼즐 풀기 성공",
+      "message": "오목을 완성하였습니다!",
+      "confirm": "다음문제",
+      "cancel": "나가기"
+    },
+    "communityPuzzleSuccess": {
+      "title": "퍼즐 풀기 성공",
+      "message": "오목을 완성하였습니다!",
+      "confirm": "나가기"
+    },
+    "rankingPuzzleSuccess": {
+      "title": "퍼즐 풀기 성공",
+      "message": "오목을 완성하였습니다!",
+      "confirm": "나가기"
+    },
+    "PuzzleFailure": {
+      "title": "퍼즐 풀기 실패",
+      "message": "수 제한 이내에 오목을 만들지 못하였습니다.",
+      "confirm": "나가기"
+    },
     "validationComplete": {
       "title": "검증이 완료되었습니다.",
       "message": "검증한 수순을 확인하고 업로드하세요. 수정 후 업로드 시 미인증 상태로 변경됩니다.",
+      "confirm": "확인",
+      "cancel": "취소"
+    },
+    "validationFailed": {
+      "title": "검증이 실패하였습니다.",
+      "message": "수순을 입력하여 미인증 퍼즐 업로드가 가능합니다.",
       "confirm": "확인",
       "cancel": "취소"
     }

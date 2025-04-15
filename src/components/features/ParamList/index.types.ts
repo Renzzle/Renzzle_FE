@@ -1,7 +1,4 @@
-import { RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-type RootStackParamList = {
+export type RootStackParamList = {
   CommunityPuzzleSolve: {
     id: number;
     boardStatus: string;
@@ -14,19 +11,4 @@ type RootStackParamList = {
     chapter: number;
   };
   OtherScreen: undefined;
-};
-
-type CommunityPuzzleSolveRouteProp = RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>;
-type CommunityPuzzleSolveNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CommunityPuzzleSolve'>;
-type LessonPuzzleListRouteProp = RouteProp<RootStackParamList, 'LessonPuzzleList'>;
-type LessonPuzzleListNavigationProp = NativeStackNavigationProp<RootStackParamList, 'LessonPuzzleList'>;
-
-export type CommunityPuzzleSolveProps = {
-  route: CommunityPuzzleSolveRouteProp;
-  navigation: CommunityPuzzleSolveNavigationProp;
-};
-
-export type LessonPuzzleListProps = {
-  route: LessonPuzzleListRouteProp;
-  navigation: LessonPuzzleListNavigationProp;
 };

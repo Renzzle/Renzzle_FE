@@ -1,22 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { CommunityPuzzleSolveProps } from '../../../components/features/ParamList/index.types';
+import { RootStackParamList } from '../../../components/features/ParamList/index.types';
 import { IndicatorContainer, SolveContainer } from './index.styles';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
-import GameStatusIndicator, { IndicatorCategoryType } from '../../../components/features/GameStatusIndicator';
+import GameStatusIndicator, {
+  IndicatorCategoryType,
+} from '../../../components/features/GameStatusIndicator';
 import Board from '../../../components/features/Board';
 import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { updateLike } from '../../../apis/user';
 import useAuthStore from '../../../store/useAuthStore';
 
-const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
+const CommunityPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>>();
   const { id, boardStatus, title, author, description, depth } = route.params;
   const [isWin, setIsWin] = useState<boolean | null>(null);
-  const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [category, setCategory] = useState<IndicatorCategoryType>();
 
@@ -24,7 +33,9 @@ const CommunityPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
   const { accessToken } = useAuthStore();
 
   const handleLikePress = async () => {
-    if (like === null) {return;}
+    if (like === null) {
+      return;
+    }
     if (accessToken !== undefined) {
       const isLiked = await updateLike(accessToken, id);
       setLike(isLiked);

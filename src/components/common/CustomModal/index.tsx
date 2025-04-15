@@ -1,48 +1,55 @@
 import React from 'react';
 import { Modal, useWindowDimensions, View } from 'react-native';
-import { CenteredView, ModalBodyContainer, ModalBottomContainer, ModalContainer, ModalExitContainer, ModalTitleContainer, ModalTopContainer } from './index.styles';
+import {
+  CenteredView,
+  ModalBodyContainer,
+  ModalBottomContainer,
+  ModalContainer,
+  ModalTitleContainer,
+  ModalTopContainer,
+} from './index.styles';
 import CustomText from '../CustomText';
-import Button from '../Button';
-import { BellIcon, LogoutIcon } from '../Icons';
+import CustomButton from '../CustomButton';
+import { useTranslation } from 'react-i18next';
 
 export type ModalCategoryType =
-  | 'LESSON_PUZZLE_SUCCESS'
+  | 'TRAINING_PUZZLE_SUCCESS'
   | 'COMMUNITY_PUZZLE_SUCCESS'
-  | 'AI_PUZZLE_SUCCESS'
+  | 'RANKING_PUZZLE_SUCCESS'
   | 'PUZZLE_FAILURE'
   | 'VALIDATION_COMPLETE'
   | 'VALIDATION_FAILED';
 
 export const MODAL_TEXTS = {
-  LESSON_PUZZLE_SUCCESS: {
-    TITLE: '퍼즐 풀기 성공',
-    BODY: '오목을 완성하였습니다!',
-    FOOTER: '다음문제',
+  TRAINING_PUZZLE_SUCCESS: {
+    TITLE: 'modal.trainingPuzzleSuccess.title',
+    BODY: 'modal.trainingPuzzleSuccess.message',
+    FOOTER: ['modal.trainingPuzzleSuccess.cancel', 'modal.trainingPuzzleSuccess.confirm'],
   },
   COMMUNITY_PUZZLE_SUCCESS: {
-    TITLE: '퍼즐 풀기 성공',
-    BODY: '오목을 완성하였습니다!',
-    FOOTER: '나가기',
+    TITLE: 'modal.communityPuzzleSuccess.title',
+    BODY: 'modal.communityPuzzleSuccess.message',
+    FOOTER: 'modal.communityPuzzleSuccess.confirm',
   },
-  AI_PUZZLE_SUCCESS: {
-    TITLE: '퍼즐 풀기 성공',
-    BODY: '오목을 완성하였습니다!',
-    FOOTER: '나가기',
+  RANKING_PUZZLE_SUCCESS: {
+    TITLE: 'modal.rankingPuzzleSuccess.title',
+    BODY: 'modal.rankingPuzzleSuccess.message',
+    FOOTER: 'modal.rankingPuzzleSuccess.confirm',
   },
   PUZZLE_FAILURE: {
-    TITLE: '퍼즐 풀기 실패',
-    BODY: '수 제한 이내에 오목을 만들지 못하였습니다.',
-    FOOTER: '나가기',
+    TITLE: 'modal.PuzzleFailure.title',
+    BODY: 'modal.PuzzleFailure.message',
+    FOOTER: 'modal.PuzzleFailure.confirm',
   },
   VALIDATION_COMPLETE: {
-    TITLE: '검증이 완료되었습니다.',
-    BODY: '업로드하시겠습니까?',
-    FOOTER: ['취소', '업로드'],
+    TITLE: 'modal.validationComplete.title',
+    BODY: 'modal.validationComplete.message',
+    FOOTER: ['modal.validationComplete.cancel', 'modal.trainingPuzzleSuccess.confirm'],
   },
   VALIDATION_FAILED: {
-    TITLE: '검증이 실패하였습니다.',
-    BODY: '다시 시도해 주세요.',
-    FOOTER: '확인',
+    TITLE: 'modal.validationFailed.title',
+    BODY: 'modal.validationFailed.message',
+    FOOTER: 'modal.validationFailed.confirm',
   },
 };
 
@@ -60,47 +67,39 @@ export const ModalCard = ({
   onSecondaryAction: onSecondaryClose = () => {},
 }: Omit<CustomModalProps, 'isVisible'>) => {
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
 
   if (!category) {
     return <View />;
   }
-  const {
-    TITLE: titleText,
-    BODY: bodyText,
-    FOOTER: footerTexts,
-  } = MODAL_TEXTS[category];
+  const { TITLE: titleText, BODY: bodyText, FOOTER: footerTexts } = MODAL_TEXTS[category];
 
   const title = (
     <ModalTopContainer>
       <ModalTitleContainer>
-        <BellIcon />
         <CustomText size={18} weight="bold" lineHeight="sm">
-          {titleText}
+          {t(titleText)}
         </CustomText>
       </ModalTitleContainer>
-      {category === 'AI_PUZZLE_SUCCESS' ? (
-        <ModalExitContainer onPress={onPrimaryClose}>
-          {/* TODO: onPress 출제화면으로 이동 */}
-          <CustomText size={12} lineHeight="sm" color="gray/gray600">
-            바로출제
-          </CustomText>
-          <LogoutIcon color="gray/gray400" />
-        </ModalExitContainer>
+      {category === 'RANKING_PUZZLE_SUCCESS' ? (
+        // <ModalExitContainer onPress={onPrimaryClose}>
+        //   {/* TODO: onPress 출제화면으로 이동 */}
+        //   <CustomText size={12} lineHeight="sm" color="gray/gray600">
+        //     바로출제
+        //   </CustomText>
+        //   <LogoutIcon color="gray/gray400" />
+        // </ModalExitContainer>
+        <View />
       ) : (
         <View />
       )}
-
     </ModalTopContainer>
   );
 
   const body = (
     <ModalBodyContainer>
-      <CustomText
-        size={14}
-        lineHeight="lg"
-        color="gray/gray600"
-      >
-        {bodyText}
+      <CustomText size={14} lineHeight="lg" color="gray/gray600">
+        {t(bodyText)}
       </CustomText>
     </ModalBodyContainer>
   );
@@ -108,18 +107,18 @@ export const ModalCard = ({
   const footer =
     typeof footerTexts === 'string' ? (
       <ModalBottomContainer>
-        <Button category="primary" onPress={onPrimaryClose}>
-          {footerTexts}
-        </Button>
+        <CustomButton category="primary" onPress={onPrimaryClose}>
+          {t(footerTexts)}
+        </CustomButton>
       </ModalBottomContainer>
     ) : (
       <ModalBottomContainer>
-        <Button category="secondary" onPress={onSecondaryClose}>
-          {footerTexts[0]}
-        </Button>
-        <Button category="primary" onPress={onPrimaryClose}>
-          {footerTexts[1]}
-        </Button>
+        <CustomButton category="secondary" onPress={onSecondaryClose}>
+          {t(footerTexts[0])}
+        </CustomButton>
+        <CustomButton category="primary" onPress={onPrimaryClose}>
+          {t(footerTexts[1])}
+        </CustomButton>
       </ModalBottomContainer>
     );
 
@@ -136,14 +135,8 @@ export const ModalCard = ({
 
 const CustomModal = ({ isVisible, ...props }: CustomModalProps) => {
   return (
-    <Modal
-      visible={isVisible}
-      transparent={true}
-      animationType="fade"
-    >
-      {isVisible && (
-        <ModalCard {...props} />
-      )}
+    <Modal visible={isVisible} transparent={true} animationType="fade">
+      {isVisible && <ModalCard {...props} />}
     </Modal>
   );
 };

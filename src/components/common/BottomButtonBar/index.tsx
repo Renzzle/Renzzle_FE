@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { StyledBottomButtonBar } from './indes.styles';
-import Button from '../Button';
+import { StyledBottomButtonBar } from './index.styles';
+import CustomButton from '../CustomButton';
 
 type BottomButtonBarType = {
   transitions: {
@@ -11,7 +11,7 @@ type BottomButtonBarType = {
 };
 
 export function BottomBar({ children }: { children: ReactNode }) {
-  return {children};
+  return { children };
 }
 
 export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
@@ -19,20 +19,18 @@ export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
     const [secondaryTransition, primaryTransition] = transitions;
     return (
       <StyledBottomButtonBar>
-        <Button
+        <CustomButton
           onPress={secondaryTransition.onAction}
           disabled={secondaryTransition.disabled}
-          category="secondary"
-        >
+          category="secondary">
           {secondaryTransition.text}
-        </Button>
-        <Button
+        </CustomButton>
+        <CustomButton
           onPress={primaryTransition.onAction}
           disabled={primaryTransition.disabled}
-          category="primary"
-        >
+          category="primary">
           {primaryTransition.text}
-        </Button>
+        </CustomButton>
       </StyledBottomButtonBar>
     );
   }
@@ -41,13 +39,12 @@ export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
     const primaryTransition = transitions[0];
     return (
       <StyledBottomButtonBar>
-        <Button
+        <CustomButton
           onPress={primaryTransition.onAction}
           disabled={primaryTransition.disabled}
-          category="secondary"
-        >
+          category="secondary">
           {primaryTransition.text}
-        </Button>
+        </CustomButton>
       </StyledBottomButtonBar>
     );
   }
