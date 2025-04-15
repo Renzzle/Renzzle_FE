@@ -1,13 +1,27 @@
-
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { BoardAndPutContainer, BoardBackground, CellContainer, FramContainer, FrameCell, FrameRow, IndicatePoint, PutButtonContainer, Stone, StoneRow } from './index.styles';
+import {
+  BoardAndPutContainer,
+  BoardBackground,
+  CellContainer,
+  FramContainer,
+  FrameCell,
+  FrameRow,
+  IndicatePoint,
+  PutButtonContainer,
+  Stone,
+  StoneRow,
+} from './index.styles';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import BoardFrameNumber from './BoardFrameNumber';
 import CircleButton from '../CircleButton';
-import { AppIcon } from '../../common/Icons';
-import theme from '../../../styles/theme';
-import { BOARD_SIZE, convertLowercaseAlphabetToNumber, convertToLowercaseAlphabet, convertToReverseNumber, valueToCoordinates } from '../../../utils/utils';
+import {
+  BOARD_SIZE,
+  convertLowercaseAlphabetToNumber,
+  convertToLowercaseAlphabet,
+  convertToReverseNumber,
+  valueToCoordinates,
+} from '../../../utils/utils';
 import { NativeModules, ViewStyle } from 'react-native';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
@@ -21,13 +35,20 @@ interface BoardProps {
   winDepth?: number;
 }
 
-const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDepth }: BoardProps) => {
+const Board = ({
+  mode,
+  sequence = '',
+  setSequence,
+  setIsWin,
+  setIsLoading,
+  winDepth,
+}: BoardProps) => {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
 
   const [board, setBoard] = useState<StoneType[][]>(
-    Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0))
+    Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0)),
   );
   const [isBlackTurn, setIsBlackTurn] = useState(true);
   const [stoneX, setStoneX] = useState<number | null>();
@@ -59,7 +80,9 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
 
   const handlePut = async () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
-      if (board[stoneX][stoneY] !== 0) {return;}
+      if (board[stoneX][stoneY] !== 0) {
+        return;
+      }
 
       addToSequence(stoneX, stoneY);
       updateBoard(stoneX, stoneY);
@@ -79,8 +102,12 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
   const handleAiTurn = async (userSequence: string) => {
     try {
       const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
-      if (result === -1) {setIsWin?.(false);}
-      if (result === 1000) {setIsWin?.(true);}
+      if (result === -1) {
+        setIsWin?.(false);
+      }
+      if (result === 1000) {
+        setIsWin?.(true);
+      }
       setAiAnswer(result);
     } catch (error) {
       console.error('AI computation failed: ', error);
@@ -91,10 +118,12 @@ const Board = ({ mode, sequence = '', setSequence, setIsWin, setIsLoading, winDe
     const processAiAnswer = async () => {
       if (aiAnswer !== null && aiAnswer !== undefined) {
         const coordinates = valueToCoordinates(aiAnswer);
-        if (!coordinates) {return;}
+        if (!coordinates) {
+          return;
+        }
 
         const { x, y } = coordinates;
-        addToSequence(x,y);
+        addToSequence(x, y);
         updateBoard(x, y);
         setIsBlackTurn(!isBlackTurn);
         setConfirmPut(false);
@@ -208,13 +237,22 @@ interface CellProps {
   style?: ViewStyle;
 }
 
-export const Cell = ({ pos, stone, cellWidth, stoneX, stoneY, onPress, showHighlights = true, style }: CellProps) => {
+export const Cell = ({
+  pos,
+  stone,
+  cellWidth,
+  stoneX,
+  stoneY,
+  onPress,
+  showHighlights = true,
+  style,
+}: CellProps) => {
   return (
     <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
-        <AppIcon name="image-filter-center-focus" size={cellWidth} color={theme.color['error/error_color']} />
+        <></>
       ) : showHighlights &&
         (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') ? (
         <IndicatePoint />

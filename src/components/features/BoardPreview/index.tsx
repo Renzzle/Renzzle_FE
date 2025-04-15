@@ -2,8 +2,11 @@
 
 import React from 'react';
 import Preview from './index.styles';
-import { LockIcon } from '../../common/Icons';
-import { BOARD_SIZE, convertLowercaseAlphabetToNumber, convertToReverseNumber } from '../../../utils/utils';
+import {
+  BOARD_SIZE,
+  convertLowercaseAlphabetToNumber,
+  convertToReverseNumber,
+} from '../../../utils/utils';
 import { Cell } from '../Board';
 
 interface BoardPreviewProps {
@@ -19,7 +22,9 @@ const parseSequence = (sequence: string) => {
   while (i < sequence.length) {
     const letter = sequence[i];
     const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/); // Match up to 2-digit numbers
-    if (!numberMatch) {break;}
+    if (!numberMatch) {
+      break;
+    }
 
     const number = numberMatch[0];
     const x = convertToReverseNumber(parseInt(number, 10));
@@ -36,16 +41,11 @@ const parseSequence = (sequence: string) => {
   return moves;
 };
 
-
 const BoardPreview = ({ isLocked = false, sequence = '' }: BoardPreviewProps) => {
   const moves = React.useMemo(() => parseSequence(sequence), [sequence]);
 
   if (isLocked) {
-    return (
-      <Preview isLocked={true}>
-        <LockIcon />
-      </Preview>
-    );
+    return <Preview isLocked={true} />;
   }
 
   return (

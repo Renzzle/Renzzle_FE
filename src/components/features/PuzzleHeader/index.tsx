@@ -1,7 +1,6 @@
 import React from 'react';
 import CustomText from '../../common/CustomText';
 import { View } from 'react-native';
-import { HeartIcon, HeartOutlineIcon } from '../../common/Icons';
 import {
   AuthorContainer,
   HeaderContainer,
@@ -25,7 +24,6 @@ const PuzzleHeader = ({
   title,
   info,
   author,
-  puzzleNum,
   isLiked = null,
   handleLikePress,
 }: PuzzleHeaderProps) => {
@@ -43,13 +41,7 @@ const PuzzleHeader = ({
             </TitleTextContainer>
           </TitleAndNumber>
 
-          {isLiked !== null ? (
-            <LikeButton onPress={handleLikePress}>
-              {isLiked ? <HeartIcon /> : <HeartOutlineIcon />}
-            </LikeButton>
-          ) : (
-            <View />
-          )}
+          {isLiked !== null ? <LikeButton onPress={handleLikePress} /> : <View />}
         </TopContainer>
 
         {info !== '' && (

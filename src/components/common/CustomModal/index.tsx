@@ -5,13 +5,11 @@ import {
   ModalBodyContainer,
   ModalBottomContainer,
   ModalContainer,
-  ModalExitContainer,
   ModalTitleContainer,
   ModalTopContainer,
 } from './index.styles';
 import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
-import { BellIcon, LogoutIcon } from '../Icons';
 import { useTranslation } from 'react-i18next';
 
 export type ModalCategoryType =
@@ -79,7 +77,6 @@ export const ModalCard = ({
   const title = (
     <ModalTopContainer>
       <ModalTitleContainer>
-        <BellIcon />
         <CustomText size={18} weight="bold" lineHeight="sm">
           {t(titleText)}
         </CustomText>
