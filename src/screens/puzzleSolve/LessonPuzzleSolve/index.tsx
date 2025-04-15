@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
-import { CommunityPuzzleSolveProps } from '../../../components/features/ParamList/index.types';
+import { RootStackParamList } from '../../../components/features/ParamList/index.types';
 import GameStatusIndicator, {
   IndicatorCategoryType,
 } from '../../../components/features/GameStatusIndicator';
@@ -14,8 +14,9 @@ import useModal from '../../../hooks/useModal';
 import { updateLessonSolve } from '../../../apis/lesson';
 import useAuthStore from '../../../store/useAuthStore';
 
-const LessonPuzzleSolve = ({ route }: CommunityPuzzleSolveProps) => {
+const LessonPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>>();
   const { id, boardStatus, title, author, description, depth } = route.params;
   const [isWin, setIsWin] = useState<boolean | null>(null);
   const {

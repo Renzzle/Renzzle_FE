@@ -1,4 +1,4 @@
-export default interface CommunityPuzzle {
+export interface CommunityPuzzle {
   id: number;
   title: string;
   boardStatus: string;

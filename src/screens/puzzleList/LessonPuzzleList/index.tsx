@@ -3,17 +3,24 @@ import React, { useCallback, useState } from 'react';
 import { CardsContainer, PuzzleListContainer } from './index.styles';
 import PuzzleListCard from '../../../components/features/PuzzleListCard';
 import useAuthStore from '../../../store/useAuthStore';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import {
+  ParamListBase,
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LessonPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
 import { getLessonPuzzle } from '../../../apis/lesson';
-import { LessonPuzzleListProps } from '../../../components/features/ParamList/index.types';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 import CustomText from '../../../components/common/CustomText';
 import { ScrollView } from 'react-native';
+import { RootStackParamList } from '../../../components/features/ParamList/index.types';
 
-const LessonPuzzleList = ({ route }: LessonPuzzleListProps) => {
+const LessonPuzzleList = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'LessonPuzzleList'>>();
   const [puzzleList, setPuzzleList] = useState<LessonPuzzleListResponse>();
   const { accessToken } = useAuthStore();
   const { chapter } = route.params;
@@ -24,8 +31,7 @@ const LessonPuzzleList = ({ route }: LessonPuzzleListProps) => {
         if (accessToken === undefined) {
           alert('accesstoken 없음');
           navigation.navigate('Signin');
-        }
-        else {
+        } else {
           try {
             const data = await getLessonPuzzle(accessToken, chapter, 100);
             setPuzzleList(data);
@@ -37,25 +43,29 @@ const LessonPuzzleList = ({ route }: LessonPuzzleListProps) => {
       loadPuzzleList();
 
       return () => {};
-    }, [accessToken, navigation])
+    }, [accessToken, navigation]),
   );
 
   return (
     <PuzzleListContainer>
       <ScrollView>
         <CardsContainer>
-          {puzzleList?.isSuccess && (
+          {puzzleList?.isSuccess &&
             puzzleList.response.map((puzzle) => {
               return (
                 <PuzzleListCard
                   key={puzzle.id}
                   title={puzzle.title}
                   author="Renzzle"
-                  description={`깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`}
+                  description={`깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(
+                    puzzle.difficulty,
+                  )} • ${toWinColorEnum(puzzle.winColor)}선승`}
                   sequence={puzzle.boardStatus}
-                  isLocked={!puzzle.isLocked}  // TODO: 잠금 - 심각!!!!! 서버에서 locked T/F 바꾸면 바꿔주기
+                  isLocked={!puzzle.isLocked} // TODO: 잠금 - 심각!!!!! 서버에서 locked T/F 바꾸면 바꿔주기
                   bottom={() => (
-                    <CustomText size={10} lineHeight="sm" color="gray/gray500">{puzzle.description}</CustomText>
+                    <CustomText size={10} lineHeight="sm" color="gray/gray500">
+                      {puzzle.description}
+                    </CustomText>
                   )}
                   onPress={() => {
                     navigation.navigate('LessonPuzzleSolve', {
@@ -63,14 +73,15 @@ const LessonPuzzleList = ({ route }: LessonPuzzleListProps) => {
                       boardStatus: puzzle.boardStatus,
                       title: puzzle.title,
                       author: 'Renzzle',
-                      description: `깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(puzzle.difficulty)} • ${toWinColorEnum(puzzle.winColor)}선승`,
+                      description: `깊이 ${puzzle.depth} • 난이도 ${toDifficultyEnum(
+                        puzzle.difficulty,
+                      )} • ${toWinColorEnum(puzzle.winColor)}선승`,
                       depth: puzzle.depth,
                     });
                   }}
                 />
               );
-            })
-          )}
+            })}
         </CardsContainer>
       </ScrollView>
     </PuzzleListContainer>
