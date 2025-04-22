@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 import CircleButton from '../../../components/features/CircleButton';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getCommunityPuzzle } from '../../../apis/community';
-import { CommunityPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
+import { CommunityPuzzleListResponse } from '../../../components/types';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuthStore from '../../../store/useAuthStore';
