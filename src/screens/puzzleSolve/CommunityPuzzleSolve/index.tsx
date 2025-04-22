@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { RootStackParamList } from '../../../components/features/types';
+import { RootStackParamList } from '../../../components/types';
 import { IndicatorContainer, SolveContainer } from './index.styles';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
 import GameStatusIndicator, {

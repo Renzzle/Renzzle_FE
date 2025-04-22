@@ -1,7 +1,7 @@
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { CommunityPuzzleListResponse } from '../../../components/features/types';
+import { CommunityPuzzleListResponse } from '../../../components/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuthStore from '../../../store/useAuthStore';
 import { getLikePuzzle } from '../../../apis/user';

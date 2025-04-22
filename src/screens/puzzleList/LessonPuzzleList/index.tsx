@@ -15,7 +15,7 @@ import { getLessonPuzzle } from '../../../apis/lesson';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 import CustomText from '../../../components/common/CustomText';
 import { ScrollView } from 'react-native';
-import { LessonPuzzleListResponse, RootStackParamList } from '../../../components/features/types';
+import { LessonPuzzleListResponse, RootStackParamList } from '../../../components/types';
 
 const LessonPuzzleList = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();

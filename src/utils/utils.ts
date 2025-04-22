@@ -1,4 +1,4 @@
-import { Difficulty, WinColor } from '../components/features/types';
+import { Difficulty, WinColor } from '../components/types';
 
 export const BOARD_SIZE = 15;
 
