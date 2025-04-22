@@ -11,12 +11,11 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LessonPuzzleListResponse } from '../../../components/features/Puzzle/index.types';
 import { getLessonPuzzle } from '../../../apis/lesson';
 import { toDifficultyEnum, toWinColorEnum } from '../../../utils/utils';
 import CustomText from '../../../components/common/CustomText';
 import { ScrollView } from 'react-native';
-import { RootStackParamList } from '../../../components/features/ParamList/index.types';
+import { LessonPuzzleListResponse, RootStackParamList } from '../../../components/features/types';
 
 const LessonPuzzleList = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();

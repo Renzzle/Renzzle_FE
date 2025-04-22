@@ -2,7 +2,7 @@
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
-import { RootStackParamList } from '../../../components/features/ParamList/index.types';
+import { RootStackParamList } from '../../../components/features/types';
 import GameStatusIndicator, {
   IndicatorCategoryType,
 } from '../../../components/features/GameStatusIndicator';
