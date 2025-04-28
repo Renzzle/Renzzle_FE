@@ -1,72 +1,45 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import React from 'react';
-import Preview from './index.styles';
-import {
-  BOARD_SIZE,
-  convertLowercaseAlphabetToNumber,
-  convertToReverseNumber,
-} from '../../../utils/utils';
+import Preview, { InnerBorder } from './index.styles';
 import { Cell } from '../Board';
+import { BOARD_SIZE, parseSequence } from '../../../utils/utils';
 
 interface BoardPreviewProps {
   isLocked?: boolean;
   sequence?: string;
+  size?: number;
 }
 
-const parseSequence = (sequence: string) => {
-  const moves: { x: number; y: number; stone: 1 | 2 }[] = [];
-  let turn = true; // true: black (1), false: white (2)
-
-  let i = 0;
-  while (i < sequence.length) {
-    const letter = sequence[i];
-    const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/); // Match up to 2-digit numbers
-    if (!numberMatch) {
-      break;
-    }
-
-    const number = numberMatch[0];
-    const x = convertToReverseNumber(parseInt(number, 10));
-    const y = convertLowercaseAlphabetToNumber(letter);
-
-    if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
-      moves.push({ x, y, stone: turn ? 1 : 2 });
-      turn = !turn;
-    }
-
-    i += 1 + number.length; // Move to the next letter-number pair
-  }
-
-  return moves;
-};
-
-const BoardPreview = ({ isLocked = false, sequence = '' }: BoardPreviewProps) => {
+const BoardPreview = ({ isLocked = false, sequence = '', size = 90 }: BoardPreviewProps) => {
   const moves = React.useMemo(() => parseSequence(sequence), [sequence]);
+  const cellWidth = size / BOARD_SIZE;
 
   if (isLocked) {
-    return <Preview isLocked={true} />;
+    return <Preview isLocked={true} size={size} />;
   }
 
   return (
-    <Preview isLocked={false}>
-      {moves.map(({ x, y, stone }, index) => (
-        <Cell
-          key={index}
-          pos={`${x}-${y}`}
-          stone={stone}
-          cellWidth={6} // Assume a fixed width
-          stoneX={x}
-          stoneY={y}
-          onPress={() => {}}
-          showHighlights={false}
-          style={{
-            position: 'absolute',
-            top: x * 6, // Adjust based on cell size
-            left: y * 6, // Adjust based on cell size
-          }}
-        />
-      ))}
+    <Preview isLocked={false} size={size}>
+      <InnerBorder size={size - 4}>
+        {moves.map(({ x, y, stone }, index) => (
+          <Cell
+            key={index}
+            pos={`${x}-${y}`}
+            stone={stone}
+            cellWidth={cellWidth} // Assume a fixed width
+            stoneX={x}
+            stoneY={y}
+            onPress={() => {}}
+            showHighlights={false}
+            style={{
+              position: 'absolute',
+              top: 1 + x * (cellWidth - 0.5), // Adjust based on cell size
+              left: 1 + y * (cellWidth - 0.5), // Adjust based on cell size
+            }}
+          />
+        ))}
+      </InnerBorder>
     </Preview>
   );
 };
