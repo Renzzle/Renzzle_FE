@@ -3,22 +3,22 @@ import { Difficulty, WinColor } from '../components/types';
 export const BOARD_SIZE = 15;
 
 export const convertToReverseNumber = (num: number): number => {
-  if (num < 0 || num > BOARD_SIZE - 1) {
-    throw new Error('Input number must be between 0 and 14');
+  if (num < 1 || num > BOARD_SIZE) {
+    throw new Error('Input number must be between 1 and 15');
   }
   return BOARD_SIZE - num;
 };
 
 export const convertToUppercaseAlphabet = (num: number): string => {
-  if (num < 0 || num > BOARD_SIZE - 1) {
-    throw new Error('Input number must be between 0 and 14');
+  if (num < 1 || num > BOARD_SIZE) {
+    throw new Error('Input number must be between 1 and 15');
   }
   return String.fromCharCode(65 + num);
 };
 
 export const convertToLowercaseAlphabet = (num: number): string => {
-  if (num < 0 || num > BOARD_SIZE - 1) {
-    throw new Error('Input number must be between 0 and 14');
+  if (num < 1 || num > BOARD_SIZE) {
+    throw new Error('Input number must be between 1 and 15');
   }
   return String.fromCharCode(97 + num);
 };
@@ -39,6 +39,39 @@ export const valueToCoordinates = (value: number): { x: number; y: number } | nu
   const x = BOARD_SIZE - 1 - (value % BOARD_SIZE);
 
   return { x, y };
+};
+
+export interface Move {
+  x: number;
+  y: number;
+  stone: 1 | 2;
+}
+
+export const parseSequence = (sequence: string): Move[] => {
+  const moves: Move[] = [];
+  let turn = true; // true: black (1), false: white (2)
+
+  let i = 0;
+  while (i < sequence.length) {
+    const letter = sequence[i];
+    const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/); // Match up to 2-digit numbers
+    if (!numberMatch) {
+      break;
+    }
+
+    const number = numberMatch[0];
+    const x = convertToReverseNumber(parseInt(number, 10));
+    const y = convertLowercaseAlphabetToNumber(letter);
+
+    if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
+      moves.push({ x, y, stone: turn ? 1 : 2 });
+      turn = !turn;
+    }
+
+    i += 1 + number.length; // Move to the next letter-number pair
+  }
+
+  return moves;
 };
 
 export const toDifficultyEnum = (key: string): Difficulty | undefined => {
