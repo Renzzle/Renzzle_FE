@@ -27,6 +27,7 @@ import LightningIcon from './ico-lightning.svg';
 import LockIcon from './ico-lock.svg';
 import NormalUserIcon from './ico-normal-user.svg';
 import NoticeIcon from './ico-notice.svg';
+import PlusIcon from './ico-plus.svg';
 import ProUserIcon from './ico-pro-user.svg';
 import PuzzlePlusIcon from './ico-puzzle-plus.svg';
 import PuzzleSquareIcon from './ico-puzzle-square.svg';
@@ -77,6 +78,7 @@ const Icons = {
   LockIcon,
   NormalUserIcon,
   NoticeIcon,
+  PlusIcon,
   ProUserIcon,
   PuzzlePlusIcon,
   PuzzleSquareIcon,
