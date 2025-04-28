@@ -13,6 +13,7 @@ import ConfusedActiveIcon from './ico-confused-active.svg';
 import ConfusedInactiveIcon from './ico-confused-inactive.svg';
 import CorrectIcon from './ico-correct.svg';
 import DepthIcon from './ico-depth.svg';
+import FocusIcon from './ico-focus.svg';
 import HashTagIcon from './ico-hashtag.svg';
 import HeartActiveIcon from './ico-heart-active.svg';
 import HeartInactiveIcon from './ico-heart-inactive.svg';
@@ -62,6 +63,7 @@ const Icons = {
   ConfusedInactiveIcon,
   CorrectIcon,
   DepthIcon,
+  FocusIcon,
   HashTagIcon,
   HeartActiveIcon,
   HeartInactiveIcon,
