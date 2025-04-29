@@ -12,7 +12,6 @@ import './src/locales/i18n.ts';
 import theme from './src/styles/theme';
 import LessonPuzzleList from './src/screens/puzzleList/LessonPuzzleList';
 import CommunityPuzzleList from './src/screens/puzzleList/CommunityPuzzleList';
-import LessonChapterList from './src/screens/LessonChapterList';
 import LessonPuzzleSolve from './src/screens/puzzleSolve/LessonPuzzleSolve';
 import CommunityPuzzleSolve from './src/screens/puzzleSolve/CommunityPuzzleSolve';
 import CommunityPuzzleMake from './src/screens/puzzleMake/CommunityPuzzleMake';
@@ -38,11 +37,6 @@ function App(): React.JSX.Element {
         }}>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="LessonChapterList"
-          component={LessonChapterList}
-          options={{ title: 'Lesson' }}
-        />
         <Stack.Screen
           name="LessonPuzzleList"
           component={LessonPuzzleList}
