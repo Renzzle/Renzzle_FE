@@ -13,6 +13,7 @@ import ConfusedActiveIcon from './ico-confused-active.svg';
 import ConfusedInactiveIcon from './ico-confused-inactive.svg';
 import CorrectIcon from './ico-correct.svg';
 import DepthIcon from './ico-depth.svg';
+import FocusIcon from './ico-focus.svg';
 import HashTagIcon from './ico-hashtag.svg';
 import HeartActiveIcon from './ico-heart-active.svg';
 import HeartInactiveIcon from './ico-heart-inactive.svg';
@@ -26,6 +27,7 @@ import LightningIcon from './ico-lightning.svg';
 import LockIcon from './ico-lock.svg';
 import NormalUserIcon from './ico-normal-user.svg';
 import NoticeIcon from './ico-notice.svg';
+import PlusIcon from './ico-plus.svg';
 import ProUserIcon from './ico-pro-user.svg';
 import PuzzlePlusIcon from './ico-puzzle-plus.svg';
 import PuzzleSquareIcon from './ico-puzzle-square.svg';
@@ -62,6 +64,7 @@ const Icons = {
   ConfusedInactiveIcon,
   CorrectIcon,
   DepthIcon,
+  FocusIcon,
   HashTagIcon,
   HeartActiveIcon,
   HeartInactiveIcon,
@@ -75,6 +78,7 @@ const Icons = {
   LockIcon,
   NormalUserIcon,
   NoticeIcon,
+  PlusIcon,
   ProUserIcon,
   PuzzlePlusIcon,
   PuzzleSquareIcon,

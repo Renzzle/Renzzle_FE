@@ -1,21 +1,16 @@
 import React from 'react';
 import { ButtonContainer } from './index.styles';
-import CustomText from '../../common/CustomText';
 
 interface PutStoneButtonProps {
   onPress: () => void;
-  category: 'put' | 'add';
   disabled?: boolean;
+  children: React.ReactNode;
 }
 
-const CircleButton = ({ onPress, category, disabled = false }: PutStoneButtonProps) => {
+const CircleButton = ({ onPress, disabled = false, children }: PutStoneButtonProps) => {
   return (
     <ButtonContainer onPress={onPress} disabled={disabled}>
-      {category === 'put' && (
-        <CustomText size={18} weight="bold" lineHeight="sm" color="gray/white">
-          착수
-        </CustomText>
-      )}
+      {children}
     </ButtonContainer>
   );
 };

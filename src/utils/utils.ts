@@ -41,6 +41,39 @@ export const valueToCoordinates = (value: number): { x: number; y: number } | nu
   return { x, y };
 };
 
+export interface Move {
+  x: number;
+  y: number;
+  stone: 1 | 2;
+}
+
+export const parseSequence = (sequence: string): Move[] => {
+  const moves: Move[] = [];
+  let turn = true; // true: black (1), false: white (2)
+
+  let i = 0;
+  while (i < sequence.length) {
+    const letter = sequence[i];
+    const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/); // Match up to 2-digit numbers
+    if (!numberMatch) {
+      break;
+    }
+
+    const number = numberMatch[0];
+    const x = convertToReverseNumber(parseInt(number, 10));
+    const y = convertLowercaseAlphabetToNumber(letter);
+
+    if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
+      moves.push({ x, y, stone: turn ? 1 : 2 });
+      turn = !turn;
+    }
+
+    i += 1 + number.length; // Move to the next letter-number pair
+  }
+
+  return moves;
+};
+
 export const toDifficultyEnum = (key: string): Difficulty | undefined => {
   switch (key) {
     case 'HIGH':

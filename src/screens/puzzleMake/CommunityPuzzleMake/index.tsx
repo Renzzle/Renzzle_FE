@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { IndicatorContainer, MakeContainer, TextInputContainer } from './index.styles';
+import { MakeContainer, TextInputContainer } from './index.styles';
 import Board from '../../../components/features/Board';
-import GameStatusIndicator, { IndicatorCategoryType } from '../../../components/features/GameStatusIndicator';
 import CustomTextInput from '../../../components/common/CustomTextInput';
 import BottomButtonBar from '../../../components/common/BottomButtonBar';
 import { uploadPuzzle } from '../../../apis/community';
@@ -27,20 +26,22 @@ const CommunityPuzzleMake = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [sequence, setSequence] = useState<string>('');
   const [isVerified, setIsVerified] = useState<boolean>(false);
-  const { isModalVisible, activateModal, closePrimarily, closeSecondarily, category: modalCategory } = useModal();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const { accessToken } = useAuthStore();
 
   const { VCFSearchJNI } = NativeModules;
   const [depth, setDepth] = useState<number>();
 
-  const [category, setCategory] = useState<IndicatorCategoryType>();
-
   const verifySequence = async () => {
     try {
-      setCategory('AI_VALIDATION_IN_PROGRESS');
       const result = await VCFSearchJNI.findVCFWrapper(sequence);
       console.log('VCF Wrapper Result: ', result);
-      setCategory(undefined);
       setDepth(result);
     } catch (error) {
       console.error('VCF search failed: ', error);
@@ -115,16 +116,8 @@ const CommunityPuzzleMake = () => {
       />
 
       <TextInputContainer>
-        <CustomTextInput
-          placeholder="Enter a title"
-          value={title}
-          onChangeText={setTitle}
-        />
+        <CustomTextInput placeholder="Enter a title" value={title} onChangeText={setTitle} />
       </TextInputContainer>
-
-      <IndicatorContainer>
-        <GameStatusIndicator category={category} />
-      </IndicatorContainer>
 
       <Board mode="make" sequence={sequence} setSequence={setSequence} />
 

@@ -11,6 +11,5 @@ export const ButtonContainer = styled(TouchableOpacity)<{ disabled: boolean }>`
   elevation: 4;
 
   background-color: ${({ disabled }) =>
-    disabled ? theme.color['gray/gray200'] : theme.color['sub_color/green/c']
-  };
+    disabled ? theme.color['gray/gray200'] : theme.color['main_color/blue_p']};
 `;

@@ -3,10 +3,7 @@ import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-naviga
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { RootStackParamList } from '../../../components/types';
-import GameStatusIndicator, {
-  IndicatorCategoryType,
-} from '../../../components/features/GameStatusIndicator';
-import { IndicatorContainer, SolveContainer } from './index.styles';
+import { SolveContainer } from './index.styles';
 import CustomModal from '../../../components/common/CustomModal';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
 import Board from '../../../components/features/Board';
@@ -27,7 +24,6 @@ const LessonPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
-  const [category, setCategory] = useState<IndicatorCategoryType>();
   const { refreshToken } = useAuthStore();
 
   useEffect(() => {
@@ -52,7 +48,7 @@ const LessonPuzzleSolve = () => {
 
   useEffect(() => {
     console.log('isLoading!!!:', isLoading);
-    isLoading ? setCategory('AI_MOVE_IN_PROGRESS') : setCategory(undefined);
+    // TODO: loading UI
   }, [isLoading]);
 
   return (
@@ -65,10 +61,6 @@ const LessonPuzzleSolve = () => {
       />
 
       <PuzzleHeader title={title} info={description} author={author} puzzleNum={`${id}`} />
-
-      <IndicatorContainer>
-        <GameStatusIndicator category={category} />
-      </IndicatorContainer>
 
       <Board
         mode="solve"

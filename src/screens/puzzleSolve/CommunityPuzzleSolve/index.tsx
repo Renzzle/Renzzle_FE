@@ -1,11 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { RootStackParamList } from '../../../components/types';
-import { IndicatorContainer, SolveContainer } from './index.styles';
+import { SolveContainer } from './index.styles';
 import PuzzleHeader from '../../../components/features/PuzzleHeader';
-import GameStatusIndicator, {
-  IndicatorCategoryType,
-} from '../../../components/features/GameStatusIndicator';
 import Board from '../../../components/features/Board';
 import useModal from '../../../hooks/useModal';
 import CustomModal from '../../../components/common/CustomModal';
@@ -27,7 +24,6 @@ const CommunityPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
-  const [category, setCategory] = useState<IndicatorCategoryType>();
 
   const [like, setLike] = useState(null);
   const { accessToken } = useAuthStore();
@@ -74,7 +70,7 @@ const CommunityPuzzleSolve = () => {
 
   useEffect(() => {
     console.log('isLoading!!!:', isLoading);
-    isLoading ? setCategory('AI_MOVE_IN_PROGRESS') : setCategory(undefined);
+    // TODO: loading UI
   }, [isLoading]);
 
   return (
@@ -94,10 +90,6 @@ const CommunityPuzzleSolve = () => {
         isLiked={like}
         handleLikePress={handleLikePress}
       />
-
-      <IndicatorContainer>
-        <GameStatusIndicator category={category} />
-      </IndicatorContainer>
 
       <Board
         mode="solve"

@@ -1,20 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import {
-  BoardAndPutContainer,
   BoardBackground,
   CellContainer,
   FramContainer,
   FrameCell,
   FrameRow,
   IndicatePoint,
-  PutButtonContainer,
   Stone,
   StoneRow,
 } from './index.styles';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import BoardFrameNumber from './BoardFrameNumber';
-import CircleButton from '../CircleButton';
 import {
   BOARD_SIZE,
   convertLowercaseAlphabetToNumber,
@@ -23,6 +20,7 @@ import {
   valueToCoordinates,
 } from '../../../utils/utils';
 import { NativeModules, ViewStyle } from 'react-native';
+import { Icon } from '../../common';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -96,6 +94,18 @@ const Board = ({
         setIsLoading?.(true);
         setConfirmPut(true); // user put ok
       }
+    }
+  };
+
+  const handleCellPress = (x: number, y: number) => {
+    if (isDisabled) {
+      return;
+    }
+    if (stoneX === x && stoneY === y) {
+      handlePut();
+    } else {
+      setStoneX(x);
+      setStoneY(y);
     }
   };
 
@@ -187,42 +197,34 @@ const Board = ({
   }, [sequence]);
 
   return (
-    <BoardAndPutContainer>
-      <BoardBackground boardWidth={boardWidth}>
-        <BoardFrameNumber direction="vertical" />
-        <BoardFrameNumber direction="horizontal" />
-        <FramContainer>
-          {Array.from({ length: BOARD_SIZE - 1 }).map((_, rowIndex) => (
-            <FrameRow key={rowIndex}>
-              {Array.from({ length: BOARD_SIZE - 1 }).map((__, colIndex) => (
-                <FrameCell key={colIndex} cellWidth={cellWidth} />
-              ))}
-            </FrameRow>
-          ))}
-        </FramContainer>
-        {board.map((row, x) => (
-          <StoneRow key={x}>
-            {row.map((cell, y) => (
-              <Cell
-                key={`${x}-${y}`}
-                pos={`${x}-${y}`}
-                stone={cell}
-                cellWidth={cellWidth}
-                stoneX={stoneX}
-                stoneY={stoneY}
-                onPress={() => {
-                  setStoneX(x);
-                  setStoneY(y);
-                }}
-              />
+    <BoardBackground boardWidth={boardWidth}>
+      <BoardFrameNumber direction="vertical" />
+      <BoardFrameNumber direction="horizontal" />
+      <FramContainer>
+        {Array.from({ length: BOARD_SIZE - 1 }).map((_, rowIndex) => (
+          <FrameRow key={rowIndex}>
+            {Array.from({ length: BOARD_SIZE - 1 }).map((__, colIndex) => (
+              <FrameCell key={colIndex} cellWidth={cellWidth} />
             ))}
-          </StoneRow>
+          </FrameRow>
         ))}
-      </BoardBackground>
-      <PutButtonContainer>
-        <CircleButton onPress={handlePut} category="put" disabled={isDisabled} />
-      </PutButtonContainer>
-    </BoardAndPutContainer>
+      </FramContainer>
+      {board.map((row, x) => (
+        <StoneRow key={x}>
+          {row.map((cell, y) => (
+            <Cell
+              key={`${x}-${y}`}
+              pos={`${x}-${y}`}
+              stone={cell}
+              cellWidth={cellWidth}
+              stoneX={stoneX}
+              stoneY={stoneY}
+              onPress={() => handleCellPress(x, y)}
+            />
+          ))}
+        </StoneRow>
+      ))}
+    </BoardBackground>
   );
 };
 
@@ -252,7 +254,7 @@ export const Cell = ({
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth} />
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
-        <></>
+        <Icon name="FocusIcon" color="error/error_color" />
       ) : showHighlights &&
         (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') ? (
         <IndicatePoint />
