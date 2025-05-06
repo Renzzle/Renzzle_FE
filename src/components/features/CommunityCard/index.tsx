@@ -26,6 +26,7 @@ interface CommunityCardProps {
   views: number;
   solvedCount: number;
   likeCount: number;
+  isSolved: boolean;
   onPress: () => void;
   onDelete?: () => void;
 }
@@ -41,6 +42,7 @@ const CommunityCard = ({
   views,
   solvedCount,
   likeCount,
+  isSolved,
   onPress,
   onDelete,
 }: CommunityCardProps) => {
@@ -88,7 +90,7 @@ const CommunityCard = ({
 
   return (
     <CardContainer onPress={onPress}>
-      <BoardPreview sequence={sequence} />
+      <BoardPreview sequence={sequence} isSolved={isSolved} />
       <ContentWrapper>
         <View>
           <TitleWrapper showDeleteIcon={onDelete ? true : false}>

@@ -53,7 +53,7 @@ const TrainingCard = ({
 
   return (
     <CardContainer onPress={onPress} cardWidth={cardWidth}>
-      <BoardPreview sequence={sequence} isLocked={isSolved} size={previewWidth} />
+      <BoardPreview sequence={sequence} isSolved={isSolved} size={previewWidth} />
       <View>
         <CustomText size={14} weight="bold">
           {title}
