@@ -58,7 +58,7 @@ export const Stone = styled(View)<{ stone: StoneType; cellWidth: number }>`
   border-radius: ${({ cellWidth }) => (cellWidth - 1) / 2}px;
   border-color: ${theme.color['gray/gray500']};
 
-  border-width: ${({ cellWidth }) => cellWidth * 0.05}px;
+  border-width: ${({ cellWidth }) => cellWidth * 0.025}px;
 
   background-color: ${({ stone }) =>
     stone === 1

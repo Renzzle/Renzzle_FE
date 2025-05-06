@@ -21,7 +21,7 @@ const BoardPreview = ({ isLocked = false, sequence = '', size = 90 }: BoardPrevi
 
   return (
     <Preview isLocked={false} size={size}>
-      <InnerBorder size={size - 4}>
+      <InnerBorder size={size * 0.95}>
         {moves.map(({ x, y, stone }, index) => (
           <Cell
             key={index}
@@ -34,8 +34,8 @@ const BoardPreview = ({ isLocked = false, sequence = '', size = 90 }: BoardPrevi
             showHighlights={false}
             style={{
               position: 'absolute',
-              top: 1 + x * (cellWidth - 0.5), // Adjust based on cell size
-              left: 1 + y * (cellWidth - 0.5), // Adjust based on cell size
+              top: x * cellWidth * 0.94, // Adjust based on cell size
+              left: y * cellWidth * 0.94, // Adjust based on cell size
             }}
           />
         ))}
