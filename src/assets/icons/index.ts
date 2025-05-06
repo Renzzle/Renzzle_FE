@@ -40,6 +40,7 @@ import RankingRatingIcon from './ico-ranking-rating.svg';
 import RankingIcon from './ico-ranking.svg';
 import RefreshIcon from './ico-refresh.svg';
 import SettingIcon from './ico-setting.svg';
+import SolvedIcon from './ico-solved.svg';
 import StoneBlackIcon from './ico-stone-black.svg';
 import StoneWhiteIcon from './ico-stone-white.svg';
 import TimerIcon from './ico-timer.svg';
@@ -91,6 +92,7 @@ const Icons = {
   RankingIcon,
   RefreshIcon,
   SettingIcon,
+  SolvedIcon,
   StoneBlackIcon,
   StoneWhiteIcon,
   TimerIcon,
