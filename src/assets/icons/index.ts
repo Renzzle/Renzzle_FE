@@ -32,9 +32,12 @@ import ProUserIcon from './ico-pro-user.svg';
 import PuzzlePlusIcon from './ico-puzzle-plus.svg';
 import PuzzleSquareIcon from './ico-puzzle-square.svg';
 import PuzzleXSmallIcon from './ico-puzzle-xs.svg';
-import Ranking1stIcon from './ico-ranking-1st.svg';
-import Ranking2ndIcon from './ico-ranking-2nd.svg';
-import Ranking3rdIcon from './ico-ranking-3rd.svg';
+import Ranking1stBlueIcon from './ico-ranking-1st-blue.svg';
+import Ranking1stOrangeIcon from './ico-ranking-1st-orange.svg';
+import Ranking2ndBlueIcon from './ico-ranking-2nd-blue.svg';
+import Ranking2ndOrangeIcon from './ico-ranking-2nd-orange.svg';
+import Ranking3rdBlueIcon from './ico-ranking-3rd-blue.svg';
+import Ranking3rdOrangeIcon from './ico-ranking-3rd-orange.svg';
 import RankingPuzzleIcon from './ico-ranking-puzzle.svg';
 import RankingRatingIcon from './ico-ranking-rating.svg';
 import RankingIcon from './ico-ranking.svg';
@@ -84,9 +87,12 @@ const Icons = {
   PuzzlePlusIcon,
   PuzzleSquareIcon,
   PuzzleXSmallIcon,
-  Ranking1stIcon,
-  Ranking2ndIcon,
-  Ranking3rdIcon,
+  Ranking1stBlueIcon,
+  Ranking1stOrangeIcon,
+  Ranking2ndBlueIcon,
+  Ranking2ndOrangeIcon,
+  Ranking3rdBlueIcon,
+  Ranking3rdOrangeIcon,
   RankingPuzzleIcon,
   RankingRatingIcon,
   RankingIcon,
