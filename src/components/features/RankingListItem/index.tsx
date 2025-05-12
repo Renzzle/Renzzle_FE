@@ -32,6 +32,17 @@ const getIconColor = (category: 'rating' | 'best'): ColorType | undefined => {
   return category === 'rating' ? 'main_color/yellow_s' : 'main_color/blue_p';
 };
 
+const getRankSize = (rank: number) => {
+  let digit = rank.toString().length;
+
+  if (digit <= 3) {
+    return 14;
+  } else if (digit === 4) {
+    return 12;
+  }
+  return 10;
+};
+
 const RankingListItem = ({
   rank,
   nickname,
@@ -43,11 +54,12 @@ const RankingListItem = ({
 
   const iconName = getIconName(rank, category);
   const iconColor = getIconColor(category);
+  const rankSize = getRankSize(rank);
 
   return (
     <CardContainer category={category} isCurrentUser={isCurrentUser}>
       <Icon name={iconName} color={iconColor} />
-      <RankText size={14} lineHeight="sm" weight="bold">
+      <RankText size={rankSize} lineHeight="sm" weight="bold">
         {rank}
       </RankText>
 
