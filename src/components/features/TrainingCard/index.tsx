@@ -1,11 +1,12 @@
 import React from 'react';
-import { CardContainer, MetaInfoItemWrapper, MetaInfoWrapper } from './index.styles';
+import { CardContainer } from './index.styles';
 import BoardPreview from '../BoardPreview';
-import { CustomText, Icon } from '../../common';
+import { CustomText } from '../../common';
 import { Dimensions, View } from 'react-native';
 import { IconName } from '../../../assets/icons';
 import { useTranslation } from 'react-i18next';
 import { ColorType } from '../../../styles/theme';
+import PuzzleAttributes from '../PuzzleAttributes';
 
 interface TrainingCardProps {
   title: string;
@@ -58,16 +59,7 @@ const TrainingCard = ({
         <CustomText size={14} weight="bold">
           {title}
         </CustomText>
-        <MetaInfoWrapper>
-          {metaInfoItems.map(({ text, iconName, iconColor }, index) => (
-            <MetaInfoItemWrapper key={index}>
-              <Icon name={iconName} color={iconColor} />
-              <CustomText size={10} lineHeight="sm" color="gray/gray500">
-                {text}
-              </CustomText>
-            </MetaInfoItemWrapper>
-          ))}
-        </MetaInfoWrapper>
+        <PuzzleAttributes depth={depth} winColor={winColor} />
       </View>
     </CardContainer>
   );

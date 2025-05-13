@@ -84,7 +84,9 @@
     "solved": "풀이 완료",
     "unsolved": "풀이 전",
     "viewAnswer": "정답보기",
-    "retry": "새로하기"
+    "retry": "새로하기",
+    "solvedCount": "solved",
+    "views": "views"
   },
   "ranking": {
     "title": "랭킹",

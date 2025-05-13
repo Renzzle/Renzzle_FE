@@ -1,19 +1,13 @@
 import React from 'react';
-import {
-  CardContainer,
-  ContentWrapper,
-  MetaInfoItemWrapper,
-  MetaInfoWrapper,
-  StatsItemWrapper,
-  StatsWrapper,
-  TitleWrapper,
-} from './index.styles';
+import { CardContainer, ContentWrapper, TitleWrapper } from './index.styles';
 import BoardPreview from '../BoardPreview';
 import { CustomText, Icon } from '../../common';
 import { useTranslation } from 'react-i18next';
 import { IconName } from '../../../assets/icons';
 import { ColorType } from '../../../styles/theme';
 import { View } from 'react-native';
+import PuzzleStats from '../PuzzleStats';
+import PuzzleAttributes from '../PuzzleAttributes';
 
 interface CommunityCardProps {
   title: string;
@@ -99,31 +93,19 @@ const CommunityCard = ({
             </CustomText>
             {onDelete && <Icon name="WasteBinIcon" size={15} />}
           </TitleWrapper>
-          <MetaInfoWrapper>
-            {metaInfoItems.map(({ text, iconName, iconColor }, index) => (
-              <MetaInfoItemWrapper key={index}>
-                <Icon name={iconName} color={iconColor} />
-                <CustomText size={10} lineHeight="sm" color="gray/gray500">
-                  {text}
-                </CustomText>
-              </MetaInfoItemWrapper>
-            ))}
-          </MetaInfoWrapper>
+          <PuzzleAttributes depth={depth} winColor={winColor} isVerified={isVerified} />
           <CustomText size={8} lineHeight="sm" color="gray/gray500">
             {date}
           </CustomText>
         </View>
 
-        <StatsWrapper>
-          {statsItems.map(({ text, iconName }, index) => (
-            <StatsItemWrapper key={index}>
-              <Icon name={iconName} color="gray/gray500" />
-              <CustomText size={8} lineHeight="sm" color="gray/gray500">
-                {text}
-              </CustomText>
-            </StatsItemWrapper>
-          ))}
-        </StatsWrapper>
+        <PuzzleStats
+          puzzleId={puzzleId}
+          solvedCount={solvedCount}
+          views={views}
+          likeCount={likeCount}
+          showIconLabel={false}
+        />
       </ContentWrapper>
     </CardContainer>
   );
