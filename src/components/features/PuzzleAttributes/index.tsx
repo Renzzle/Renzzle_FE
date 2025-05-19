@@ -8,10 +8,10 @@ import { CustomText, Icon } from '../../common';
 interface PuzzleAttributesProps {
   depth: number;
   winColor: 'BLACK' | 'WHITE';
-  isVerified?: boolean;
+  isVerified?: boolean | null;
 }
 
-const PuzzleAttributes = ({ depth, winColor, isVerified }: PuzzleAttributesProps) => {
+const PuzzleAttributes = ({ depth, winColor, isVerified = null }: PuzzleAttributesProps) => {
   const { t } = useTranslation();
 
   const metaInfoItems: { text: string | number; iconName: IconName; iconColor?: ColorType }[] = [];
