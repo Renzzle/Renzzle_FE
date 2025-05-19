@@ -1,32 +1,42 @@
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import styled from 'styled-components';
+import { CustomText } from '../../common';
 
 export const HeaderContainer = styled(View)`
-  gap: 4px;
-  margin: 22px 25px;
-`;
-
-export const TopContainer = styled(View)`
+  display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-between;
-`;
-
-export const TitleAndNumber = styled(View)`
-  flex-wrap: wrap;
-  flex-direction: row;
   align-items: center;
+  padding: 20px;
+  gap: 10px;
+`;
+
+export const LeftInfoWrapper = styled(View)`
+  display: flex;
   gap: 9px;
+  flex: 1;
 `;
 
-export const TitleTextContainer = styled(View)<{ deviceWidth: number }>`
-  max-width: ${({ deviceWidth }) => deviceWidth - 140}px;
+export const TitleWrapper = styled(View)`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 6px;
 `;
 
-export const LikeButton = styled(TouchableOpacity)`
-  padding: 3px 0;
+export const TitleText = styled(CustomText)`
+  min-width: 0px;
+  overflow: hidden;
+  flex-shrink: 1;
 `;
 
-export const AuthorContainer = styled(View)`
-  
+export const AutorText = styled(CustomText)`
+  margin-left: -5px;
+`;
+
+export const ActionButtonsWrapper = styled(View)`
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 `;

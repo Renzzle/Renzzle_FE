@@ -1,61 +1,58 @@
 import React from 'react';
-import CustomText from '../../common/CustomText';
-import { View } from 'react-native';
 import {
-  AuthorContainer,
+  ActionButtonsWrapper,
+  AutorText,
   HeaderContainer,
-  LikeButton,
-  TitleAndNumber,
-  TitleTextContainer,
-  TopContainer,
+  LeftInfoWrapper,
+  TitleText,
+  TitleWrapper,
 } from './index.styles';
-import useDeviceWidth from '../../../hooks/useDeviceWidth';
+import PuzzleAttributes from '../PuzzleAttributes';
+import { CustomTag } from '../../common';
+import PuzzleActionButton from '../PuzzleActionButton';
 
 interface PuzzleHeaderProps {
   title: string;
-  info: string;
-  author: string;
-  puzzleNum?: string;
-  isLiked?: boolean | null;
-  handleLikePress?: () => void;
+  depth: number;
+  winColor: 'BLACK' | 'WHITE';
+  isSolved: boolean;
+  isVerified?: boolean | null;
+  isCommunityPuzzle?: boolean;
+  displayNumber?: number;
 }
 
 const PuzzleHeader = ({
   title,
-  info,
-  author,
-  isLiked = null,
-  handleLikePress,
+  depth,
+  winColor,
+  isSolved = false,
+  isVerified,
+  isCommunityPuzzle = false,
+  displayNumber,
 }: PuzzleHeaderProps) => {
-  const width = useDeviceWidth();
-
   return (
     <HeaderContainer>
-      <View>
-        <TopContainer>
-          <TitleAndNumber>
-            <TitleTextContainer deviceWidth={width}>
-              <CustomText size={20} weight="bold" lineHeight="lg" numberOfLines={1}>
-                {title}
-              </CustomText>
-            </TitleTextContainer>
-          </TitleAndNumber>
+      <LeftInfoWrapper>
+        <TitleWrapper>
+          <TitleText weight="bold" lineHeight="sm" numberOfLines={1} ellipsizeMode="tail">
+            {title}
+          </TitleText>
+          {isCommunityPuzzle && (
+            <AutorText size={10} color="gray/gray500" weight="bold" lineHeight="lg">
+              님 출제
+            </AutorText>
+          )}
+          {!isCommunityPuzzle && displayNumber && <CustomTag>#{displayNumber}</CustomTag>}
+          {isSolved && <CustomTag variant="highlight">풀이 완료</CustomTag>}
+        </TitleWrapper>
 
-          {isLiked !== null ? <LikeButton onPress={handleLikePress} /> : <View />}
-        </TopContainer>
+        <PuzzleAttributes depth={depth} winColor={winColor} isVerified={isVerified} />
+      </LeftInfoWrapper>
 
-        {info !== '' && (
-          <CustomText size={10} lineHeight="sm" color="gray/gray500">
-            {info}
-          </CustomText>
-        )}
-      </View>
-
-      <AuthorContainer>
-        <CustomText size={14} lineHeight="sm">
-          {author}
-        </CustomText>
-      </AuthorContainer>
+      <ActionButtonsWrapper>
+        <PuzzleActionButton mode="showAnswer" onPress={() => {}} />
+        <PuzzleActionButton mode="retry" onPress={() => {}} />
+      </ActionButtonsWrapper>
     </HeaderContainer>
   );
 };
