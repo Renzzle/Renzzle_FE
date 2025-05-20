@@ -25,6 +25,8 @@ import LightbulbAlertIcon from './ico-lightbulb-alert.svg';
 import LightbulbIcon from './ico-lightbulb.svg';
 import LightningIcon from './ico-lightning.svg';
 import LockIcon from './ico-lock.svg';
+import LogoIcon from './ico-logo.svg';
+import LogoTextIcon from './ico-logo-text.svg';
 import NormalUserIcon from './ico-normal-user.svg';
 import NoticeIcon from './ico-notice.svg';
 import PlusIcon from './ico-plus.svg';
@@ -80,6 +82,8 @@ const Icons = {
   LightbulbIcon,
   LightningIcon,
   LockIcon,
+  LogoIcon,
+  LogoTextIcon,
   NormalUserIcon,
   NoticeIcon,
   PlusIcon,
