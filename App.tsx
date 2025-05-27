@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import './src/locales/i18n.ts';
@@ -19,10 +19,16 @@ import AIPuzzleSolve from './src/screens/puzzleSolve/AIPuzzleSolve';
 import AIPuzzleMake from './src/screens/puzzleMake/AIPuzzleMake';
 import Signin from './src/screens/Signin';
 import Home from './src/screens/Home/index.tsx';
+import SplashScreen from 'react-native-splash-screen';
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
+  useEffect(() => {
+    setTimeout(() => {
+      SplashScreen.hide();
+    }, 1000);
+  });
   return (
     <NavigationContainer>
       <Stack.Navigator
