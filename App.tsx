@@ -27,13 +27,17 @@ import { reissueToken } from './src/apis/auth.ts';
 
 const Stack = createNativeStackNavigator();
 
-function App(): React.JSX.Element {
-  const { accessToken, refreshToken, setTokens, clearTokens } = useAuthStore();
-  const [initialScreen, setInitialScreen] = useState<'Signin' | 'Home'>('Signin');
+function App(): React.JSX.Element | null {
+  const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
+  const [initialScreen, setInitialScreen] = useState<'Signin' | 'Home' | null>(null);
 
   useEffect(() => {
     const init = async () => {
       try {
+        await restoreCredentials();
+
+        const { accessToken, refreshToken } = useAuthStore.getState();
+
         if (accessToken) {
           const user = await getUser(accessToken);
           if (user) {
@@ -46,13 +50,15 @@ function App(): React.JSX.Element {
         if (refreshToken) {
           try {
             const { newAccessToken, newRefreshToken } = await reissueToken(refreshToken);
-            setTokens(newAccessToken, newRefreshToken);
+            await setTokens(newAccessToken, newRefreshToken);
 
             const user = await getUser(newAccessToken);
             if (user) {
               setInitialScreen('Home');
               return;
             }
+            clearTokens();
+            setInitialScreen('Signin');
           } catch (err) {
             // Failed to reissue tokens
             clearTokens();
@@ -64,18 +70,22 @@ function App(): React.JSX.Element {
       } catch (error) {
         clearTokens();
         setInitialScreen('Signin');
-      } finally {
-        SplashScreen.hide();
       }
     };
 
-    init();
+    init().finally(() => {
+      SplashScreen.hide();
+    });
   }, []);
+
+  if (initialScreen == null) {
+    return null;
+  }
 
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Signin"
+        initialRouteName={initialScreen}
         screenOptions={{
           headerStyle: {
             backgroundColor: theme.color['gray/grayBG'],
