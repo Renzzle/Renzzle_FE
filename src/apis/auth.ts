@@ -19,3 +19,13 @@ export const getAuth = async (email: string, password: string) => {
     throw error;
   }
 };
+
+export const reissueToken = async (refreshToken: string) => {
+  try {
+    const response = await apiClient.post('/api/auth/reissueToken', { refreshToken });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

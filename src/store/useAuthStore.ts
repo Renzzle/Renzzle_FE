@@ -13,6 +13,8 @@ type AuthStateType = {
   signin: (email: string, password: string) => Promise<void>;
   restoreCredentials: () => Promise<void>;
   signout: () => Promise<void>;
+  setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
+  clearTokens: () => Promise<void>;
 };
 
 const useAuthStore = create<AuthStateType>((set) => ({
@@ -23,10 +25,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
       const { response } = await getAuth(email, password);
       const { accessToken, refreshToken } = response;
 
-      await EncryptedStorage.setItem(
-        'tokens',
-        JSON.stringify({ accessToken, refreshToken })
-      );
+      await EncryptedStorage.setItem('tokens', JSON.stringify({ accessToken, refreshToken }));
 
       console.log('Accesstoken 저장:', accessToken);
 
@@ -44,7 +43,9 @@ const useAuthStore = create<AuthStateType>((set) => ({
   async restoreCredentials() {
     try {
       const storedTokens = await EncryptedStorage.getItem('tokens');
-      if (!storedTokens) {return;}
+      if (!storedTokens) {
+        return;
+      }
 
       const { accessToken, refreshToken } = JSON.parse(storedTokens);
 
@@ -64,6 +65,24 @@ const useAuthStore = create<AuthStateType>((set) => ({
       set(initialState);
     } catch (error) {
       console.error('Failed to sign out:', error);
+    }
+  },
+
+  async setTokens(accessToken: string, refreshToken: string) {
+    try {
+      await EncryptedStorage.setItem('tokens', JSON.stringify({ accessToken, refreshToken }));
+      set((state) => ({ ...state, accessToken, refreshToken }));
+    } catch (error) {
+      console.error('Failed to set tokens:', error);
+    }
+  },
+
+  async clearTokens() {
+    try {
+      await EncryptedStorage.removeItem('tokens');
+      set(initialState);
+    } catch (error) {
+      console.error('Failed to clear tokens:', error);
     }
   },
 }));
