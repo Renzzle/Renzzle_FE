@@ -1,3 +1,4 @@
+import axios from 'axios';
 import apiClient from './interceptor';
 
 export const updateEmailAuthCode = async (email: string) => {
@@ -22,7 +23,8 @@ export const getAuth = async (email: string, password: string) => {
 
 export const reissueToken = async (refreshToken: string) => {
   try {
-    const response = await apiClient.post('/api/auth/reissueToken', { refreshToken });
+    // prevent infinite loop
+    const response = await axios.post('/api/auth/reissueToken', { refreshToken });
 
     return response.data;
   } catch (error) {
