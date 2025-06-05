@@ -87,7 +87,7 @@ apiClient.interceptors.response.use(
           processQueue(null, newAccessToken); // Resolve all queued requests with the new token
           return apiClient(originalRequest); // Retry the original request with the new token
         } catch (refreshError) {
-          console.error('토큰 재발급 실패:', refreshError);
+          console.log('토큰 재발급 실패:', refreshError);
           await signout();
           processQueue(refreshError as Error); // Fail all queued requests
           isRefreshing = false;

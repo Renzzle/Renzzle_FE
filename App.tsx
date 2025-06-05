@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -6,7 +5,7 @@
  * @format
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import './src/locales/i18n.ts';
@@ -20,72 +19,22 @@ import AIPuzzleSolve from './src/screens/puzzleSolve/AIPuzzleSolve';
 import AIPuzzleMake from './src/screens/puzzleMake/AIPuzzleMake';
 import Signin from './src/screens/Signin';
 import Home from './src/screens/Home/index.tsx';
-import SplashScreen from 'react-native-splash-screen';
 import useAuthStore from './src/store/useAuthStore.ts';
-import { getUser } from './src/apis/user.ts';
-import { reissueToken } from './src/apis/auth.ts';
+import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element | null {
-  const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
-  const [initialScreen, setInitialScreen] = useState<'Signin' | 'Home' | null>(null);
+  const { accessToken } = useAuthStore();
+  const isLoading = useInitializeApp();
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        await restoreCredentials();
-
-        const { accessToken, refreshToken } = useAuthStore.getState();
-
-        if (accessToken) {
-          const user = await getUser(accessToken);
-          if (user) {
-            setInitialScreen('Home');
-            return;
-          }
-        }
-
-        // No token or user -> reissue
-        if (refreshToken) {
-          try {
-            const { newAccessToken, newRefreshToken } = await reissueToken(refreshToken);
-            await setTokens(newAccessToken, newRefreshToken);
-
-            const user = await getUser(newAccessToken);
-            if (user) {
-              setInitialScreen('Home');
-              return;
-            }
-            clearTokens();
-            setInitialScreen('Signin');
-          } catch (err) {
-            // Failed to reissue tokens
-            clearTokens();
-            setInitialScreen('Signin');
-          }
-        } else {
-          setInitialScreen('Signin');
-        }
-      } catch (error) {
-        clearTokens();
-        setInitialScreen('Signin');
-      }
-    };
-
-    init().finally(() => {
-      SplashScreen.hide();
-    });
-  }, []);
-
-  if (initialScreen == null) {
+  if (isLoading) {
     return null;
   }
 
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={initialScreen}
         screenOptions={{
           headerStyle: {
             backgroundColor: theme.color['gray/grayBG'],
@@ -94,35 +43,44 @@ function App(): React.JSX.Element | null {
             fontSize: 18,
           },
         }}>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="LessonPuzzleList"
-          component={LessonPuzzleList}
-          options={{ title: 'Lesson' }}
-        />
-        <Stack.Screen
-          name="LessonPuzzleSolve"
-          component={LessonPuzzleSolve}
-          options={{ title: 'Lesson' }}
-        />
-        <Stack.Screen
-          name="CommunityPuzzleList"
-          component={CommunityPuzzleList}
-          options={{ title: 'Community' }}
-        />
-        <Stack.Screen
-          name="CommunityPuzzleSolve"
-          component={CommunityPuzzleSolve}
-          options={{ title: 'Community' }}
-        />
-        <Stack.Screen
-          name="CommunityPuzzleMake"
-          component={CommunityPuzzleMake}
-          options={{ title: 'Community' }}
-        />
-        <Stack.Screen name="AIPuzzleSolve" component={AIPuzzleSolve} options={{ title: 'AI' }} />
-        <Stack.Screen name="AIPuzzleMake" component={AIPuzzleMake} options={{ title: 'AI' }} />
+        {accessToken ? (
+          <>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen
+              name="LessonPuzzleList"
+              component={LessonPuzzleList}
+              options={{ title: 'Lesson' }}
+            />
+            <Stack.Screen
+              name="LessonPuzzleSolve"
+              component={LessonPuzzleSolve}
+              options={{ title: 'Lesson' }}
+            />
+            <Stack.Screen
+              name="CommunityPuzzleList"
+              component={CommunityPuzzleList}
+              options={{ title: 'Community' }}
+            />
+            <Stack.Screen
+              name="CommunityPuzzleSolve"
+              component={CommunityPuzzleSolve}
+              options={{ title: 'Community' }}
+            />
+            <Stack.Screen
+              name="CommunityPuzzleMake"
+              component={CommunityPuzzleMake}
+              options={{ title: 'Community' }}
+            />
+            <Stack.Screen
+              name="AIPuzzleSolve"
+              component={AIPuzzleSolve}
+              options={{ title: 'AI' }}
+            />
+            <Stack.Screen name="AIPuzzleMake" component={AIPuzzleMake} options={{ title: 'AI' }} />
+          </>
+        ) : (
+          <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
