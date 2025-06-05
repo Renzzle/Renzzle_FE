@@ -28,6 +28,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
       await EncryptedStorage.setItem('tokens', JSON.stringify({ accessToken, refreshToken }));
 
       console.log('Accesstoken 저장:', accessToken);
+      console.log('Refreshtoken 저장:', refreshToken);
 
       set((state) => ({
         ...state,
