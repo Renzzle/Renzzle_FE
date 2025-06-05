@@ -21,6 +21,7 @@ import Signin from './src/screens/Signin';
 import Home from './src/screens/Home/index.tsx';
 import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
+import AppWrapper from './src/components/common/AppWrapper/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,54 +35,60 @@ function App(): React.JSX.Element | null {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: theme.color['gray/grayBG'],
-          },
-          headerTitleStyle: {
-            fontSize: 18,
-          },
-        }}>
-        {accessToken ? (
-          <>
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen
-              name="LessonPuzzleList"
-              component={LessonPuzzleList}
-              options={{ title: 'Lesson' }}
-            />
-            <Stack.Screen
-              name="LessonPuzzleSolve"
-              component={LessonPuzzleSolve}
-              options={{ title: 'Lesson' }}
-            />
-            <Stack.Screen
-              name="CommunityPuzzleList"
-              component={CommunityPuzzleList}
-              options={{ title: 'Community' }}
-            />
-            <Stack.Screen
-              name="CommunityPuzzleSolve"
-              component={CommunityPuzzleSolve}
-              options={{ title: 'Community' }}
-            />
-            <Stack.Screen
-              name="CommunityPuzzleMake"
-              component={CommunityPuzzleMake}
-              options={{ title: 'Community' }}
-            />
-            <Stack.Screen
-              name="AIPuzzleSolve"
-              component={AIPuzzleSolve}
-              options={{ title: 'AI' }}
-            />
-            <Stack.Screen name="AIPuzzleMake" component={AIPuzzleMake} options={{ title: 'AI' }} />
-          </>
-        ) : (
-          <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
-        )}
-      </Stack.Navigator>
+      <AppWrapper>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: theme.color['gray/grayBG'],
+            },
+            headerTitleStyle: {
+              fontSize: 18,
+            },
+          }}>
+          {accessToken ? (
+            <>
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen
+                name="LessonPuzzleList"
+                component={LessonPuzzleList}
+                options={{ title: 'Lesson' }}
+              />
+              <Stack.Screen
+                name="LessonPuzzleSolve"
+                component={LessonPuzzleSolve}
+                options={{ title: 'Lesson' }}
+              />
+              <Stack.Screen
+                name="CommunityPuzzleList"
+                component={CommunityPuzzleList}
+                options={{ title: 'Community' }}
+              />
+              <Stack.Screen
+                name="CommunityPuzzleSolve"
+                component={CommunityPuzzleSolve}
+                options={{ title: 'Community' }}
+              />
+              <Stack.Screen
+                name="CommunityPuzzleMake"
+                component={CommunityPuzzleMake}
+                options={{ title: 'Community' }}
+              />
+              <Stack.Screen
+                name="AIPuzzleSolve"
+                component={AIPuzzleSolve}
+                options={{ title: 'AI' }}
+              />
+              <Stack.Screen
+                name="AIPuzzleMake"
+                component={AIPuzzleMake}
+                options={{ title: 'AI' }}
+              />
+            </>
+          ) : (
+            <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
+          )}
+        </Stack.Navigator>
+      </AppWrapper>
     </NavigationContainer>
   );
 }

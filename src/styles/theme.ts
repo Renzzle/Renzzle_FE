@@ -120,6 +120,9 @@ const theme = {
     md: 1.4,
     lg: 1.6,
   },
+  layout: {
+    maxWidth: 450,
+  },
 };
 
 export default theme;
