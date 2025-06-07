@@ -36,7 +36,7 @@ const Signin = () => {
 
   const transition = [
     {
-      text: t('auth.login'),
+      text: t('auth.signin'),
       onAction: async () => {
         handleLogin();
       },
@@ -48,7 +48,7 @@ const Signin = () => {
     <SigninContainer>
       <SigninInfoContainer>
         <CustomText size={22} weight="bold" lineHeight="lg">
-          {t('auth.login')}
+          {t('auth.signin')}
         </CustomText>
         <TextInputContainer>
           <CustomTextInput

@@ -1,8 +1,10 @@
 {
   "auth": {
-    "login": "로그인"
+    "signin": "로그인",
+    "signup": "회원가입"
   },
   "common": {
+    "appName": "Renzzle",
     "ranking": "랭킹",
     "myPuzzle": "내 퍼즐",
     "likes": "좋아요",
