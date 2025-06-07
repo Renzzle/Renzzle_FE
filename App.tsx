@@ -7,9 +7,8 @@
 
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack';
 import './src/locales/i18n.ts';
-import theme from './src/styles/theme';
 import LessonPuzzleList from './src/screens/puzzleList/LessonPuzzleList';
 import CommunityPuzzleList from './src/screens/puzzleList/CommunityPuzzleList';
 import LessonPuzzleSolve from './src/screens/puzzleSolve/LessonPuzzleSolve';
@@ -22,12 +21,15 @@ import Home from './src/screens/Home/index.tsx';
 import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
 import AppWrapper from './src/components/common/AppWrapper/index.tsx';
+import CustomHeader from './src/components/common/CustomHeader/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element | null {
   const { accessToken } = useAuthStore();
   const isLoading = useInitializeApp();
+
+  const renderCustomHeader = (props: NativeStackHeaderProps) => <CustomHeader {...props} />;
 
   if (isLoading) {
     return null;
@@ -38,16 +40,11 @@ function App(): React.JSX.Element | null {
       <AppWrapper>
         <Stack.Navigator
           screenOptions={{
-            headerStyle: {
-              backgroundColor: theme.color['gray/grayBG'],
-            },
-            headerTitleStyle: {
-              fontSize: 18,
-            },
+            header: renderCustomHeader,
           }}>
           {accessToken ? (
             <>
-              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="Home" component={Home} options={{ title: 'common.appName' }} />
               <Stack.Screen
                 name="LessonPuzzleList"
                 component={LessonPuzzleList}
