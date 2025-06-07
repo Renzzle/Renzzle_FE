@@ -9,11 +9,13 @@ interface StyledTextInputProps {
 }
 
 export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
-  height: 36px;
   padding: 5px 50px 5px 16px;
   color: ${theme.color['gray/gray900']};
   border-width: 1px;
   border-radius: 13px;
+
+  font-family: 'NanumSquareNeoOTF-Bd';
+  font-size: 14px;
 
   border-color: ${({ isFocused, hasError }) =>
     isFocused
