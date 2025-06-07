@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { getAuth } from '../apis/auth';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import { useUserStore } from './useUserStore';
 
 const initialState = {
   accessToken: undefined,
@@ -64,6 +65,8 @@ const useAuthStore = create<AuthStateType>((set) => ({
     try {
       await EncryptedStorage.removeItem('tokens');
       set(initialState);
+
+      useUserStore.getState().clearUser();
     } catch (error) {
       console.error('Failed to sign out:', error);
     }
