@@ -7,12 +7,18 @@ import CustomText from '../CustomText';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../../../store/useUserStore';
 import Icon from '../Icon';
+import theme from '../../../styles/theme';
 
-const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options }) => {
+const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
   const { t } = useTranslation();
   const user = useUserStore((state) => state.user);
 
-  const isHome = options.title === 'common.appName';
+  const isHome = route.name === 'Home';
+
+  const grayBGRoutes = ['Signup']; // TODO: 밝은 배경 적용해야하는 화면들 route.name 추가
+  const backgroundColor = grayBGRoutes.includes(route.name)
+    ? theme.color['gray/grayBG']
+    : theme.color['gray/grayBGDim'];
 
   const matchedEntry = Object.entries(menuThemeMap).find(
     ([, value]) => value.titleKey === options.title,
@@ -53,7 +59,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options }) => {
   };
 
   return (
-    <HeaderContainer>
+    <HeaderContainer backgroundColor={backgroundColor}>
       <MenuWrapper>{renderLeftContent()}</MenuWrapper>
       <CurrencyWrapper>{renderRightContent()}</CurrencyWrapper>
     </HeaderContainer>
