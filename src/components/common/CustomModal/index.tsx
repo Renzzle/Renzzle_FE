@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, useWindowDimensions, View } from 'react-native';
+import { Modal, View } from 'react-native';
 import {
   CenteredView,
   ModalBodyContainer,
@@ -11,6 +11,7 @@ import {
 import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
+import useDeviceWidth from '../../../hooks/useDeviceWidth';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
@@ -66,7 +67,7 @@ export const ModalCard = ({
   onPrimaryAction: onPrimaryClose,
   onSecondaryAction: onSecondaryClose = () => {},
 }: Omit<CustomModalProps, 'isVisible'>) => {
-  const { width } = useWindowDimensions();
+  const width = useDeviceWidth();
   const { t } = useTranslation();
 
   if (!category) {

@@ -47,6 +47,18 @@ export const menuThemeMap = {
     iconColor: 'gray/gray400',
     iconName: 'SettingIcon',
   },
+  signup: {
+    titleKey: 'auth.signup',
+    background: 'sub_color/indigo/bg',
+    iconColor: 'main_color/blue_p',
+    iconName: 'LogoIcon',
+  },
+  home: {
+    titleKey: 'common.appName',
+    background: 'sub_color/indigo/bg',
+    iconColor: 'main_color/blue_p',
+    iconName: 'LogoIcon',
+  },
 } as const;
 
 export type MenuType = keyof typeof menuThemeMap;
