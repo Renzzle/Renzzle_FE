@@ -5,6 +5,7 @@ import { BottomButtonBar, CustomText, CustomTextInput } from '../../../component
 import HelperText from '../../../components/common/HelperText';
 import { nicknameRegex } from '../../../utils/validators';
 import { checkNicknameDuplicate } from '../../../apis/auth';
+import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 
 interface SignupNicknameStepProps {
   nickname: string;
@@ -14,6 +15,7 @@ interface SignupNicknameStepProps {
 
 const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknameStepProps) => {
   const { t } = useTranslation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isNicknameValid, setIsNicknameValid] = useState<boolean>(false);
 
   const transition = [
@@ -22,23 +24,24 @@ const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknam
       onAction: async () => {
         handleNicknameConfirm();
       },
-      disabled: !isNicknameValid,
+      disabled: !isNicknameValid || isLoading,
     },
   ];
 
   const handleNicknameConfirm = async () => {
     try {
+      setIsLoading(true);
       const response = await checkNicknameDuplicate(nickname);
 
       if (!response?.response) {
         onComplete();
       } else {
-        // TODO: 닉네임 중복 다이얼로그
-        console.error('닉네임 중복!!!');
+        showBottomToast('error', '이미 사용된 닉네임입니다.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      showBottomToast('error', error as string);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {

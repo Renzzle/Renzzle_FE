@@ -5,6 +5,7 @@ import { HelperWrapper, InputWithHelperWrapper, LabelWrapper } from '../index.st
 import HelperText from '../../../components/common/HelperText';
 import { emailRegex } from '../../../utils/validators';
 import { updateEmailAuthCode } from '../../../apis/auth';
+import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 
 interface SignupEmailStepProps {
   email: string;
@@ -14,6 +15,7 @@ interface SignupEmailStepProps {
 
 const SignupEmailStep = ({ email, setEmail, onNext }: SignupEmailStepProps) => {
   const { t } = useTranslation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
 
   const transition = [
@@ -22,18 +24,20 @@ const SignupEmailStep = ({ email, setEmail, onNext }: SignupEmailStepProps) => {
       onAction: async () => {
         handleSendEmail();
       },
-      disabled: !isEmailValid,
+      disabled: !isEmailValid || isLoading,
     },
   ];
 
   const handleSendEmail = async () => {
     if (isEmailValid) {
       try {
+        setIsLoading(true);
         await updateEmailAuthCode(email);
         onNext();
       } catch (msg) {
-        console.error(msg);
+        showBottomToast('error', msg as string);
       }
+      setIsLoading(false);
     }
   };
 

@@ -41,7 +41,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
       const user = await getUser(accessToken);
       useUserStore.getState().setUser(user);
     } catch (error) {
-      console.error('Fail to sign in:', error);
+      console.log('Fail to sign in:', error);
       throw error;
     }
   },

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HelperWrapper, InputWithHelperWrapper, LabelWrapper } from '../index.styles';
 import { BottomButtonBar, CustomText, CustomTextInput } from '../../../components/common';
 import HelperText from '../../../components/common/HelperText';
 import { confirmCode, updateEmailAuthCode } from '../../../apis/auth';
+import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 
 interface SignupCodeStepProps {
   code: string;
@@ -21,6 +22,7 @@ const SignupCodeStep = ({
   onNext,
 }: SignupCodeStepProps) => {
   const { t } = useTranslation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const transition = [
     {
@@ -28,39 +30,42 @@ const SignupCodeStep = ({
       onAction: async () => {
         handleResend();
       },
-      disabled: false,
+      disabled: isLoading,
     },
     {
       text: t('button.confirm'),
       onAction: async () => {
         codeConfirm();
       },
-      disabled: code.length === 0,
+      disabled: code.length === 0 || isLoading,
     },
   ];
 
   const handleResend = async () => {
     try {
+      setIsLoading(true);
       await updateEmailAuthCode(email);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      showBottomToast('error', error as string);
     }
+    setIsLoading(false);
   };
 
   const codeConfirm = async () => {
     try {
-      console.log('hi');
+      setIsLoading(true);
       const response = await confirmCode(email, code);
       const token = response?.response?.authVerityToken;
       if (response?.isSuccess && token) {
         setAuthVerityToken(token);
         onNext();
       } else {
-        console.error(response);
+        showBottomToast('error', response?.errorResponse?.message as string);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      showBottomToast('error', error as string);
     }
+    setIsLoading(false);
   };
 
   return (

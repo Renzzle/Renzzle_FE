@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DeviceInfo from 'react-native-device-info';
 import { registerUser } from '../../apis/auth';
 import useAuthStore from '../../store/useAuthStore';
+import { showBottomToast } from '../../components/common/Toast/toastMessage';
 
 enum SignupStep {
   Email,
@@ -30,7 +31,7 @@ const Signup = () => {
 
   const handleSignupComplete = async () => {
     if (!email || !code || !password || !nickname || !authVerityToken || !deviceId) {
-      console.warn('필수 항목이 누락되었습니다.');
+      showBottomToast('error', '필수 항목이 누락되었습니다. 처음으로 돌아갑니다.');
       fetchDeviceId();
       setStep(SignupStep.Email);
       return;
@@ -42,8 +43,8 @@ const Signup = () => {
         await signin(email, password);
         navigation.navigate('Home');
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      showBottomToast('error', error as string);
     }
   };
 

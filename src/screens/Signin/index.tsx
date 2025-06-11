@@ -15,6 +15,7 @@ import BottomButtonBar from '../../components/common/BottomButtonBar';
 import CustomText from '../../components/common/CustomText';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '../../components/common';
+import { showBottomToast } from '../../components/common/Toast/toastMessage';
 
 const Signin = () => {
   const { t } = useTranslation();
@@ -27,19 +28,23 @@ const Signin = () => {
 
   const handleLogin = async () => {
     if (!email) {
+      showBottomToast('error', '이메일을 입력해주세요.');
+      return;
+    }
+    if (!password) {
+      showBottomToast('error', '비밀번호를 입력해주세요.');
       return;
     }
 
     try {
       setLoading(true);
       await signin(email, password);
-      setLoading(false);
 
       navigation.navigate('Home');
     } catch (error) {
-      setLoading(false);
-      console.error('문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      showBottomToast('error', error as string);
     }
+    setLoading(false);
   };
 
   const transition = [
