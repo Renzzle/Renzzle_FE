@@ -39,15 +39,17 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options }) => {
   };
 
   const renderRightContent = () => {
-    return (
-      <>
-        <CustomText size={12} weight="bold" lineHeight="sm" color="main_color/blue_p">
-          {user?.currency}
-          {user && t('puzzle.piece')}
-        </CustomText>
-        <Icon name="PuzzlePlusIcon" color="main_color/blue_p" size={22} />
-      </>
-    );
+    if (user) {
+      return (
+        <>
+          <CustomText size={12} weight="bold" lineHeight="sm" color="main_color/blue_p">
+            {user?.currency}
+            {user && t('puzzle.piece')}
+          </CustomText>
+          <Icon name="PuzzlePlusIcon" color="main_color/blue_p" size={22} />
+        </>
+      );
+    }
   };
 
   return (

@@ -76,7 +76,10 @@ const Signin = () => {
         </TextInputContainer>
 
         <NavigationWrapper>
-          <NavigationButton>
+          <NavigationButton
+            onPress={() => {
+              navigation.navigate('Signup');
+            }}>
             <CustomText size={12} lineHeight="sm" color="gray/gray500">
               {t('auth.signup')}
             </CustomText>

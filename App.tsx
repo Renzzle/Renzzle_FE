@@ -22,6 +22,7 @@ import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
 import AppWrapper from './src/components/common/AppWrapper/index.tsx';
 import CustomHeader from './src/components/common/CustomHeader/index.tsx';
+import Signup from './src/screens/Signup/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -82,7 +83,10 @@ function App(): React.JSX.Element | null {
               />
             </>
           ) : (
-            <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
+            <>
+              <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
+              <Stack.Screen name="Signup" component={Signup} options={{ title: 'auth.signup' }} />
+            </>
           )}
         </Stack.Navigator>
       </AppWrapper>

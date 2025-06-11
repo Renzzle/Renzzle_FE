@@ -1,48 +1,94 @@
-import React, { useState } from 'react';
-import CustomTextInput from '../../components/common/CustomTextInput';
-import { updateEmailAuthCode } from '../../apis/auth';
-import { View } from 'react-native';
-import CustomButton from '../../components/common/CustomButton';
+import React, { useEffect, useState } from 'react';
+import { SignupContainer } from './index.styles';
+import SignupEmailStep from './SignupEmailStep';
+import SignupCodeStep from './SignupCodeStep';
+import SignupPasswordStep from './SignupPasswordStep';
+import SignupNicknameStep from './SignupNicknameStep';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import DeviceInfo from 'react-native-device-info';
+import { registerUser } from '../../apis/auth';
+import useAuthStore from '../../store/useAuthStore';
+
+enum SignupStep {
+  Email,
+  Code,
+  Password,
+  Nickname,
+}
 
 const Signup = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const { signin } = useAuthStore();
+  const [step, setStep] = useState<SignupStep>(SignupStep.Email);
   const [email, setEmail] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [code, setCode] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [nickname, setNickname] = useState<string>('');
+  const [authVerityToken, setAuthVerityToken] = useState<string>('');
+  const [deviceId, setDeviceId] = useState<string>('');
 
-  const handleSendAuthCode = async () => {
-    if (!email) {
+  const handleSignupComplete = async () => {
+    if (!email || !code || !password || !nickname || !authVerityToken || !deviceId) {
+      console.warn('필수 항목이 누락되었습니다.');
+      fetchDeviceId();
+      setStep(SignupStep.Email);
       return;
     }
 
     try {
-      setLoading(true);
-      const data = await updateEmailAuthCode(email);
-      setLoading(false);
-
-      alert(`${data.response.code}`);
-      console.log(`${data.response.code}`);
-
-      if (data && data.success) {
-        alert('Success');
-      } else {
-        alert('Error');
+      const response = await registerUser(email, password, nickname, authVerityToken, deviceId);
+      if (response?.isSuccess) {
+        await signin(email, password);
+        navigation.navigate('Home');
       }
-    } catch (error) {
-      setLoading(false);
-      alert('Error');
+    } catch (err) {
+      console.error(err);
     }
   };
+
+  const fetchDeviceId = async () => {
+    const id = await DeviceInfo.getUniqueId();
+    setDeviceId(id);
+  };
+
+  useEffect(() => {
+    fetchDeviceId();
+  }, []);
+
   return (
-    <View>
-      <CustomTextInput
-        placeholder="Enter your email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <CustomButton onPress={handleSendAuthCode} category="primary" disabled={loading}>
-        인증번호 발급
-      </CustomButton>
-    </View>
+    <SignupContainer>
+      {step === SignupStep.Email && (
+        <SignupEmailStep
+          email={email}
+          setEmail={setEmail}
+          onNext={() => setStep(SignupStep.Code)}
+        />
+      )}
+      {step === SignupStep.Code && (
+        <SignupCodeStep
+          code={code}
+          setCode={setCode}
+          email={email}
+          setAuthVerityToken={setAuthVerityToken}
+          onNext={() => setStep(SignupStep.Password)}
+        />
+      )}
+      {step === SignupStep.Password && (
+        <SignupPasswordStep
+          password={password}
+          setPassword={setPassword}
+          onNext={() => setStep(SignupStep.Nickname)}
+        />
+      )}
+      {step === SignupStep.Nickname && (
+        <SignupNicknameStep
+          nickname={nickname}
+          setNickname={setNickname}
+          onComplete={handleSignupComplete}
+        />
+      )}
+    </SignupContainer>
   );
 };
 
