@@ -16,14 +16,14 @@
     "enterPassword": {
       "prefix": "안전하게 지켜줄",
       "title": "비밀번호를 입력해 주세요",
-      "description": "8~12자의 영문 대소문자, 숫자만 가능합니다.",
+      "description": "8~12자의 영문자와 숫자를 조합해 주세요.",
       "passwordMatch": "비밀번호가 일치합니다.",
       "passwordMisMatch": "비밀번호가 일치하지 않습니다."
     },
     "enterNickname": {
       "prefix": "당신을 나타낼",
       "title": "닉네임을 입력해 주세요",
-      "description": "2~8자리 문자만 가능합니다."
+      "description": "2~8자의 문자나 숫자만 가능해요. (특수문자 제외)"
     }
   },
   "common": {
@@ -37,10 +37,14 @@
   },
   "button": {
     "createPuzzle": "출제",
-    "uploadPuzzle": "업로드"
+    "uploadPuzzle": "업로드",
+    "sendEmail": "인증메일 전송",
+    "resend": "재발송",
+    "confirm": "확인"
   },
   "placeholder": {
     "email": "이메일",
+    "code": "인증번호",
     "password": "비밀번호",
     "confirmPassword": "비밀번호 확인",
     "nickname": "닉네임"
