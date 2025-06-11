@@ -23,6 +23,8 @@ import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
 import AppWrapper from './src/components/common/AppWrapper/index.tsx';
 import CustomHeader from './src/components/common/CustomHeader/index.tsx';
 import Signup from './src/screens/Signup/index.tsx';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from './src/components/common/Toast/toast.config.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -90,6 +92,7 @@ function App(): React.JSX.Element | null {
           )}
         </Stack.Navigator>
       </AppWrapper>
+      <Toast config={toastConfig} />
     </NavigationContainer>
   );
 }
