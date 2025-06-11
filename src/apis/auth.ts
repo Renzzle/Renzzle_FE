@@ -12,6 +12,48 @@ export const updateEmailAuthCode = async (email: string) => {
   }
 };
 
+export const confirmCode = async (email: string, code: string) => {
+  try {
+    const response = await apiClient.post('/api/auth/confirmCode', { email, code });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const checkNicknameDuplicate = async (nickname: string) => {
+  try {
+    const response = await apiClient.get(`/api/auth/duplicate/${nickname}`);
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const registerUser = async (
+  email: string,
+  password: string,
+  nickname: string,
+  authVerityToken: string,
+  deviceId: string,
+) => {
+  try {
+    const response = await apiClient.post('/api/auth/signup', {
+      email,
+      password,
+      nickname,
+      authVerityToken,
+      deviceId,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAuth = async (email: string, password: string) => {
   try {
     const response = await apiClient.post('/api/auth/login', { email, password });
