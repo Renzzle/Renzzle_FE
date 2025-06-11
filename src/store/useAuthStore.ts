@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { getAuth } from '../apis/auth';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { useUserStore } from './useUserStore';
+import { getUser } from '../apis/user';
 
 const initialState = {
   accessToken: undefined,
@@ -36,6 +37,9 @@ const useAuthStore = create<AuthStateType>((set) => ({
         accessToken,
         refreshToken,
       }));
+
+      const user = await getUser(accessToken);
+      useUserStore.getState().setUser(user);
     } catch (error) {
       console.error('Fail to sign in:', error);
       throw error;
@@ -85,6 +89,8 @@ const useAuthStore = create<AuthStateType>((set) => ({
     try {
       await EncryptedStorage.removeItem('tokens');
       set(initialState);
+
+      useUserStore.getState().clearUser();
     } catch (error) {
       console.error('Failed to clear tokens:', error);
     }
