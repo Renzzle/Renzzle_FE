@@ -4,6 +4,7 @@ import AuthenticatedUserIcon from './ico-authenticated-user.svg';
 import AuthenticatedIcon from './ico-authenticated.svg';
 import BestUserIcon from './ico-best-user.svg';
 import BookShelfIcon from './ico-book-shelf.svg';
+import CheckIcon from './ico-check.svg';
 import ChevronDoubleLeftIcon from './ico-chevron-double-left.svg';
 import ChevronDoubleRightIcon from './ico-chevron-double-right.svg';
 import ChevronLeftIcon from './ico-chevron-left.svg';
@@ -13,6 +14,7 @@ import ConfusedActiveIcon from './ico-confused-active.svg';
 import ConfusedInactiveIcon from './ico-confused-inactive.svg';
 import CorrectIcon from './ico-correct.svg';
 import DepthIcon from './ico-depth.svg';
+import ErrorIcon from './ico-error.svg';
 import FocusIcon from './ico-focus.svg';
 import HashTagIcon from './ico-hashtag.svg';
 import HeartActiveIcon from './ico-heart-active.svg';
@@ -21,6 +23,7 @@ import HeartMediumIcon from './ico-heart-m.svg';
 import HeartSmallIcon from './ico-heart-s.svg';
 import HotIcon from './ico-hot.svg';
 import IncorrectIcon from './ico-incorrect.svg';
+import InfoIcon from './ico-info.svg';
 import LightbulbAlertIcon from './ico-lightbulb-alert.svg';
 import LightbulbIcon from './ico-lightbulb.svg';
 import LightningIcon from './ico-lightning.svg';
@@ -61,6 +64,7 @@ const Icons = {
   AuthenticatedIcon,
   BestUserIcon,
   BookShelfIcon,
+  CheckIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
   ChevronLeftIcon,
@@ -70,6 +74,7 @@ const Icons = {
   ConfusedInactiveIcon,
   CorrectIcon,
   DepthIcon,
+  ErrorIcon,
   FocusIcon,
   HashTagIcon,
   HeartActiveIcon,
@@ -78,6 +83,7 @@ const Icons = {
   HeartSmallIcon,
   HotIcon,
   IncorrectIcon,
+  InfoIcon,
   LightbulbAlertIcon,
   LightbulbIcon,
   LightningIcon,
