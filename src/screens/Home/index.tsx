@@ -33,12 +33,15 @@ const Home = () => {
       <HomeContainer>
         <MainMenuWrapper>
           {mainMenus.map((menu) => {
-            const { background, iconColor, titleKey } = menuThemeMap[menu];
+            const { background, iconColor, titleKey, route } = menuThemeMap[menu];
             const bgColor = theme.color[background];
             const textColor = getTextColor(menu, iconColor);
 
             return (
-              <MainMenuButton key={menu} backgroundColor={bgColor}>
+              <MainMenuButton
+                key={menu}
+                backgroundColor={bgColor}
+                onPress={() => route && navigation.navigate(route)}>
                 <MenuButton type={menu} size={120} />
                 <MainMenuText>
                   {['', 'Description'].map((suffix, index) => (
@@ -59,10 +62,10 @@ const Home = () => {
 
         <SubMenuWrapper>
           {subMenus.map((menu) => {
-            const { titleKey } = menuThemeMap[menu];
+            const { titleKey, route } = menuThemeMap[menu];
 
             return (
-              <SubMenuButton key={menu}>
+              <SubMenuButton key={menu} onPress={() => route && navigation.navigate(route)}>
                 <MenuButton type={menu} size={40} />
                 <CustomText size={12} weight="bold" lineHeight="sm">
                   {t(titleKey)}
