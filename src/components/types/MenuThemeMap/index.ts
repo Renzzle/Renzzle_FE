@@ -14,7 +14,7 @@ export const menuThemeMap = {
   rankingPuzzle: {
     titleKey: 'home.rankingPuzzle',
     background: 'sub_color/yellow/bg',
-    iconColor: 'sub_color/yellow/p',
+    iconColor: 'main_color/yellow_p',
     iconName: 'LightningIcon',
   },
   ranking: {
