@@ -20,7 +20,9 @@ const tryReissueToken = async (
   refreshToken: string,
 ): Promise<{ accessToken: string; refreshToken: string } | null> => {
   try {
-    const { newAccessToken, newRefreshToken } = await reissueToken(refreshToken);
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await reissueToken(
+      refreshToken,
+    );
     console.log('Token reissue successful');
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (err) {
@@ -32,7 +34,7 @@ const tryReissueToken = async (
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
   const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
-  const { setUser, clearUser } = useUserStore(); // Get setters from the user store
+  const { setUser } = useUserStore(); // Get setters from the user store
 
   useEffect(() => {
     const initApp = async () => {
@@ -46,7 +48,6 @@ const useInitializeApp = (): boolean => {
 
         const handleLogout = async () => {
           await clearTokens();
-          clearUser();
         };
 
         if (accessToken) {
@@ -78,7 +79,6 @@ const useInitializeApp = (): boolean => {
       } catch (err) {
         console.error('Error occurred during app initialization: ', err);
         await clearTokens();
-        clearUser();
       } finally {
         SplashScreen.hide();
         setIsLoading(false);
@@ -87,7 +87,7 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [restoreCredentials, setTokens, clearTokens, setUser, clearUser]);
+  }, [restoreCredentials, setTokens, clearTokens, setUser]);
 
   return isLoading;
 };
