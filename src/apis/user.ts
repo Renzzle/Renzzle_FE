@@ -30,6 +30,21 @@ export const getUserPuzzles = async (id: number | null, size: number) => {
   }
 };
 
+export const getLikedPuzzles = async (id: number | null, size: number) => {
+  const params: Record<string, any> = { size };
+  if (id !== null) {
+    params.id = id;
+  }
+
+  try {
+    const response = await apiClient.get('/api/user/like', { params });
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const updateLike = async (authStore: string, puzzleId: number) => {
   try {
     const response = await apiClient.post(
