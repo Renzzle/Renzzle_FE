@@ -53,7 +53,11 @@ const InfiniteScrollList = <T,>({
   }, [fetchData]);
 
   const renderFooter = () =>
-    loading ? <ActivityIndicator style={{ marginVertical: 16 }} /> : null;
+    loading ? (
+      <ActivityIndicator style={{ marginVertical: 16 }} />
+    ) : (
+      <View style={{ marginBottom: 15 }} />
+    );
 
   return (
     <FlatList
@@ -65,6 +69,8 @@ const InfiniteScrollList = <T,>({
       ListFooterComponent={renderFooter}
       ListEmptyComponent={!loading ? ListEmptyComponent : null}
       ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
       {...flatListProps}
     />
   );
