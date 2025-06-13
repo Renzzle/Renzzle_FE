@@ -91,7 +91,7 @@ const CommunityCard = ({
             <CustomText size={14} weight="bold">
               {title}
             </CustomText>
-            {onDelete && <Icon name="WasteBinIcon" size={15} />}
+            {onDelete && <Icon onPress={onDelete} name="WasteBinIcon" size={15} />}
           </TitleWrapper>
           <PuzzleAttributes depth={depth} winColor={winColor} isVerified={isVerified} />
           <CustomText size={8} lineHeight="sm" color="gray/gray500">
