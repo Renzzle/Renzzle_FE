@@ -13,6 +13,17 @@ export interface CommunityPuzzle {
   isVerified: boolean;
 }
 
+export interface TrainingPack {
+  id: number;
+  title: string;
+  author: string;
+  description: string;
+  price: number;
+  totalPuzzleCount: number;
+  solvedPuzzleCount: number;
+  locked: boolean;
+}
+
 export interface LessonPuzzle {
   id: number;
   title: string;

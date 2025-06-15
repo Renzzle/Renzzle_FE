@@ -101,6 +101,7 @@ apiClient.interceptors.response.use(
         }
       }
     }
+    console.log(error.response?.data?.errorResponse);
     return Promise.reject(error.response?.data?.errorResponse?.message ?? error);
   },
 );
