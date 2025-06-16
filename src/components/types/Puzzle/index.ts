@@ -24,6 +24,14 @@ export interface TrainingPack {
   locked: boolean;
 }
 
+export interface TrainingPuzzle {
+  id: number;
+  boardStatus: string;
+  depth: number;
+  winColor: 'BLACK' | 'WHITE';
+  isSolved: boolean;
+}
+
 export interface LessonPuzzle {
   id: number;
   title: string;

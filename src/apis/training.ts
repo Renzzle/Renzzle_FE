@@ -14,3 +14,13 @@ export const getPack = async (difficulty: string, lang: string) => {
     throw error;
   }
 };
+
+export const getTrainingPuzzles = async (packId: number) => {
+  try {
+    const response = await apiClient.get(`/api/training/puzzle/${packId}`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};

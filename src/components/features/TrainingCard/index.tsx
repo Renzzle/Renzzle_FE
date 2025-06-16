@@ -1,8 +1,8 @@
 import React from 'react';
-import { CardContainer } from './index.styles';
+import { CardContainer, DescriptionContainer } from './index.styles';
 import BoardPreview from '../BoardPreview';
 import { CustomText } from '../../common';
-import { Dimensions, View } from 'react-native';
+import { Dimensions } from 'react-native';
 import { IconName } from '../../../assets/icons';
 import { useTranslation } from 'react-i18next';
 import { ColorType } from '../../../styles/theme';
@@ -55,12 +55,12 @@ const TrainingCard = ({
   return (
     <CardContainer onPress={onPress} cardWidth={cardWidth}>
       <BoardPreview sequence={sequence} isSolved={isSolved} size={previewWidth} />
-      <View>
+      <DescriptionContainer>
         <CustomText size={14} weight="bold">
-          {title}
+          #{title}
         </CustomText>
         <PuzzleAttributes depth={depth} winColor={winColor} />
-      </View>
+      </DescriptionContainer>
     </CardContainer>
   );
 };

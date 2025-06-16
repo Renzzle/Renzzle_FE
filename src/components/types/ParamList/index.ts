@@ -10,5 +10,8 @@ export type RootStackParamList = {
   LessonPuzzleList: {
     chapter: number;
   };
+  TrainingPuzzles: {
+    packId: number;
+  };
   OtherScreen: undefined;
 };
