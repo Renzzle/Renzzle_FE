@@ -1,3 +1,4 @@
+import { ApiCallParams } from '../components/common/InfiniteScrollList';
 import { HTTP_HEADERS } from './constants';
 import apiClient from './interceptor';
 
@@ -15,10 +16,13 @@ export const getUser = async (authStore: string) => {
   }
 };
 
-export const getUserPuzzles = async (id: number | null, size: number) => {
-  const params: Record<string, any> = { size };
-  if (id !== null) {
-    params.id = id;
+export const getUserPuzzles = async (params: ApiCallParams) => {
+  const queryParams: Record<string, any> = {
+    size: params.size ?? 10,
+  };
+
+  if (params.id !== null && params.id !== undefined) {
+    queryParams.id = params.id;
   }
 
   try {

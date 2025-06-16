@@ -9,7 +9,7 @@ const MyPuzzles = () => {
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
-        apiCall={({ id, size }) => getUserPuzzles(id, size)}
+        apiCall={getUserPuzzles}
         renderItem={({ item }) => (
           <CommunityCard
             title={item.authorName}
