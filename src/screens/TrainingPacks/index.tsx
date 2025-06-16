@@ -1,14 +1,18 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
 import TabBar from '../../components/common/TabBar';
 import { ActiveTabContainer, Container } from './index.styles';
 import { getPack } from '../../apis/training';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
 import { TrainingPack } from '../../components/types';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const TrainingPacks = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [packs, setPacks] = useState<TrainingPack[]>([]);
   const [currentTab, setCurrentTab] = useState('LOW');
   const [loading, setLoading] = useState(true);
@@ -42,19 +46,28 @@ const TrainingPacks = () => {
         {loading ? (
           <ActivityIndicator style={{ marginVertical: 16 }} />
         ) : (
-          packs.map((pack) => (
-            <PackCard
-              key={pack.id}
-              title={pack.title}
-              author={pack.author}
-              description={pack.description}
-              price={pack.price}
-              totalPuzzleCount={pack.totalPuzzleCount}
-              solvedPuzzleCount={pack.solvedPuzzleCount}
-              isLocked={pack.locked}
-              onPress={() => {}}
-            />
-          ))
+          <FlatList
+            data={packs}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <PackCard
+                key={item.id}
+                title={item.title}
+                author={item.author}
+                description={item.description}
+                price={item.price}
+                totalPuzzleCount={item.totalPuzzleCount}
+                solvedPuzzleCount={item.solvedPuzzleCount}
+                isLocked={item.locked}
+                onPress={() => {
+                  navigation.navigate('TrainingPuzzles', { packId: item.id });
+                }}
+              />
+            )}
+            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+          />
         )}
       </ActiveTabContainer>
     </Container>
