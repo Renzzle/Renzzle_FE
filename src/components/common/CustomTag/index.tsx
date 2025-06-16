@@ -8,9 +8,10 @@ export type CustomTagVariant = 'default' | 'highlight';
 interface CustomTagProps {
   children: React.ReactNode;
   variant?: CustomTagVariant;
+  size?: 'sm' | 'lg';
 }
 
-const CustomTag = ({ children, variant }: CustomTagProps) => {
+const CustomTag = ({ children, variant, size = 'sm' }: CustomTagProps) => {
   const pointColorMap: Record<CustomTagVariant, ColorType> = {
     default: 'gray/gray500',
     highlight: 'main_color/yellow_p',
@@ -22,6 +23,16 @@ const CustomTag = ({ children, variant }: CustomTagProps) => {
 
   const pointColor = pointColorMap[variant ?? 'default'];
   const backColor = backColorMap[variant ?? 'default'];
+
+  if (size === 'lg') {
+    return (
+      <TagContainer backColor={backColor}>
+        <CustomText size={14} weight="bold" lineHeight="sm" color={pointColor}>
+          {children}
+        </CustomText>
+      </TagContainer>
+    );
+  }
 
   return (
     <TagContainer backColor={backColor}>
