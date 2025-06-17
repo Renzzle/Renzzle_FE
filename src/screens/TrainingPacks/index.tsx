@@ -60,7 +60,7 @@ const TrainingPacks = () => {
                 solvedPuzzleCount={item.solvedPuzzleCount}
                 isLocked={item.locked}
                 onPress={() => {
-                  navigation.navigate('TrainingPuzzles', { packId: item.id });
+                  navigation.navigate('TrainingPuzzles', { pack: item });
                 }}
               />
             )}

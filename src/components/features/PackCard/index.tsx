@@ -1,5 +1,11 @@
 import React from 'react';
-import { AuthorWrapper, CardContainer, CardRightWrapper, PriceWrapper } from './index.styles';
+import {
+  AuthorWrapper,
+  CardContainerButton,
+  CardContainerView,
+  CardRightWrapper,
+  PriceWrapper,
+} from './index.styles';
 import { View } from 'react-native';
 import { CustomText, Icon } from '../../common';
 
@@ -30,8 +36,11 @@ const PackCard = ({
   const secondaryColor = isLocked ? 'gray/gray400' : 'main_color/blue_s';
   const tertiaryColor = isLocked ? 'gray/gray400' : 'gray/gray500';
 
+  const ContainerComponent: React.ElementType =
+    variant === 'minimal' ? CardContainerView : CardContainerButton;
+
   return (
-    <CardContainer onPress={onPress} variant={variant}>
+    <ContainerComponent onPress={variant === 'default' ? onPress : undefined}>
       <View>
         <CustomText size={16} weight="bold" color={primaryColor}>
           {title}
@@ -66,7 +75,7 @@ const PackCard = ({
           </>
         )}
       </CardRightWrapper>
-    </CardContainer>
+    </ContainerComponent>
   );
 };
 

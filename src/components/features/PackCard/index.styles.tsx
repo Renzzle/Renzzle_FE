@@ -2,13 +2,23 @@ import { TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
 
-export const CardContainer = styled(TouchableOpacity)<{ variant: string }>`
+export const CardContainerButton = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: ${({ variant }) =>
-    variant === 'default' ? theme.color['gray/white'] : 'transparent'};
+  background-color: ${theme.color['gray/white']};
+  padding: 20px 30px;
+  border-radius: 13px;
+  width: 100%;
+`;
+
+export const CardContainerView = styled(View)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
   padding: 20px 30px;
   border-radius: 13px;
   width: 100%;

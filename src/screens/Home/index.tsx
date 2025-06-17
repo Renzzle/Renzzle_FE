@@ -128,7 +128,7 @@ const Home = () => {
               solvedPuzzleCount={recommendPack.solvedPuzzleCount}
               isLocked={recommendPack.locked}
               onPress={() => {
-                navigation.navigate('TrainingPuzzles', { packId: recommendPack.id });
+                navigation.navigate('TrainingPuzzles', { pack: recommendPack });
               }}
             />
           </ArticleWrapper>
