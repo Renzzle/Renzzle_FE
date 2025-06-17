@@ -11,6 +11,7 @@ export const CardContainer = styled(TouchableOpacity)<{ variant: string }>`
     variant === 'default' ? theme.color['gray/white'] : 'transparent'};
   padding: 20px 30px;
   border-radius: 13px;
+  width: 100%;
 `;
 
 export const AuthorWrapper = styled(View)`
