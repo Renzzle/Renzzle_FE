@@ -1,3 +1,5 @@
+import { TrainingPack } from '../Puzzle';
+
 export type RootStackParamList = {
   CommunityPuzzleSolve: {
     id: number;
@@ -9,6 +11,9 @@ export type RootStackParamList = {
   };
   LessonPuzzleList: {
     chapter: number;
+  };
+  TrainingPuzzles: {
+    pack: TrainingPack;
   };
   OtherScreen: undefined;
 };

@@ -15,7 +15,13 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
 
   const isHome = route.name === 'Home';
 
-  const grayBGRoutes = ['Signup']; // TODO: 밝은 배경 적용해야하는 화면들 route.name 추가
+  const grayBGRoutes = [
+    'Signup',
+    'TrainingPuzzleSolve',
+    'CommunityPuzzleSolve',
+    'CreateCommunityPuzzle',
+    'RankedPuzzleSolve',
+  ];
   const backgroundColor = grayBGRoutes.includes(route.name)
     ? theme.color['gray/grayBG']
     : theme.color['gray/grayBGDim'];

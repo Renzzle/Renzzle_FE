@@ -99,11 +99,11 @@
   },
   "home": {
     "trainingPuzzle": "트레이닝 퍼즐",
-    "trainingDescription": "인증된 단계별 퍼즐을 통한 훈련장",
+    "trainingPuzzleDescription": "인증된 단계별 퍼즐을 통한 훈련장",
     "communityPuzzle": "커뮤니티 퍼즐",
-    "communityDescription": "유저 간 퍼즐을 통해 소통하는 교류의 장",
+    "communityPuzzleDescription": "유저 간 퍼즐을 통해 소통하는 교류의 장",
     "rankingPuzzle": "랭킹 퍼즐",
-    "rankingDescription": "시간 안에 랜덤한 퍼즐들을 푸는 경쟁의 장",
+    "rankingPuzzleDescription": "시간 안에 랜덤한 퍼즐들을 푸는 경쟁의 장",
     "recommendedBook": "풀고 있는 문제집",
     "featuredPuzzle": "주목할 만한 퍼즐"
   },

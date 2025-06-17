@@ -1,9 +1,9 @@
-import { TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
 import { CustomText } from '../../common';
 
-export const CardContainer = styled(TouchableOpacity)<{
+export const CardContainer = styled(View)<{
   category: 'rating' | 'best';
   isCurrentUser?: boolean;
 }>`

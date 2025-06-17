@@ -1,16 +1,35 @@
 export interface CommunityPuzzle {
   id: number;
-  title: string;
   boardStatus: string;
   authorId: number;
   authorName: string;
-  solvedCount: number;
-  correctRate: number;
   depth: number;
-  difficulty: 'HIGH' | 'MIDDLE' | 'LOW';
   winColor: 'BLACK' | 'WHITE';
+  solvedCount: number;
+  views: number;
   likeCount: number;
-  tag: string[];
+  createdAt: string;
+  isSolved: boolean;
+  isVerified: boolean;
+}
+
+export interface TrainingPack {
+  id: number;
+  title: string;
+  author: string;
+  description: string;
+  price: number;
+  totalPuzzleCount: number;
+  solvedPuzzleCount: number;
+  locked: boolean;
+}
+
+export interface TrainingPuzzle {
+  id: number;
+  boardStatus: string;
+  depth: number;
+  winColor: 'BLACK' | 'WHITE';
+  isSolved: boolean;
 }
 
 export interface LessonPuzzle {

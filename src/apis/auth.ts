@@ -77,7 +77,7 @@ export const reissueToken = async (refreshToken: string) => {
       },
     );
 
-    return response.data;
+    return response.data.response;
   } catch (error) {
     throw error;
   }

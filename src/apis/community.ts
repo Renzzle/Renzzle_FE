@@ -1,26 +1,29 @@
+import { ApiCallParams } from '../components/common/InfiniteScrollList';
 import { HTTP_HEADERS } from './constants';
 import { apiClient } from './interceptor';
 
-export const getCommunityPuzzle = async (
-  authStore: string,
-  size?: number,
-  sort?: string,
-  id?: number,
-) => {
+const cleanParams = (params: ApiCallParams): Record<string, any> => {
+  return Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value !== null && value !== undefined),
+  );
+};
+
+export const getCommunityPuzzles = async (params: ApiCallParams) => {
   try {
-    const params: Record<string, string | number> = {};
-    if (id !== undefined) {params.id = id;}
-    if (size !== undefined) {params.size = size;}
-    if (sort !== undefined) {params.sort = sort;}
+    const filteredParams = cleanParams(params);
 
-    const response = await apiClient.get('/api/community/puzzle', {
-      headers: {
-        [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
-      },
-      params,
-    });
+    // TODO: 서버 수정 후 if문 두개 삭제 !!
+    if (params.stone === null || params.stone === undefined) {
+      filteredParams.stone = 'BLACK';
+    }
+    if (params.sort === null || params.sort === undefined) {
+      filteredParams.sort = 'LATEST';
+    }
+    console.log('filteredparams: ', filteredParams);
 
-    return response.data;
+    const response = await apiClient.get('/api/community/puzzle', { params: filteredParams });
+
+    return response.data.response;
   } catch (error) {
     throw error;
   }
@@ -42,7 +45,7 @@ export const uploadPuzzle = async (
         headers: {
           [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
         },
-      }
+      },
     );
 
     return response.data;
