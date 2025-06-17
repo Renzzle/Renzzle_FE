@@ -13,7 +13,7 @@ type AuthStateType = {
   accessToken?: string;
   refreshToken?: string;
   signin: (email: string, password: string) => Promise<void>;
-  restoreCredentials: () => Promise<void>;
+  restoreCredentials: () => Promise<{ accessToken?: string; refreshToken?: string }>;
   signout: () => Promise<void>;
   setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
   clearTokens: () => Promise<void>;
@@ -50,7 +50,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
     try {
       const storedTokens = await EncryptedStorage.getItem('tokens');
       if (!storedTokens) {
-        return;
+        return {};
       }
 
       const { accessToken, refreshToken } = JSON.parse(storedTokens);
@@ -60,8 +60,11 @@ const useAuthStore = create<AuthStateType>((set) => ({
         accessToken,
         refreshToken,
       }));
+
+      return { accessToken, refreshToken };
     } catch (error) {
       console.error('Failed to restore credentials:', error);
+      return {};
     }
   },
 
