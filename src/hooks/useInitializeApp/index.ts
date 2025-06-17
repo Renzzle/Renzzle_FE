@@ -39,7 +39,9 @@ const useInitializeApp = (): boolean => {
   useEffect(() => {
     const initApp = async () => {
       try {
-        const { accessToken, refreshToken } = await restoreCredentials();
+        const credentials = await restoreCredentials();
+        const accessToken = credentials?.accessToken;
+        const refreshToken = credentials?.refreshToken;
 
         const handleSuccessfulLogin = (user: User) => {
           setUser(user);
