@@ -76,7 +76,13 @@ apiClient.interceptors.response.use(
 
         try {
           console.log('J4010: Access Token 만료!! 토큰 재발급 시도 중...');
-          const { newAccessToken, newRefreshToken } = await reissueToken(refreshToken);
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await reissueToken(
+            refreshToken,
+          );
+          if (!newAccessToken) {
+            throw new Error('재발급된 액세스 토큰이 유효하지 않습니다.');
+          }
+
           await setTokens(newAccessToken, newRefreshToken); // Save new tokens to store and AsyncStorage
           console.log('토큰 재발급 성공.');
 
