@@ -5,7 +5,7 @@ import * as Progress from 'react-native-progress';
 import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 
-const TOTAL_DURATION = 3 * 60 * 1000; // 10 min
+const TOTAL_DURATION = 5 * 60 * 1000; // 5 min
 
 interface TimerWithProgressBarProps {
   start: boolean;

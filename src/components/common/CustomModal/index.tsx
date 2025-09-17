@@ -19,7 +19,8 @@ export type ModalCategoryType =
   | 'RANKING_PUZZLE_SUCCESS'
   | 'PUZZLE_FAILURE'
   | 'VALIDATION_COMPLETE'
-  | 'VALIDATION_FAILED';
+  | 'VALIDATION_FAILED'
+  | 'RANKING_PUZZLE_INTRO';
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -51,6 +52,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.validationFailed.title',
     BODY: 'modal.validationFailed.message',
     FOOTER: 'modal.validationFailed.confirm',
+  },
+  RANKING_PUZZLE_INTRO: {
+    TITLE: 'modal.rankingPuzzleIntro.title',
+    BODY: 'modal.rankingPuzzleIntro.message',
+    FOOTER: ['modal.rankingPuzzleIntro.cancel', 'modal.rankingPuzzleIntro.confirm'],
   },
 };
 
