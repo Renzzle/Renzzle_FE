@@ -5,20 +5,28 @@ import * as Progress from 'react-native-progress';
 import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 
-const TOTAL_DURATION = 5 * 60 * 1000; // 5 min
+const TOTAL_DURATION = 3 * 60 * 1000; // 3 min
+const BONUS_TIME = 10 * 1000; // 10 sec
 
 interface TimerWithProgressBarProps {
   start: boolean;
   paused: boolean;
   onFinish: () => void;
+  bonusTimeTrigger?: number;
 }
 
-const TimerWithProgressBar = ({ start, paused, onFinish }: TimerWithProgressBarProps) => {
+const TimerWithProgressBar = ({
+  start,
+  paused,
+  onFinish,
+  bonusTimeTrigger,
+}: TimerWithProgressBarProps) => {
   const [remainingTime, setRemainingTime] = useState<number>(TOTAL_DURATION);
   const appState = useRef<AppStateStatus>(AppState.currentState); // active, inactive, background
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null); // Store the interval ID for clearing the timer later
   const backgroundTimestamp = useRef<number | null>(null);
   const started = useRef<boolean>(false);
+  const isInitialMount = useRef(true);
 
   const progress = remainingTime / TOTAL_DURATION;
 
@@ -46,6 +54,18 @@ const TimerWithProgressBar = ({ start, paused, onFinish }: TimerWithProgressBarP
       });
     }, 1000);
   }, [onFinish, stopTimer]);
+
+  // Add bonus time
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (bonusTimeTrigger !== undefined) {
+      setRemainingTime((prev) => prev + BONUS_TIME);
+    }
+  }, [bonusTimeTrigger]);
 
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
