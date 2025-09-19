@@ -48,3 +48,12 @@ export const RankingResultTheme: Record<ResultVariant, ResultTheme> = {
     iconName: 'CloseIcon',
   },
 };
+
+export interface GameResult {
+  variant: ResultVariant;
+}
+
+export interface GameOutcome {
+  rating: number;
+  reward: number;
+}

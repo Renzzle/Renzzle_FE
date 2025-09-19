@@ -7,7 +7,7 @@ interface Props {
   variant: ResultVariant;
   text: string;
   disabled?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const RankingResultButton = ({ variant, text, disabled = false, onPress }: Props) => {
