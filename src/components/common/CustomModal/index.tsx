@@ -12,6 +12,7 @@ import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
+import { GameOutcome } from '../../types/Ranking';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
@@ -20,7 +21,8 @@ export type ModalCategoryType =
   | 'PUZZLE_FAILURE'
   | 'VALIDATION_COMPLETE'
   | 'VALIDATION_FAILED'
-  | 'RANKING_PUZZLE_INTRO';
+  | 'RANKING_PUZZLE_INTRO'
+  | 'RANKING_PUZZLE_OUTRO';
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -58,6 +60,11 @@ export const MODAL_TEXTS = {
     BODY: 'modal.rankingPuzzleIntro.message',
     FOOTER: ['modal.rankingPuzzleIntro.cancel', 'modal.rankingPuzzleIntro.confirm'],
   },
+  RANKING_PUZZLE_OUTRO: {
+    TITLE: 'modal.rankingPuzzleOutro.title',
+    BODY: 'modal.rankingPuzzleOutro.message',
+    FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
+  },
 };
 
 interface CustomModalProps {
@@ -65,6 +72,7 @@ interface CustomModalProps {
   isVisible: boolean;
   onPrimaryAction: () => void;
   onSecondaryAction?: () => void;
+  gameOutcome?: GameOutcome;
   bodyText?: string;
 }
 
@@ -72,6 +80,7 @@ export const ModalCard = ({
   category,
   onPrimaryAction: onPrimaryClose,
   onSecondaryAction: onSecondaryClose = () => {},
+  gameOutcome,
 }: Omit<CustomModalProps, 'isVisible'>) => {
   const width = useDeviceWidth();
   const { t } = useTranslation();
@@ -106,7 +115,10 @@ export const ModalCard = ({
   const body = (
     <ModalBodyContainer>
       <CustomText size={14} lineHeight="lg" color="gray/gray600">
-        {t(bodyText)}
+        {t(bodyText, {
+          rating: gameOutcome?.rating,
+          reward: gameOutcome?.reward,
+        })}
       </CustomText>
     </ModalBodyContainer>
   );

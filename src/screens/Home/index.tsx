@@ -45,7 +45,7 @@ const Home = () => {
 
   const fetchRecommendPack = async () => {
     try {
-      const data = await getRecommendPack('KO');
+      const data = await getRecommendPack('KO'); // TODO: 팩 언어 설정
       setRecommendPack(data);
     } catch (error) {
       showBottomToast('error', error as string);
