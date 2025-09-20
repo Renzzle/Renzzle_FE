@@ -16,6 +16,12 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GameOutcome, GameResult } from '../../components/types/Ranking';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import PuzzleAttributes from '../../components/features/PuzzleAttributes';
+
+interface PuzzleData {
+  boardStatus: string;
+  winColor: 'BLACK' | 'WHITE';
+}
 
 const RankedPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -29,7 +35,7 @@ const RankedPuzzleSolve = () => {
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
   const [outcome, setOutcome] = useState<GameOutcome>();
-  const [boardStatus, setBoardStatus] = useState<string>('');
+  const [puzzleData, setPuzzleData] = useState<PuzzleData>();
   const [bonusTrigger, setBonusTrigger] = useState(0);
 
   useEffect(() => {
@@ -37,7 +43,7 @@ const RankedPuzzleSolve = () => {
       try {
         setIsLoading(true);
         const initialData = await startRankingGame();
-        setBoardStatus(initialData.boardStatus);
+        setPuzzleData(initialData);
       } catch (error) {
         showBottomToast('error', error as string);
         console.error('게임 시작 실패', error);
@@ -58,7 +64,7 @@ const RankedPuzzleSolve = () => {
     }
 
     const data = await submitRankingGameResult(result);
-    setBoardStatus(data.boardStatus);
+    setPuzzleData(data);
     setResults((prev) => [...prev, { variant: result ? 'success' : 'error' }]);
     setIsLoading(false);
   };
@@ -104,15 +110,18 @@ const RankedPuzzleSolve = () => {
           </RankingResultButtonWrapper>
         </HorizontalScrollContainer>
 
-        {!!boardStatus && (
-          <Board
-            mode="solve"
-            sequence={boardStatus}
-            setSequence={() => {}}
-            setIsWin={handleResult}
-            setIsLoading={setIsLoading}
-            winDepth={225}
-          />
+        {!!puzzleData && (
+          <>
+            <Board
+              mode="solve"
+              sequence={puzzleData.boardStatus}
+              setSequence={() => {}}
+              setIsWin={handleResult}
+              setIsLoading={setIsLoading}
+              winDepth={225}
+            />
+            <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
+          </>
         )}
       </BoardWrapper>
 
