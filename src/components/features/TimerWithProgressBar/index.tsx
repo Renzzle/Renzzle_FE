@@ -44,6 +44,12 @@ const TimerWithProgressBar = ({
 
     intervalRef.current = setInterval(() => {
       setRemainingTime((prev) => {
+        // Prevent onFinish from being called multiple times
+        if (prev <= 0) {
+          stopTimer();
+          return 0;
+        }
+
         const next = prev - 1000;
         if (next <= 0) {
           stopTimer();
