@@ -7,7 +7,7 @@
 
 class SearchWin {
 
-private:
+PRIVATE
     TreeManager treeManager;
     SearchMonitor& monitor;
     Color targetColor;
@@ -17,7 +17,7 @@ private:
     bool isWin();
     bool isTargetTurn();
 
-public:
+PUBLIC
     SearchWin(Board& board, SearchMonitor& monitor);
     bool findVCF();
     void stop();
@@ -91,6 +91,10 @@ bool SearchWin::isWin() {
         MoveList bestPath(fullPath.begin() + rootSize, fullPath.end());
 
         monitor.setBestPath(bestPath);
+        monitor.setBestValueProvider([&bestPath]() {
+            int resultDepth = bestPath.size();
+            return Value(Value::Result::WIN, resultDepth);
+        });
     }
 
     return isWin;
