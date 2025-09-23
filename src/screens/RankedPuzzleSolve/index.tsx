@@ -17,6 +17,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GameOutcome, GameResult } from '../../components/types/Ranking';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
+import { getUser } from '../../apis/user';
+import { useUserStore } from '../../store/useUserStore';
 
 interface PuzzleData {
   boardStatus: string;
@@ -32,6 +34,7 @@ const RankedPuzzleSolve = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
+  const { setUser } = useUserStore();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
   const [outcome, setOutcome] = useState<GameOutcome>();
@@ -46,7 +49,6 @@ const RankedPuzzleSolve = () => {
         setPuzzleData(initialData);
       } catch (error) {
         showBottomToast('error', error as string);
-        console.error('게임 시작 실패', error);
       } finally {
         setIsLoading(false);
       }
@@ -72,6 +74,8 @@ const RankedPuzzleSolve = () => {
   const handleFinish = async () => {
     const data = await finishRankingGame();
     setOutcome(data);
+    const user = await getUser();
+    setUser(user);
     activateModal('RANKING_PUZZLE_OUTRO', {
       primaryAction: () => {
         navigation.navigate('Home');
