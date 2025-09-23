@@ -6,7 +6,7 @@ import { AttributeItemWrapper, AttributesWrapper } from './index.styles';
 import { CustomText, Icon } from '../../common';
 
 interface PuzzleAttributesProps {
-  depth: number;
+  depth: number | null;
   winColor: 'BLACK' | 'WHITE';
   isVerified?: boolean | null;
 }

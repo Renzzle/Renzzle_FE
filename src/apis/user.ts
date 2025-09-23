@@ -2,13 +2,9 @@ import { ApiCallParams } from '../components/common/InfiniteScrollList';
 import { HTTP_HEADERS } from './constants';
 import apiClient from './interceptor';
 
-export const getUser = async (authStore: string) => {
+export const getUser = async () => {
   try {
-    const response = await apiClient.get('/api/user', {
-      headers: {
-        [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
-      },
-    });
+    const response = await apiClient.get('/api/user');
 
     return response.data.response;
   } catch (error) {

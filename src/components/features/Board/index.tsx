@@ -113,9 +113,11 @@ const Board = ({
     try {
       const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
       if (result === -1) {
+        console.log('졌다!');
         setIsWin?.(false);
       }
       if (result === 1000) {
+        console.log('이겼다!');
         setIsWin?.(true);
       }
       setAiAnswer(result);

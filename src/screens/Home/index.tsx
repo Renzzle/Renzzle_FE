@@ -13,7 +13,7 @@ import {
 } from './index.styles';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MenuButton from '../../components/features/MenuButton';
-import { CustomText, Icon } from '../../components/common';
+import { CustomModal, CustomText, Icon } from '../../components/common';
 import { menuThemeMap, MenuType } from '../../components/types/MenuThemeMap';
 import { useTranslation } from 'react-i18next';
 import theme, { ColorType } from '../../styles/theme';
@@ -22,10 +22,18 @@ import { getRecommendPack, getTrendPuzzles } from '../../apis/content';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PackCard from '../../components/features/PackCard';
 import CommunityCard from '../../components/features/CommunityCard';
+import useModal from '../../hooks/useModal';
 
 const Home = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const [recommendPack, setRecommendPack] = useState<TrainingPack | null>(null);
   const [trendPuzzles, setTrendPuzzles] = useState<CommunityPuzzle[] | null>(null);
 
@@ -37,7 +45,7 @@ const Home = () => {
 
   const fetchRecommendPack = async () => {
     try {
-      const data = await getRecommendPack('KO');
+      const data = await getRecommendPack('KO'); // TODO: 팩 언어 설정
       setRecommendPack(data);
     } catch (error) {
       showBottomToast('error', error as string);
@@ -64,6 +72,14 @@ const Home = () => {
     }
   }, [recommendPack, trendPuzzles]);
 
+  const handleRanking = () => {
+    activateModal('RANKING_PUZZLE_INTRO', {
+      primaryAction: () => {
+        navigation.navigate('RankedPuzzleSolve');
+      },
+    });
+  };
+
   return (
     <ScrollContainer showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
       <HomeContainer>
@@ -77,7 +93,11 @@ const Home = () => {
               <MainMenuButton
                 key={menu}
                 backgroundColor={bgColor}
-                onPress={() => route && navigation.navigate(route)}>
+                onPress={
+                  menu === 'rankingPuzzle'
+                    ? handleRanking
+                    : () => route && navigation.navigate(route)
+                }>
                 <MenuButton type={menu} size={120} />
                 <MainMenuText>
                   {['', 'Description'].map((suffix, index) => (
@@ -161,6 +181,13 @@ const Home = () => {
             ))}
           </ArticleWrapper>
         )}
+
+        <CustomModal
+          isVisible={isModalVisible}
+          category={modalCategory}
+          onPrimaryAction={closePrimarily}
+          onSecondaryAction={closeSecondarily}
+        />
       </HomeContainer>
     </ScrollContainer>
   );
