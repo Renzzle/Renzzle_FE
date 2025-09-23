@@ -5,9 +5,9 @@ import { reissueToken } from '../../apis/auth';
 import useAuthStore from '../../store/useAuthStore';
 import { useUserStore, User } from '../../store/useUserStore';
 
-const validateAccessToken = async (token: string): Promise<User | null> => {
+const validateAccessToken = async (): Promise<User | null> => {
   try {
-    const user = await getUser(token);
+    const user = await getUser();
     console.log('User verified with existing access token');
     return user;
   } catch {
@@ -52,14 +52,14 @@ const useInitializeApp = (): boolean => {
         };
 
         if (accessToken) {
-          const user = await validateAccessToken(accessToken);
+          const user = await validateAccessToken();
           if (user) {
             handleSuccessfulLogin(user);
           } else if (refreshToken) {
             const tokens = await tryReissueToken(refreshToken);
             if (tokens) {
               await setTokens(tokens.accessToken, tokens.refreshToken);
-              const newUser = await getUser(tokens.accessToken);
+              const newUser = await getUser();
               handleSuccessfulLogin(newUser);
             } else {
               await handleLogout();
@@ -71,7 +71,7 @@ const useInitializeApp = (): boolean => {
           const tokens = await tryReissueToken(refreshToken);
           if (tokens) {
             await setTokens(tokens.accessToken, tokens.refreshToken);
-            const newUser = await getUser(tokens.accessToken);
+            const newUser = await getUser();
             handleSuccessfulLogin(newUser);
           } else {
             await handleLogout();

@@ -38,7 +38,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
         refreshToken,
       }));
 
-      const user = await getUser(accessToken);
+      const user = await getUser();
       useUserStore.getState().setUser(user);
     } catch (error) {
       console.log('Fail to sign in:', error);
