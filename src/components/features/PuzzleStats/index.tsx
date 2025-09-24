@@ -8,7 +8,7 @@ interface PuzzleStatsProps {
   puzzleId: number;
   solvedCount: number;
   views: number;
-  likeCount: number;
+  likeCount?: number;
   showIconLabel?: boolean;
 }
 
@@ -42,8 +42,8 @@ const PuzzleStats = ({
       iconLabel: t('puzzle.views'),
     },
     {
-      condition: likeCount != null,
-      text: likeCount,
+      condition: likeCount !== undefined,
+      text: likeCount!,
       iconName: 'HeartSmallIcon',
       iconLabel: t('common.likes'),
     },

@@ -12,12 +12,10 @@ interface LikeDislikeToggleProps {
 const LikeDislikeToggle = ({ value, likeCount, onChange }: LikeDislikeToggleProps) => {
   const handleLikeClick = () => {
     onChange(value === 'like' ? null : 'like');
-    console.log('like click:', value);
   };
 
   const handleDislikeClick = () => {
     onChange(value === 'dislike' ? null : 'dislike');
-    console.log('dislike click:', value);
   };
 
   return (

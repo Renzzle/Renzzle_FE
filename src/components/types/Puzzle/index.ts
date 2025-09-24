@@ -11,6 +11,8 @@ export interface CommunityPuzzle {
   createdAt: string;
   isSolved: boolean;
   isVerified: boolean;
+  myLike?: boolean;
+  myDislike?: boolean;
 }
 
 export interface TrainingPack {

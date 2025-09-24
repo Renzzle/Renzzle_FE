@@ -4,8 +4,16 @@ import InfiniteScrollList from '../../components/common/InfiniteScrollList';
 import { CommunityPuzzle } from '../../components/types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const CommunityPuzzles = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
+  const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
+    navigation.navigate('CommunityPuzzleSolve', { puzzle });
+  };
+
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
@@ -23,7 +31,7 @@ const CommunityPuzzles = () => {
             solvedCount={item.solvedCount}
             likeCount={item.likeCount}
             isSolved={item.isSolved}
-            onPress={() => {}}
+            onPress={() => navigateToCommunityDetail(item)}
           />
         )}
         keyExtractor={(item) => item && item.id.toString()}

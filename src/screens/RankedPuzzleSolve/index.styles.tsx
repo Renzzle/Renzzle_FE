@@ -5,10 +5,15 @@ import theme from '../../styles/theme';
 export const Container = styled(View)`
   flex: 1;
   background-color: ${theme.color['gray/grayBG']};
+  position: relative;
 `;
 
 export const ProgressBarContainer = styled(View)`
   padding: 10px 20px 0px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 `;
 
 export const HorizontalScrollContainer = styled(ScrollView)`
