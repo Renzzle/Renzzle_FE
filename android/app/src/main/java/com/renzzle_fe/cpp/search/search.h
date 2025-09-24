@@ -344,6 +344,7 @@ void Search::ids() {
             break;
 
         monitor.incDepth(2);
+        if (!isRunning) break;
     }
 }
 
