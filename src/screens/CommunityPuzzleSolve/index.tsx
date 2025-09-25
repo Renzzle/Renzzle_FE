@@ -15,7 +15,7 @@ import Board from '../../components/features/Board';
 import LikeDislikeToggle from '../../components/features/LikeDislikeToggle';
 import { ReactionType } from '../../components/types/Community';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
-import { getCommunityPuzzle } from '../../apis/community';
+import { getCommunityPuzzle, updateDislike, updateLike } from '../../apis/community';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { CommunityPuzzle, RootStackParamList } from '../../components/types';
 
@@ -24,7 +24,7 @@ const CommunityPuzzleSolve = () => {
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleReactionChange = (newReaction: ReactionType) => {
+  const handleReactionChange = async (newReaction: ReactionType) => {
     setPuzzleDetail((prev) => {
       if (!prev) {
         return null;
@@ -48,7 +48,20 @@ const CommunityPuzzleSolve = () => {
       };
     });
 
-    // TODO: 서버에 반응을 업데이트하는 API 호출
+    if (!puzzleDetail?.id) {
+      return;
+    }
+
+    try {
+      if (newReaction === 'like' || (puzzleDetail.myLike && newReaction === null)) {
+        await updateLike(puzzleDetail.id);
+      } else if (newReaction === 'dislike' || (puzzleDetail.myDislike && newReaction === null)) {
+        await updateDislike(puzzleDetail.id);
+      }
+    } catch (error) {
+      console.error(error);
+      showBottomToast('error', error as string);
+    }
   };
 
   useEffect(() => {

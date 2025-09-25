@@ -45,26 +45,6 @@ export const getLikedPuzzles = async (id: number | null, size: number) => {
   }
 };
 
-export const updateLike = async (authStore: string, puzzleId: number) => {
-  try {
-    const response = await apiClient.post(
-      '/api/user/like',
-      { puzzleId },
-      {
-        headers: {
-          [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
-        },
-      },
-    );
-
-    console.log('like api:' + response.data.response);
-
-    return response.data.response;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const getLikePuzzle = async (authStore: string, size?: number, id?: number) => {
   try {
     const params: Record<string, string | number> = {};
