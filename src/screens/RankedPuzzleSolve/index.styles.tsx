@@ -31,5 +31,4 @@ export const BoardWrapper = styled(View)`
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding-bottom: 24px;
 `;

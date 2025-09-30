@@ -15,24 +15,7 @@ export const HeaderWrapper = styled(View)`
   left: 0;
 `;
 
-export const DescriptionWrapper = styled(View)`
-  padding: 0 20px;
-`;
-
 export const BoardWrapper = styled(View)`
   flex: 1;
   justify-content: center;
-`;
-
-export const BoardStatusWrapper = styled(View)`
-  height: 60px;
-`;
-
-export const BoardStatsWrapper = styled(BoardStatusWrapper)`
-  padding-right: 20px;
-  justify-content: flex-end;
-`;
-
-export const BoardReactionWrapper = styled(BoardStatusWrapper)`
-  padding: 10px 20px 0;
 `;

@@ -24,3 +24,13 @@ export const getTrainingPuzzles = async (packId: number) => {
     throw error;
   }
 };
+
+export const getTrainingPuzzle = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.get(`/api/training/puzzle/${puzzleId}`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
