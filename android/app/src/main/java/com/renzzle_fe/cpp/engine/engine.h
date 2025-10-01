@@ -117,7 +117,8 @@ int findNextMove(string boardStr) {
     Evaluator evaluator(board);
 
     // if game is already over
-    if (!evaluator.evaluate().isOnGoing()) return -1;
+    if (evaluator.evaluate().isWin()) return -1;
+    else if (evaluator.evaluate().isLose()) return 1000;
 
     // if there is sure move
     Pos nextMove = evaluator.getSureMove();

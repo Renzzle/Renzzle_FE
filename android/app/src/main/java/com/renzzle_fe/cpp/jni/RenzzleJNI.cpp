@@ -1,28 +1,12 @@
+#include <jni.h>
 #include <string>
 #include "search/search_win.h"
 #include "search/search.h"
 #include "test/util.h"
 #include "game/board.h"
 #include "engine/engine.h"
-// #include "generator/puzzle_generator.h"
 
 using namespace std;
-
-// JNI 타입들을 직접 정의 (jni.h 대신)
-typedef int jint;
-typedef void* jobject;
-typedef void* jstring;
-
-// JNIEnv 구조체 정의
-struct JNIEnv {
-    jstring (*NewStringUTF)(const char*);
-    const char* (*GetStringUTFChars)(jstring, int*);
-    void (*ReleaseStringUTFChars)(jstring, const char*);
-};
-
-// JNI 매크로들을 직접 정의
-#define JNIEXPORT
-#define JNICALL
 
 extern "C" {
 
