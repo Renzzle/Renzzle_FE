@@ -129,6 +129,13 @@ const Board = ({
   useEffect(() => {
     const processAiAnswer = async () => {
       if (aiAnswer !== null && aiAnswer !== undefined) {
+        if (aiAnswer === 1000 || aiAnswer === -1) {
+          setConfirmPut(false);
+          setIsDisabled(false);
+          setIsLoading?.(false);
+          return;
+        }
+
         const coordinates = valueToCoordinates(aiAnswer);
         if (!coordinates) {
           return;
@@ -181,7 +188,7 @@ const Board = ({
       const x = convertToReverseNumber(parseInt(number, 10));
       const y = convertLowercaseAlphabetToNumber(letter);
 
-      if (x >= 0 || x < BOARD_SIZE || y >= 0 || y < BOARD_SIZE) {
+      if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
         newBoard[x][y] = turn ? 1 : 2;
         turn = !turn;
       }
