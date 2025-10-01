@@ -8,25 +8,50 @@
 
 struct Node {
     Board board;
-    Value actualValue;
-    Value evaluatedValue;
-    Result result;
-    unordered_map<size_t, shared_ptr<Node>> childNodes;
-    int visitedCnt;
+    Value value;
+    int searchedDepth;
+    unordered_map<size_t, Node*> childNodes;
+    Pos bestMove;
 
-    Node(Board b) : board(b), actualValue(INITIAL_VALUE), evaluatedValue(INITIAL_VALUE), result(ONGOING), visitedCnt(0) {}
+    Node(Board b) : board(b), value(), searchedDepth(0) {}
 };
 
 class Tree {
 
-private:
-    unordered_map<size_t, shared_ptr<Node>> nodeMap;
+PRIVATE
+    unordered_map<size_t, unique_ptr<Node>> nodeMap;
 
-public:
-    void addNodeAsRoot(shared_ptr<Node> node);
-    void addNode(shared_ptr<Node> parentNode, shared_ptr<Node> node);
-    void cleanTree();
-    shared_ptr<Node> createNode(Board board);
-    bool exist(Board& board);
+PUBLIC
+    Node* addNodeAsRoot(Board& board);
+    Node* addNode(Node* parentNode, Board& newNode);
+    Node* findNode(size_t hash);
 
 };
+
+Node* Tree::addNodeAsRoot(Board& board) {
+    size_t key = board.getCurrentHash();
+    nodeMap[key] = unique_ptr<Node>(new Node(board));
+    return nodeMap[key].get();
+}
+
+Node* Tree::addNode(Node* parentNode, Board& newNode) {
+    size_t key = newNode.getCurrentHash();
+
+    auto it = nodeMap.find(key);
+    if (it != nodeMap.end()) { // node already exists
+        parentNode->childNodes[key] = it->second.get();
+        return it->second.get();
+    }
+
+    nodeMap[key] = unique_ptr<Node>(new Node(newNode));
+    parentNode->childNodes[key] = nodeMap[key].get();
+    return parentNode->childNodes[key];
+}
+
+Node* Tree::findNode(size_t hash) {
+    auto it = nodeMap.find(hash);
+    if (it != nodeMap.end()) {
+        return it->second.get();
+    }
+    return nullptr;
+}
