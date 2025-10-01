@@ -54,6 +54,6 @@ export interface GameResult {
 }
 
 export interface GameOutcome {
-  rating: number;
+  rating?: number;
   reward: number;
 }

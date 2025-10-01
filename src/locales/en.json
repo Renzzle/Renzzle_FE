@@ -65,7 +65,7 @@
     },
     "trainingPuzzleSuccess": {
       "title": "퍼즐 풀기 성공",
-      "message": "오목을 완성하였습니다!",
+      "message": "오목을 완성하였습니다!\n획득 재화: {{reward}}피스",
       "confirm": "다음문제",
       "cancel": "나가기"
     },
