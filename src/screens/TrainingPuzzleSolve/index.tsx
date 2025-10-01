@@ -5,11 +5,24 @@ import Board from '../../components/features/Board';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList, TrainingPuzzle } from '../../components/types';
 import { CustomText } from '../../components/common';
+import { solveTrainingPuzzle } from '../../apis/training';
+import { useUserStore } from '../../store/useUserStore';
 
 const TrainingPuzzleSolve = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPuzzleSolve'>>();
   const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { updateUser } = useUserStore();
+
+  const handleResult = async (result: boolean | null) => {
+    if (result === null || !puzzleDetail) {
+      return;
+    }
+    if (result) {
+      await solveTrainingPuzzle(puzzleDetail.id);
+      updateUser();
+    }
+  };
 
   useEffect(() => {
     if (route.params.puzzle?.id) {
@@ -39,7 +52,7 @@ const TrainingPuzzleSolve = () => {
           title={puzzleDetail.title ?? puzzleDetail.id.toString()}
           depth={puzzleDetail.depth}
           winColor={puzzleDetail.winColor}
-          displayNumber={puzzleDetail.id}
+          displayNumber={puzzleDetail.index}
           isSolved={puzzleDetail.isSolved}
           isCommunityPuzzle={false}
         />
@@ -50,7 +63,7 @@ const TrainingPuzzleSolve = () => {
           mode="solve"
           sequence={puzzleDetail.boardStatus}
           setSequence={() => {}}
-          setIsWin={() => {}}
+          setIsWin={handleResult}
           setIsLoading={() => {}}
           winDepth={puzzleDetail.depth}
         />

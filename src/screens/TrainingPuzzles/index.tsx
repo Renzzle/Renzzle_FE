@@ -22,7 +22,7 @@ const TrainingPuzzles = () => {
 
   const navigateToTrainingDetail = (puzzle: TrainingPuzzle, index: number) => {
     navigation.navigate('TrainingPuzzleSolve', {
-      puzzle: { ...puzzle, title: pack.title, id: index },
+      puzzle: { ...puzzle, title: pack.title, index: index },
     });
   };
 

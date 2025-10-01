@@ -17,8 +17,17 @@ export const getPack = async (difficulty: string, lang: string) => {
 
 export const getTrainingPuzzles = async (packId: number) => {
   try {
-    console.log('pack Id: ', packId);
     const response = await apiClient.get(`/api/training/puzzle/${packId}`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const solveTrainingPuzzle = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/training/puzzle/${puzzleId}/solve`);
 
     return response.data.response;
   } catch (error) {
