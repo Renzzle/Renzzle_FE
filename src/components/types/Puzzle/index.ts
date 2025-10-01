@@ -28,6 +28,7 @@ export interface TrainingPack {
 
 export interface TrainingPuzzle {
   id: number;
+  title?: string;
   boardStatus: string;
   depth: number;
   winColor: 'BLACK' | 'WHITE';

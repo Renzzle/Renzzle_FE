@@ -20,8 +20,10 @@ const TrainingPuzzles = () => {
   const [puzzles, setPuzzless] = useState<TrainingPuzzle[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const navigateToTrainingDetail = (puzzle: TrainingPuzzle) => {
-    navigation.navigate('TrainingPuzzleSolve', { puzzle });
+  const navigateToTrainingDetail = (puzzle: TrainingPuzzle, index: number) => {
+    navigation.navigate('TrainingPuzzleSolve', {
+      puzzle: { ...puzzle, title: pack.title, id: index },
+    });
   };
 
   const fetchPuzzleData = async (packId: number) => {
@@ -71,7 +73,7 @@ const TrainingPuzzles = () => {
                 depth={item.depth}
                 winColor={item.winColor}
                 isSolved={item.isSolved}
-                onPress={() => navigateToTrainingDetail(item)}
+                onPress={() => navigateToTrainingDetail(item, index + 1)}
               />
             )}
             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}

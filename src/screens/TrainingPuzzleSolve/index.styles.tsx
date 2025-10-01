@@ -6,6 +6,8 @@ export const Container = styled(View)`
   flex: 1;
   background-color: ${theme.color['gray/grayBG']};
   position: relative;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const HeaderWrapper = styled(View)`
