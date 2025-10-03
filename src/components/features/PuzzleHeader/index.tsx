@@ -42,7 +42,7 @@ const PuzzleHeader = ({
               님 출제
             </AutorText>
           )}
-          {!isCommunityPuzzle && displayNumber && <CustomTag>#{displayNumber}</CustomTag>}
+          {!isCommunityPuzzle && displayNumber != null && <CustomTag>#{displayNumber}</CustomTag>}
           {isSolved && <CustomTag variant="highlight">풀이 완료</CustomTag>}
         </TitleWrapper>
 
