@@ -50,6 +50,12 @@ const TrainingPuzzleSolve = () => {
           navigation.goBack();
         },
       });
+    } else {
+      activateModal('PUZZLE_FAILURE', {
+        primaryAction: async () => {
+          navigation.goBack();
+        },
+      });
     }
   };
 
