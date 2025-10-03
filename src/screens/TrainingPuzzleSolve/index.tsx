@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
@@ -25,6 +26,7 @@ const TrainingPuzzleSolve = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
+  const [boardKey, setBoardKey] = useState(0);
 
   const handleResult = async (result: boolean | null) => {
     if (result === null || !puzzleDetail) {
@@ -51,6 +53,10 @@ const TrainingPuzzleSolve = () => {
     }
   };
 
+  const handleRetry = () => {
+    setBoardKey((prevKey) => prevKey + 1);
+  };
+
   useEffect(() => {
     if (route.params.puzzle?.id) {
       setPuzzleDetail(route.params.puzzle);
@@ -58,7 +64,7 @@ const TrainingPuzzleSolve = () => {
     } else {
       setIsLoading(false);
     }
-  }, [route.params.puzzle]);
+  }, [route.params?.puzzle?.id]);
 
   if (isLoading) {
     return <Container />;
@@ -82,11 +88,14 @@ const TrainingPuzzleSolve = () => {
           displayNumber={puzzleDetail.index}
           isSolved={puzzleDetail.isSolved}
           isCommunityPuzzle={false}
+          handleRetry={handleRetry}
+          handleShowAnswer={() => {}}
         />
       </HeaderWrapper>
 
       <BoardWrapper>
         <Board
+          key={boardKey}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
           setSequence={() => {}}

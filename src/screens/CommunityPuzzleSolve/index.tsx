@@ -23,6 +23,7 @@ const CommunityPuzzleSolve = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>>();
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [isLoading, setIsLoading] = useState(true);
+  const [boardKey, setBoardKey] = useState(0);
 
   const handleReactionChange = async (newReaction: ReactionType) => {
     setPuzzleDetail((prev) => {
@@ -62,6 +63,10 @@ const CommunityPuzzleSolve = () => {
       console.error(error);
       showBottomToast('error', error as string);
     }
+  };
+
+  const handleRetry = () => {
+    setBoardKey((prevKey) => prevKey + 1);
   };
 
   useEffect(() => {
@@ -105,6 +110,8 @@ const CommunityPuzzleSolve = () => {
           isVerified={puzzleDetail.isVerified}
           isSolved={puzzleDetail.isSolved}
           isCommunityPuzzle
+          handleRetry={handleRetry}
+          handleShowAnswer={() => {}}
         />
         <DescriptionWrapper>
           <CustomText size={12} lineHeight="lg" color="gray/gray600">
@@ -123,6 +130,7 @@ const CommunityPuzzleSolve = () => {
           />
         </BoardStatsWrapper>
         <Board
+          key={boardKey}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
           setSequence={() => {}}

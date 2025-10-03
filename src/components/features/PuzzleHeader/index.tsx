@@ -19,6 +19,8 @@ interface PuzzleHeaderProps {
   isVerified?: boolean | null;
   isCommunityPuzzle?: boolean;
   displayNumber?: number;
+  handleRetry: () => void;
+  handleShowAnswer: () => void;
 }
 
 const PuzzleHeader = ({
@@ -29,6 +31,8 @@ const PuzzleHeader = ({
   isVerified,
   isCommunityPuzzle = false,
   displayNumber,
+  handleRetry,
+  handleShowAnswer,
 }: PuzzleHeaderProps) => {
   return (
     <HeaderContainer>
@@ -50,8 +54,8 @@ const PuzzleHeader = ({
       </LeftInfoWrapper>
 
       <ActionButtonsWrapper>
-        <PuzzleActionButton mode="showAnswer" onPress={() => {}} />
-        <PuzzleActionButton mode="retry" onPress={() => {}} />
+        <PuzzleActionButton mode="showAnswer" onPress={handleShowAnswer} />
+        <PuzzleActionButton mode="retry" onPress={handleRetry} />
       </ActionButtonsWrapper>
     </HeaderContainer>
   );
