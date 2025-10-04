@@ -5,12 +5,14 @@ import PuzzleHeader from '../../components/features/PuzzleHeader';
 import Board from '../../components/features/Board';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList, TrainingPuzzle } from '../../components/types';
-import { CustomModal, CustomText } from '../../components/common';
+import { CustomModal } from '../../components/common';
 import { solveTrainingPuzzle } from '../../apis/training';
 import { useUserStore } from '../../store/useUserStore';
 import useModal from '../../hooks/useModal';
 import { GameOutcome } from '../../components/types/Ranking';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ActivityIndicator } from 'react-native';
+import theme from '../../styles/theme';
 
 const TrainingPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -23,13 +25,13 @@ const TrainingPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
   const [boardKey, setBoardKey] = useState(0);
 
   const handleResult = async (result: boolean | null) => {
-    if (result === null || !puzzleDetail) {
+    if (result === null || !puzzleDetail || isLoading) {
       return;
     }
     if (result) {
@@ -72,14 +74,10 @@ const TrainingPuzzleSolve = () => {
     }
   }, [route.params?.puzzle?.id]);
 
-  if (isLoading) {
-    return <Container />;
-  }
-
   if (!puzzleDetail) {
     return (
       <Container>
-        <CustomText color="gray/gray500">퍼즐 정보 가져오기 실패</CustomText>
+        <ActivityIndicator color={theme.color['main_color/yellow_p']} />
       </Container>
     );
   }
@@ -106,8 +104,8 @@ const TrainingPuzzleSolve = () => {
           sequence={puzzleDetail.boardStatus}
           setSequence={() => {}}
           setIsWin={handleResult}
-          setIsLoading={() => {}}
-          winDepth={puzzleDetail.depth}
+          setIsLoading={setIsLoading}
+          winDepth={225}
         />
       </BoardWrapper>
 

@@ -18,6 +18,8 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { getCommunityPuzzle, updateDislike, updateLike } from '../../apis/community';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { CommunityPuzzle, RootStackParamList } from '../../components/types';
+import { ActivityIndicator } from 'react-native';
+import theme from '../../styles/theme';
 
 const CommunityPuzzleSolve = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>>();
@@ -26,6 +28,10 @@ const CommunityPuzzleSolve = () => {
   const [boardKey, setBoardKey] = useState(0);
 
   const handleReactionChange = async (newReaction: ReactionType) => {
+    if (isLoading) {
+      return;
+    }
+
     setPuzzleDetail((prev) => {
       if (!prev) {
         return null;
@@ -96,8 +102,12 @@ const CommunityPuzzleSolve = () => {
     getDetail();
   }, [route.params.puzzle.id]);
 
-  if (isLoading || !puzzleDetail) {
-    return <Container />;
+  if (!puzzleDetail) {
+    return (
+      <Container>
+        <ActivityIndicator color={theme.color['main_color/yellow_p']} />
+      </Container>
+    );
   }
 
   return (
@@ -135,8 +145,8 @@ const CommunityPuzzleSolve = () => {
           sequence={puzzleDetail.boardStatus}
           setSequence={() => {}}
           setIsWin={() => {}}
-          setIsLoading={() => {}}
-          winDepth={puzzleDetail.depth}
+          setIsLoading={setIsLoading}
+          winDepth={225}
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle
