@@ -20,6 +20,17 @@ export const BoardBackground = styled(View)<{ boardWidth: number }>`
   background-color: ${theme.color['sub_color/beige/c']};
 `;
 
+export const LoadingWrapper = styled(View)`
+  flex: 1;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;
+
 export const FramContainer = styled(View)`
   position: absolute;
   border-width: 1.5px;
