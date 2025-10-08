@@ -60,6 +60,16 @@ export const updateDislike = async (puzzleId: number) => {
   }
 };
 
+export const solveCommunityPuzzle = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/community/puzzle/${puzzleId}/solve`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const uploadPuzzle = async (
   authStore: string,
   title: string,
