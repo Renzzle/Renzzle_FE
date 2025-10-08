@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import {
   BoardBackground,
   CellContainer,
@@ -26,23 +26,43 @@ import theme from '../../../styles/theme';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
+export interface BoardRef {
+  undo: () => void;
+  redo: () => void;
+}
+
 interface BoardProps {
   mode: 'make' | 'solve';
+  makeMode?: 'create' | 'review';
   sequence: string;
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
   setIsLoading?: (isLoading: boolean) => void;
   winDepth?: number;
+
+  // 'review' mode
+  mainSequence?: string; // 정답까지 포함된 전체 시퀀스
+  problemSequence?: string; // 사용자가 시작할 문제 시퀀스
+
+  // undo/redo 가능 여부를 부모에게 알리는 콜백
+  onUndoRedoStateChange?: (canUndo: boolean, canRedo: boolean) => void;
 }
 
-const Board = ({
-  mode,
-  sequence = '',
-  setSequence,
-  setIsWin,
-  setIsLoading,
-  winDepth,
-}: BoardProps) => {
+const Board = forwardRef<BoardRef, BoardProps>(function Board(
+  {
+    mode,
+    makeMode,
+    sequence = '',
+    setSequence,
+    setIsWin,
+    setIsLoading,
+    winDepth,
+    mainSequence = '',
+    problemSequence = '',
+    onUndoRedoStateChange,
+  },
+  ref,
+) {
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -51,8 +71,8 @@ const Board = ({
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0)),
   );
   const [isBlackTurn, setIsBlackTurn] = useState(true);
-  const [stoneX, setStoneX] = useState<number | null>();
-  const [stoneY, setStoneY] = useState<number | null>();
+  const [stoneX, setStoneX] = useState<number | null>(null);
+  const [stoneY, setStoneY] = useState<number | null>(null);
 
   const [aiAnswer, setAiAnswer] = useState<number>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -60,6 +80,59 @@ const Board = ({
   const [localSequence, setLocalSequence] = useState(sequence);
   const [confirmPut, setConfirmPut] = useState<boolean>(false);
   const [depth, setDepth] = useState(0);
+
+  const [history, setHistory] = useState<string[]>([sequence]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useImperativeHandle(ref, () => ({
+    undo: () => {
+      if (mode !== 'make') {
+        return;
+      }
+
+      if (makeMode === 'create') {
+        if (currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+      } else if (makeMode === 'review') {
+        // 현재 시퀀스가 문제 시퀀스보다 길 때만 undo 가능
+        if (localSequence.length > problemSequence.length) {
+          const lastMoveMatch = localSequence.match(/[a-o]([1-9]|1[0-5])$/);
+          if (lastMoveMatch) {
+            const lastMove = lastMoveMatch[0];
+            const newSequence = localSequence.slice(0, -lastMove.length);
+            setLocalSequence(newSequence);
+            setSequence(newSequence);
+          }
+        }
+      }
+    },
+    redo: () => {
+      if (mode !== 'make') {
+        return;
+      }
+
+      if (makeMode === 'create') {
+        if (currentIndex < history.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        }
+      } else if (makeMode === 'review') {
+        // 현재 시퀀스가 메인 시퀀스보다 짧고, 메인 시퀀스의 일부일 때만 redo 가능
+        if (localSequence.length < mainSequence.length && mainSequence.startsWith(localSequence)) {
+          // 다음 수를 메인 시퀀스에서 가져와 추가
+          const nextMoveMatch = mainSequence
+            .substring(localSequence.length)
+            .match(/^[a-o]([1-9]|1[0-5])/);
+          if (nextMoveMatch) {
+            const nextMove = nextMoveMatch[0];
+            const newSequence = localSequence + nextMove;
+            setLocalSequence(newSequence);
+            setSequence(newSequence);
+          }
+        }
+      }
+    },
+  }));
 
   const updateBoard = (x: number, y: number) => {
     const newBoard = board.map((row) => [...row]); // copy row
@@ -71,10 +144,18 @@ const Board = ({
     const letter = convertToLowercaseAlphabet(y);
     const number = convertToReverseNumber(x).toString();
     const updatedSequence = localSequence + letter + number;
-    setLocalSequence(updatedSequence);
 
-    if (mode === 'make') {
+    if (mode === 'make' && makeMode === 'create') {
+      const newHistory = [...history.slice(0, currentIndex + 1), updatedSequence];
+      setHistory(newHistory);
+      setCurrentIndex(newHistory.length - 1);
+      setLocalSequence(updatedSequence);
       setSequence(updatedSequence);
+    } else {
+      setLocalSequence(updatedSequence);
+      if (mode === 'make') {
+        setSequence(updatedSequence);
+      }
     }
   };
 
@@ -172,6 +253,44 @@ const Board = ({
     }
   }, [depth, winDepth]);
 
+  useEffect(() => {
+    if (mode === 'make' && makeMode === 'create') {
+      const currentSequence = history[currentIndex];
+      setLocalSequence(currentSequence);
+      setSequence(currentSequence);
+    }
+  }, [currentIndex, history, mode, makeMode, setSequence]);
+
+  useEffect(() => {
+    if (mode !== 'make' || !onUndoRedoStateChange) {
+      return;
+    }
+    let canUndo = false;
+    let canRedo = false;
+
+    if (makeMode === 'create') {
+      canUndo = currentIndex > 0;
+      canRedo = currentIndex < history.length - 1;
+    } else if (makeMode === 'review') {
+      const isSubPath = mainSequence.startsWith(localSequence);
+      canUndo = localSequence.length > problemSequence.length;
+      if (isSubPath) {
+        canRedo = localSequence.length < mainSequence.length;
+      }
+    }
+
+    onUndoRedoStateChange(canUndo, canRedo);
+  }, [
+    localSequence,
+    currentIndex,
+    history,
+    mainSequence,
+    problemSequence,
+    mode,
+    makeMode,
+    onUndoRedoStateChange,
+  ]);
+
   const initializeBoard = () => {
     console.log('보드 초기화 - 시퀀스: ' + sequence);
     const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
@@ -242,7 +361,7 @@ const Board = ({
       )}
     </BoardBackground>
   );
-};
+});
 
 interface CellProps {
   pos: string;
