@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 import Board from '../../components/features/Board';
@@ -24,14 +23,14 @@ const TrainingPuzzleSolve = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
+  const puzzleParam = useMemo(() => route.params?.puzzle, [route.params]);
   const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
   const [boardKey, setBoardKey] = useState(0);
 
   const handleResult = async (result: boolean | null) => {
-    if (result === null || !puzzleDetail || isLoading) {
+    if (result === null || !puzzleDetail) {
       return;
     }
     if (result) {
@@ -66,13 +65,10 @@ const TrainingPuzzleSolve = () => {
   };
 
   useEffect(() => {
-    if (route.params.puzzle?.id) {
-      setPuzzleDetail(route.params.puzzle);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
+    if (puzzleParam) {
+      setPuzzleDetail(puzzleParam);
     }
-  }, [route.params?.puzzle?.id]);
+  }, [puzzleParam]);
 
   if (!puzzleDetail) {
     return (
@@ -104,7 +100,7 @@ const TrainingPuzzleSolve = () => {
           sequence={puzzleDetail.boardStatus}
           setSequence={() => {}}
           setIsWin={handleResult}
-          setIsLoading={setIsLoading}
+          setIsLoading={() => {}}
           winDepth={225}
         />
       </BoardWrapper>
