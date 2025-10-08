@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { getAuth } from '../apis/auth';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { useUserStore } from './useUserStore';
-import { getUser } from '../apis/user';
 
 const initialState = {
   accessToken: undefined,
@@ -38,8 +37,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
         refreshToken,
       }));
 
-      const user = await getUser();
-      useUserStore.getState().setUser(user);
+      await useUserStore.getState().updateUser();
     } catch (error) {
       console.log('Fail to sign in:', error);
       throw error;
@@ -61,9 +59,14 @@ const useAuthStore = create<AuthStateType>((set) => ({
         refreshToken,
       }));
 
+      await useUserStore.getState().updateUser();
+
       return { accessToken, refreshToken };
     } catch (error) {
       console.error('Failed to restore credentials:', error);
+      await EncryptedStorage.removeItem('tokens');
+      set(initialState);
+      useUserStore.getState().clearUser();
       return {};
     }
   },

@@ -11,6 +11,8 @@ export interface CommunityPuzzle {
   createdAt: string;
   isSolved: boolean;
   isVerified: boolean;
+  myLike?: boolean;
+  myDislike?: boolean;
 }
 
 export interface TrainingPack {
@@ -26,6 +28,8 @@ export interface TrainingPack {
 
 export interface TrainingPuzzle {
   id: number;
+  index: number;
+  title?: string;
   boardStatus: string;
   depth: number;
   winColor: 'BLACK' | 'WHITE';

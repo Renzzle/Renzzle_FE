@@ -65,7 +65,7 @@
     },
     "trainingPuzzleSuccess": {
       "title": "퍼즐 풀기 성공",
-      "message": "오목을 완성하였습니다!",
+      "message": "오목을 완성하였습니다!\n획득 재화: {{reward}}피스",
       "confirm": "다음문제",
       "cancel": "나가기"
     },
@@ -107,6 +107,12 @@
       "message": "레이팅: {{rating}}점\n획득 재화: {{reward}}피스",
       "confirm": "확인",
       "cancel": "복습하기"
+    },
+    "trainingPackPurchase": {
+      "title": "트레이닝 퍼즐 구매",
+      "message": "이 퍼즐을 구매하시겠습니까?\n필요 재화: {{price}}피스",
+      "confirm": "구매하기",
+      "cancel": "취소"
     }
   },
   "home": {

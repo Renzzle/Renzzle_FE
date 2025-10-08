@@ -3,19 +3,60 @@
 import React, { useEffect, useState } from 'react';
 import TabBar from '../../components/common/TabBar';
 import { ActiveTabContainer, Container } from './index.styles';
-import { getPack } from '../../apis/training';
+import { getPack, purchaseTrainingPack } from '../../apis/training';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
 import { TrainingPack } from '../../components/types';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { CustomModal } from '../../components/common';
+import useModal from '../../hooks/useModal';
+import { GameOutcome } from '../../components/types/Ranking';
 
 const TrainingPacks = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const [packs, setPacks] = useState<TrainingPack[]>([]);
   const [currentTab, setCurrentTab] = useState('LOW');
   const [loading, setLoading] = useState(true);
+  const [outcome, setOutcome] = useState<GameOutcome>();
+
+  const handlePackClick = (item: TrainingPack) => {
+    setOutcome({ price: item.price });
+    if (item.locked) {
+      activateModal('TRAINING_PACK_PURCHASE', {
+        primaryAction: async () => {
+          const isSuccess = await handlePurchase(item.id);
+          if (isSuccess) {
+            showBottomToast('success', '구매가 완료되었습니다.');
+            navigation.navigate('TrainingPuzzles', { pack: item });
+          } else {
+            return;
+          }
+        },
+      });
+    } else {
+      navigation.navigate('TrainingPuzzles', { pack: item });
+    }
+  };
+
+  const handlePurchase = async (id: number) => {
+    try {
+      await purchaseTrainingPack(id);
+
+      return true;
+    } catch (error) {
+      showBottomToast('error', error as string);
+      return false;
+    }
+  };
 
   const fetchPackData = async (difficulty: string) => {
     setLoading(true);
@@ -59,9 +100,7 @@ const TrainingPacks = () => {
                 totalPuzzleCount={item.totalPuzzleCount}
                 solvedPuzzleCount={item.solvedPuzzleCount}
                 isLocked={item.locked}
-                onPress={() => {
-                  navigation.navigate('TrainingPuzzles', { pack: item });
-                }}
+                onPress={() => handlePackClick(item)}
               />
             )}
             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -70,6 +109,14 @@ const TrainingPacks = () => {
           />
         )}
       </ActiveTabContainer>
+
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}
+        gameOutcome={outcome}
+      />
     </Container>
   );
 };

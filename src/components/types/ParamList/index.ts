@@ -1,16 +1,11 @@
-import { TrainingPack } from '../Puzzle';
+import { CommunityPuzzle, TrainingPack, TrainingPuzzle } from '../Puzzle';
 
 export type RootStackParamList = {
   CommunityPuzzleSolve: {
-    id: number;
-    boardStatus: string;
-    title: string;
-    author: string;
-    description: string;
-    depth: number;
+    puzzle: CommunityPuzzle;
   };
-  LessonPuzzleList: {
-    chapter: number;
+  TrainingPuzzleSolve: {
+    puzzle: TrainingPuzzle;
   };
   TrainingPuzzles: {
     pack: TrainingPack;

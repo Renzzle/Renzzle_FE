@@ -22,7 +22,8 @@ export type ModalCategoryType =
   | 'VALIDATION_COMPLETE'
   | 'VALIDATION_FAILED'
   | 'RANKING_PUZZLE_INTRO'
-  | 'RANKING_PUZZLE_OUTRO';
+  | 'RANKING_PUZZLE_OUTRO'
+  | 'TRAINING_PACK_PURCHASE';
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -64,6 +65,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.rankingPuzzleOutro.title',
     BODY: 'modal.rankingPuzzleOutro.message',
     FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
+  },
+  TRAINING_PACK_PURCHASE: {
+    TITLE: 'modal.trainingPackPurchase.title',
+    BODY: 'modal.trainingPackPurchase.message',
+    FOOTER: ['modal.trainingPackPurchase.cancel', 'modal.trainingPackPurchase.confirm'],
   },
 };
 
@@ -118,6 +124,7 @@ export const ModalCard = ({
         {t(bodyText, {
           rating: gameOutcome?.rating,
           reward: gameOutcome?.reward,
+          price: gameOutcome?.price,
         })}
       </CustomText>
     </ModalBodyContainer>

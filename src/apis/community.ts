@@ -29,6 +29,37 @@ export const getCommunityPuzzles = async (params: ApiCallParams) => {
   }
 };
 
+export const getCommunityPuzzle = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.get(`/api/community/puzzle/${puzzleId}`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateLike = async (puzzleId: number) => {
+  try {
+    console.log('puzzleId: ', puzzleId);
+    const response = await apiClient.post(`/api/community/puzzle/${puzzleId}/like`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateDislike = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/community/puzzle/${puzzleId}/dislike`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const uploadPuzzle = async (
   authStore: string,
   title: string,

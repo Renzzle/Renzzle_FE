@@ -7,6 +7,7 @@ import {
   FrameCell,
   FrameRow,
   IndicatePoint,
+  LoadingWrapper,
   Stone,
   StoneRow,
 } from './index.styles';
@@ -19,8 +20,9 @@ import {
   convertToReverseNumber,
   valueToCoordinates,
 } from '../../../utils/utils';
-import { NativeModules, ViewStyle } from 'react-native';
+import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
 import { Icon } from '../../common';
+import theme from '../../../styles/theme';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -29,7 +31,7 @@ interface BoardProps {
   sequence: string;
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
-  setIsLoading?: (isLoading: boolean | null) => void;
+  setIsLoading?: (isLoading: boolean) => void;
   winDepth?: number;
 }
 
@@ -129,6 +131,13 @@ const Board = ({
   useEffect(() => {
     const processAiAnswer = async () => {
       if (aiAnswer !== null && aiAnswer !== undefined) {
+        if (aiAnswer === 1000 || aiAnswer === -1) {
+          setConfirmPut(false);
+          setIsDisabled(false);
+          setIsLoading?.(false);
+          return;
+        }
+
         const coordinates = valueToCoordinates(aiAnswer);
         if (!coordinates) {
           return;
@@ -181,7 +190,7 @@ const Board = ({
       const x = convertToReverseNumber(parseInt(number, 10));
       const y = convertLowercaseAlphabetToNumber(letter);
 
-      if (x >= 0 || x < BOARD_SIZE || y >= 0 || y < BOARD_SIZE) {
+      if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
         newBoard[x][y] = turn ? 1 : 2;
         turn = !turn;
       }
@@ -226,6 +235,11 @@ const Board = ({
           ))}
         </StoneRow>
       ))}
+      {isDisabled && (
+        <LoadingWrapper>
+          <ActivityIndicator color={theme.color['main_color/yellow_p']} />
+        </LoadingWrapper>
+      )}
     </BoardBackground>
   );
 };
