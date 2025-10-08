@@ -17,6 +17,7 @@ import { ReactionType } from '../../components/types/Community';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import {
   getCommunityPuzzle,
+  openCommunityAnswer,
   solveCommunityPuzzle,
   updateDislike,
   updateLike,
@@ -27,6 +28,7 @@ import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import useModal from '../../hooks/useModal';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useUserStore } from '../../store/useUserStore';
 
 const CommunityPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -38,6 +40,7 @@ const CommunityPuzzleSolve = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
+  const { updateUser } = useUserStore();
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
@@ -111,6 +114,45 @@ const CommunityPuzzleSolve = () => {
     setBoardKey((prevKey) => prevKey + 1);
   };
 
+  const handleShowAnswer = () => {
+    if (isLoading || !puzzleDetail?.id) {
+      return;
+    }
+
+    const openAnswer = async () => {
+      setIsLoading(true);
+      try {
+        const data = await openCommunityAnswer(puzzleDetail.id);
+        const problemSequence = puzzleDetail.boardStatus;
+        const mainSequence = problemSequence + data.answer;
+
+        if (data.isSuccess) {
+          await updateUser();
+          showBottomToast('success', '구매가 완료되었습니다.');
+          navigation.navigate('CommunityPuzzleReview', {
+            problemSequence,
+            mainSequence,
+          });
+        } else {
+          return;
+        }
+      } catch (error) {
+        console.error('정답 보기 처리 중 오류 발생:', error);
+        showBottomToast('error', error as string);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (puzzleDetail.isSolved) {
+      openAnswer();
+    } else {
+      activateModal('PUZZLE_REVIEW_PURCHASE', {
+        primaryAction: openAnswer,
+      });
+    }
+  };
+
   useEffect(() => {
     const getDetail = async () => {
       if (!route.params.puzzle?.id) {
@@ -157,7 +199,7 @@ const CommunityPuzzleSolve = () => {
           isSolved={puzzleDetail.isSolved}
           isCommunityPuzzle
           handleRetry={handleRetry}
-          handleShowAnswer={() => {}}
+          handleShowAnswer={handleShowAnswer}
         />
         <DescriptionWrapper>
           <CustomText size={12} lineHeight="lg" color="gray/gray600">
@@ -198,6 +240,7 @@ const CommunityPuzzleSolve = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
+        gameOutcome={{ price: 100 }}
       />
     </Container>
   );

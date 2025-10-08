@@ -10,5 +10,9 @@ export type RootStackParamList = {
   TrainingPuzzles: {
     pack: TrainingPack;
   };
+  PuzzleReview: {
+    problemSequence: string;
+    mainSequence: string;
+  };
   OtherScreen: undefined;
 };

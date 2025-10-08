@@ -8,6 +8,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import './src/locales/i18n.ts';
 import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
@@ -28,7 +29,7 @@ import CommunityPuzzles from './src/screens/CommunityPuzzles/index.tsx';
 import CommunityPuzzleSolve from './src/screens/CommunityPuzzleSolve/index.tsx';
 import CreateCommunityPuzzle from './src/screens/CreateCommunityPuzzle/index.tsx';
 import RankedPuzzleSolve from './src/screens/RankedPuzzleSolve/index.tsx';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -84,6 +85,11 @@ function App(): React.JSX.Element | null {
                   options={{ title: 'home.trainingPuzzle' }}
                 />
                 <Stack.Screen
+                  name="TrainingPuzzleReview"
+                  component={PuzzleReview}
+                  options={{ title: 'home.trainingPuzzle' }}
+                />
+                <Stack.Screen
                   name="CommunityPuzzles"
                   component={CommunityPuzzles}
                   options={{ title: 'home.communityPuzzle' }}
@@ -91,6 +97,11 @@ function App(): React.JSX.Element | null {
                 <Stack.Screen
                   name="CommunityPuzzleSolve"
                   component={CommunityPuzzleSolve}
+                  options={{ title: 'home.communityPuzzle' }}
+                />
+                <Stack.Screen
+                  name="CommunityPuzzleReview"
+                  component={PuzzleReview}
                   options={{ title: 'home.communityPuzzle' }}
                 />
                 <Stack.Screen

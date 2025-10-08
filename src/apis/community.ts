@@ -70,6 +70,16 @@ export const solveCommunityPuzzle = async (puzzleId: number) => {
   }
 };
 
+export const openCommunityAnswer = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/community/puzzle/${puzzleId}/answer`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const uploadPuzzle = async (
   authStore: string,
   title: string,

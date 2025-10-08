@@ -1,13 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { Container, EmptyContainer } from './index.styles';
+import { ButtonWrapper, Container, EmptyContainer } from './index.styles';
 import InfiniteScrollList from '../../components/common/InfiniteScrollList';
 import { CommunityPuzzle } from '../../components/types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CustomText } from '../../components/common';
+import { CustomText, Icon } from '../../components/common';
 import { useTranslation } from 'react-i18next';
+import CircleButton from '../../components/features/CircleButton';
 
 const CommunityPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -55,6 +56,12 @@ const CommunityPuzzles = () => {
           </EmptyContainer>
         }
       />
+
+      <ButtonWrapper>
+        <CircleButton onPress={() => navigation.navigate('CreateCommunityPuzzle')}>
+          <Icon name="PlusIcon" color="gray/white" />
+        </CircleButton>
+      </ButtonWrapper>
     </Container>
   );
 };
