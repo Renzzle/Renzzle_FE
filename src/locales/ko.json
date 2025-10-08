@@ -150,5 +150,8 @@
     "score": "{{score}}점",
     "rank": "{{rank}}위",
     "topPercent": "상위{{percent}}%"
+  },
+  "alert": {
+    "noData": "데이터가 없습니다."
   }
 }

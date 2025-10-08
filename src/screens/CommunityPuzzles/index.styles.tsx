@@ -7,3 +7,10 @@ export const Container = styled(View)`
   background-color: ${theme.color['gray/grayBGDim']};
   flex: 1;
 `;
+
+export const EmptyContainer = styled(View)`
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+`;

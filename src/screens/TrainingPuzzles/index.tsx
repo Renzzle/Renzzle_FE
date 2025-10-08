@@ -1,8 +1,14 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 
-import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import {
+  ParamListBase,
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
 import { RootStackParamList, TrainingPuzzle } from '../../components/types';
 import { Container } from './index.styles';
 import TrainingCard from '../../components/features/TrainingCard';
@@ -14,19 +20,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const TrainingPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPuzzles'>>();
   const { pack } = route.params;
+
   const [puzzles, setPuzzless] = useState<TrainingPuzzle[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const navigateToTrainingDetail = (puzzle: TrainingPuzzle, index: number) => {
-    navigation.navigate('TrainingPuzzleSolve', {
-      puzzle: { ...puzzle, title: pack.title, index: index },
-    });
-  };
-
-  const fetchPuzzleData = async (packId: number) => {
+  const fetchPuzzleData = useCallback(async (packId: number) => {
     setLoading(true);
     try {
       const data = await getTrainingPuzzles(packId);
@@ -36,13 +36,38 @@ const TrainingPuzzles = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    if (pack && pack.id) {
-      fetchPuzzleData(pack.id);
-    }
-  }, [pack]);
+  useFocusEffect(
+    useCallback(() => {
+      if (pack && pack.id) {
+        fetchPuzzleData(pack.id);
+      }
+    }, [pack, fetchPuzzleData]),
+  );
+
+  const navigateToTrainingDetail = useCallback(
+    (puzzle: TrainingPuzzle, index: number) => {
+      navigation.navigate('TrainingPuzzleSolve', {
+        puzzle: { ...puzzle, title: pack.title, index: index },
+      });
+    },
+    [navigation, pack.title],
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: TrainingPuzzle; index: number }) => (
+      <TrainingCard
+        title={(index + 1).toString()}
+        sequence={item.boardStatus}
+        depth={item.depth}
+        winColor={item.winColor}
+        isSolved={item.isSolved}
+        onPress={() => navigateToTrainingDetail(item, index + 1)}
+      />
+    ),
+    [navigateToTrainingDetail],
+  );
 
   return (
     <Container>
@@ -66,16 +91,7 @@ const TrainingPuzzles = () => {
             keyExtractor={(item, index) => index.toString()}
             numColumns={2}
             columnWrapperStyle={{ justifyContent: 'space-between' }}
-            renderItem={({ item, index }) => (
-              <TrainingCard
-                title={(index + 1).toString()}
-                sequence={item.boardStatus}
-                depth={item.depth}
-                winColor={item.winColor}
-                isSolved={item.isSolved}
-                onPress={() => navigateToTrainingDetail(item, index + 1)}
-              />
-            )}
+            renderItem={renderItem}
             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
