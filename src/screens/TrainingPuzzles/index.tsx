@@ -57,7 +57,7 @@ const TrainingPuzzles = () => {
             price={pack.price}
             totalPuzzleCount={pack.totalPuzzleCount}
             solvedPuzzleCount={pack.solvedPuzzleCount}
-            isLocked={pack.locked}
+            isLocked={false}
             variant="minimal"
             onPress={() => {}}
           />
