@@ -5,6 +5,8 @@ import AuthenticatedIcon from './ico-authenticated.svg';
 import BestUserIcon from './ico-best-user.svg';
 import BookShelfIcon from './ico-book-shelf.svg';
 import CheckIcon from './ico-check.svg';
+import CheckboxBlankIcon from './ico-checkbox-blank.svg';
+import CheckboxMarkedIcon from './ico-checkbox-marked.svg';
 import ChevronDoubleLeftIcon from './ico-chevron-double-left.svg';
 import ChevronDoubleRightIcon from './ico-chevron-double-right.svg';
 import ChevronLeftIcon from './ico-chevron-left.svg';
@@ -38,6 +40,8 @@ import ProUserIcon from './ico-pro-user.svg';
 import PuzzlePlusIcon from './ico-puzzle-plus.svg';
 import PuzzleSquareIcon from './ico-puzzle-square.svg';
 import PuzzleXSmallIcon from './ico-puzzle-xs.svg';
+import RadioboxBlankIcon from './ico-radiobox-blank.svg';
+import RadioboxMarkedIcon from './ico-radiobox-marked.svg';
 import Ranking1stBlueIcon from './ico-ranking-1st-blue.svg';
 import Ranking1stOrangeIcon from './ico-ranking-1st-orange.svg';
 import Ranking2ndBlueIcon from './ico-ranking-2nd-blue.svg';
@@ -66,6 +70,8 @@ const Icons = {
   BestUserIcon,
   BookShelfIcon,
   CheckIcon,
+  CheckboxBlankIcon,
+  CheckboxMarkedIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
   ChevronLeftIcon,
@@ -99,6 +105,8 @@ const Icons = {
   PuzzlePlusIcon,
   PuzzleSquareIcon,
   PuzzleXSmallIcon,
+  RadioboxBlankIcon,
+  RadioboxMarkedIcon,
   Ranking1stBlueIcon,
   Ranking1stOrangeIcon,
   Ranking2ndBlueIcon,
