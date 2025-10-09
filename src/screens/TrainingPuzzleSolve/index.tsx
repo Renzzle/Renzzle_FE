@@ -71,11 +71,9 @@ const TrainingPuzzleSolve = () => {
       return;
     }
 
-    console.log('hi');
     const openAnswer = async () => {
       setIsLoading(true);
       try {
-        console.log('hello');
         const data = await openTrainingAnswer(puzzleDetail.id);
         const problemSequence = puzzleDetail.boardStatus;
         const mainSequence = problemSequence + data.answer;
