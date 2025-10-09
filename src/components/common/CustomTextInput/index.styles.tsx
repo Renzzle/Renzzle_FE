@@ -10,7 +10,8 @@ interface StyledTextInputProps {
 
 export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
   padding: 5px 50px 5px 16px;
-  color: ${theme.color['gray/gray900']};
+  color: ${({ isDisabled }) =>
+    isDisabled ? theme.color['gray/gray500'] : theme.color['gray/gray900']};
   border-width: 1px;
   border-radius: 13px;
 
