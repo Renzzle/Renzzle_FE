@@ -50,7 +50,7 @@ export const MODAL_TEXTS = {
   VALIDATION_COMPLETE: {
     TITLE: 'modal.validationComplete.title',
     BODY: 'modal.validationComplete.message',
-    FOOTER: ['modal.validationComplete.cancel', 'modal.trainingPuzzleSuccess.confirm'],
+    FOOTER: 'modal.validationComplete.confirm',
   },
   VALIDATION_FAILED: {
     TITLE: 'modal.validationFailed.title',

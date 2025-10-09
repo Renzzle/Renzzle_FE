@@ -14,3 +14,9 @@ export const EmptyContainer = styled(View)`
   align-items: center;
   margin-top: 20px;
 `;
+
+export const ButtonWrapper = styled(View)`
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+`;

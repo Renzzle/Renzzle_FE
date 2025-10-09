@@ -47,7 +47,8 @@
     "code": "인증번호",
     "password": "비밀번호",
     "confirmPassword": "비밀번호 확인",
-    "nickname": "닉네임"
+    "nickname": "닉네임",
+    "description": "설명 입력"
   },
   "modal": {
     "filter": {
@@ -85,10 +86,9 @@
       "confirm": "나가기"
     },
     "validationComplete": {
-      "title": "검증이 완료되었습니다.",
+      "title": "검증이 성공하였습니다.",
       "message": "검증한 수순을 확인하고 업로드하세요. 수정 후 업로드 시 미인증 상태로 변경됩니다.",
-      "confirm": "확인",
-      "cancel": "취소"
+      "confirm": "확인"
     },
     "validationFailed": {
       "title": "검증이 실패하였습니다.",

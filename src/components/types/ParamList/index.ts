@@ -14,5 +14,9 @@ export type RootStackParamList = {
     problemSequence: string;
     mainSequence: string;
   };
+  AnswerCommunityPuzzle: {
+    problemSequence: string;
+    description: string;
+  };
   OtherScreen: undefined;
 };

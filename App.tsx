@@ -30,6 +30,7 @@ import CommunityPuzzleSolve from './src/screens/CommunityPuzzleSolve/index.tsx';
 import CreateCommunityPuzzle from './src/screens/CreateCommunityPuzzle/index.tsx';
 import RankedPuzzleSolve from './src/screens/RankedPuzzleSolve/index.tsx';
 import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
+import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -107,6 +108,11 @@ function App(): React.JSX.Element | null {
                 <Stack.Screen
                   name="CreateCommunityPuzzle"
                   component={CreateCommunityPuzzle}
+                  options={{ title: 'home.communityPuzzle' }}
+                />
+                <Stack.Screen
+                  name="AnswerCommunityPuzzle"
+                  component={AnswerCommunityPuzzle}
                   options={{ title: 'home.communityPuzzle' }}
                 />
                 <Stack.Screen
