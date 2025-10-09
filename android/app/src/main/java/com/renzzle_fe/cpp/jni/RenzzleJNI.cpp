@@ -11,14 +11,14 @@ using namespace std;
 extern "C" {
 
 // JNI 메서드: findVCF 메소드를 호출하여 결과를 반환
-JNIEXPORT jint JNICALL
-Java_com_renzzle_1fe_VCFSearchJNI_findVCF(JNIEnv *env, jobject obj, jstring javaBoardData) {
+JNIEXPORT jstring JNICALL
+Java_com_renzzle_1fe_SearchJNI_findWin(JNIEnv *env, jobject obj, jstring javaBoardData) {
     // Java String을 C++의 string으로 변환
     const char *nativeBoardData = env->GetStringUTFChars(javaBoardData, 0);
     string boardDataStr(nativeBoardData);
     env->ReleaseStringUTFChars(javaBoardData, nativeBoardData);
 
-    return validatePuzzle(boardDataStr);
+    return env->NewStringUTF(validatePuzzle(boardDataStr).c_str());
 }
 
 // 새로 추가한 메서드
