@@ -5,28 +5,27 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
-public class PuzzleGenerateJNI extends ReactContextBaseJavaModule {
+public class CheckWinJNI extends ReactContextBaseJavaModule {
 
     static {
         System.loadLibrary("native-lib");
     }
 
-    public PuzzleGenerateJNI(ReactApplicationContext reactContext) {
+    public CheckWinJNI(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 
     @Override
     public String getName() {
-        return "PuzzleGenerateJNI";
+        return "CheckWinJNI";
     }
 
-    public native String generatePuzzle();
+    public native int checkWin(String boardData);
 
     @ReactMethod
-    public void generatePuzzleWrapper(Promise promise) {
+    public void checkWinWrapper(String boardData, Promise promise) {
         try {
-            String result = generatePuzzle();
-            if (result == null) result = "h8";
+            int result = checkWin(boardData);
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject("ERROR", "Failed to react user move", e);
