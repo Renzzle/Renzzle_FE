@@ -3,6 +3,7 @@ export interface CommunityPuzzle {
   boardStatus: string;
   authorId: number;
   authorName: string;
+  description: string;
   depth: number;
   winColor: 'BLACK' | 'WHITE';
   solvedCount: number;

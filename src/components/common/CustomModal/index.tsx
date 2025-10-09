@@ -86,12 +86,14 @@ interface CustomModalProps {
   onSecondaryAction?: () => void;
   gameOutcome?: GameOutcome;
   bodyText?: string;
+  isLoading?: boolean;
 }
 
 export const ModalCard = ({
   category,
   onPrimaryAction: onPrimaryClose,
   onSecondaryAction: onSecondaryClose = () => {},
+  isLoading,
   gameOutcome,
 }: Omit<CustomModalProps, 'isVisible'>) => {
   const width = useDeviceWidth();
@@ -139,16 +141,16 @@ export const ModalCard = ({
   const footer =
     typeof footerTexts === 'string' ? (
       <ModalBottomContainer>
-        <CustomButton category="primary" onPress={onPrimaryClose}>
+        <CustomButton category="primary" onPress={onPrimaryClose} disabled={isLoading}>
           {t(footerTexts)}
         </CustomButton>
       </ModalBottomContainer>
     ) : (
       <ModalBottomContainer>
-        <CustomButton category="secondary" onPress={onSecondaryClose}>
+        <CustomButton category="secondary" onPress={onSecondaryClose} disabled={isLoading}>
           {t(footerTexts[0])}
         </CustomButton>
-        <CustomButton category="primary" onPress={onPrimaryClose}>
+        <CustomButton category="primary" onPress={onPrimaryClose} disabled={isLoading}>
           {t(footerTexts[1])}
         </CustomButton>
       </ModalBottomContainer>
