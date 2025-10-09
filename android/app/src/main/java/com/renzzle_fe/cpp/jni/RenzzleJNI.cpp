@@ -33,10 +33,22 @@ Java_com_renzzle_1fe_UserAgainstActionJNI_reactUserMove(JNIEnv *env, jobject obj
     return result;
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_renzzle_1fe_PuzzleGenerateJNI_generatePuzzle(JNIEnv *env, jobject obj) {
-    jstring javaString = env->NewStringUTF("");
-    return javaString;
+JNIEXPORT jint JNICALL
+Java_com_renzzle_1fe_CheckWinJNI_checkWin(JNIEnv *env, jobject obj, jstring javaBoardData) {
+    const char *nativeBoardData = env->GetStringUTFChars(javaBoardData, 0);
+    string boardDataStr(nativeBoardData);
+    env->ReleaseStringUTFChars(javaBoardData, nativeBoardData);
+
+    Board board = getBoard(boardDataStr);
+    if (board.getResult() == BLACK_WIN) {
+        if (board.isBlackTurn()) return 0;
+        else return 1;
+    } else if (board.getResult() == WHITE_WIN) {
+        if (board.isBlackTurn()) return 1;
+        else return 0;
+    } else {
+        return 0;
+    }
 }
 
 }

@@ -16,7 +16,7 @@ public class JNIPackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new VCFSearchJNI(reactContext));
         modules.add(new UserAgainstActionJNI(reactContext));
-        modules.add(new PuzzleGenerateJNI(reactContext));
+        modules.add(new CheckWinJNI(reactContext));
         return modules;
     }
 
