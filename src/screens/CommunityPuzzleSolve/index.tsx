@@ -126,16 +126,12 @@ const CommunityPuzzleSolve = () => {
         const problemSequence = puzzleDetail.boardStatus;
         const mainSequence = problemSequence + data.answer;
 
-        if (data.isSuccess) {
-          await updateUser();
-          showBottomToast('success', '구매가 완료되었습니다.');
-          navigation.navigate('CommunityPuzzleReview', {
-            problemSequence,
-            mainSequence,
-          });
-        } else {
-          return;
-        }
+        await updateUser();
+        showBottomToast('success', '구매가 완료되었습니다.');
+        navigation.navigate('CommunityPuzzleReview', {
+          problemSequence,
+          mainSequence,
+        });
       } catch (error) {
         console.error('정답 보기 처리 중 오류 발생:', error);
         showBottomToast('error', error as string);
@@ -144,13 +140,9 @@ const CommunityPuzzleSolve = () => {
       }
     };
 
-    if (puzzleDetail.isSolved) {
-      openAnswer();
-    } else {
-      activateModal('PUZZLE_REVIEW_PURCHASE', {
-        primaryAction: openAnswer,
-      });
-    }
+    activateModal('PUZZLE_REVIEW_PURCHASE', {
+      primaryAction: openAnswer,
+    });
   };
 
   useEffect(() => {
@@ -203,7 +195,7 @@ const CommunityPuzzleSolve = () => {
         />
         <DescriptionWrapper>
           <CustomText size={12} lineHeight="lg" color="gray/gray600">
-            동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리 나라 만세 무궁화 삼천리 화려 강산
+            {puzzleDetail.description}
           </CustomText>
         </DescriptionWrapper>
       </HeaderWrapper>
@@ -241,6 +233,7 @@ const CommunityPuzzleSolve = () => {
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
         gameOutcome={{ price: 100 }}
+        isLoading={isLoading}
       />
     </Container>
   );
