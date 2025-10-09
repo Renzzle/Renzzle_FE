@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import TabBar from '../../components/common/TabBar';
 import { ActiveTabContainer, Container } from './index.styles';
 import { getPack, purchaseTrainingPack } from '../../apis/training';
@@ -8,11 +8,12 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
 import { TrainingPack } from '../../components/types';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
 import { GameOutcome } from '../../components/types/Ranking';
+import { useUserStore } from '../../store/useUserStore';
 
 const TrainingPacks = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -23,23 +24,28 @@ const TrainingPacks = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
+  const { updateUser } = useUserStore();
   const [packs, setPacks] = useState<TrainingPack[]>([]);
   const [currentTab, setCurrentTab] = useState('LOW');
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<GameOutcome>();
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
 
   const handlePackClick = (item: TrainingPack) => {
     setOutcome({ price: item.price });
     if (item.locked) {
       activateModal('TRAINING_PACK_PURCHASE', {
         primaryAction: async () => {
+          setPurchaseLoading(true);
           const isSuccess = await handlePurchase(item.id);
           if (isSuccess) {
+            updateUser();
             showBottomToast('success', '구매가 완료되었습니다.');
             navigation.navigate('TrainingPuzzles', { pack: item });
           } else {
             return;
           }
+          setPurchaseLoading(false);
         },
       });
     } else {
@@ -70,9 +76,11 @@ const TrainingPacks = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPackData(currentTab);
-  }, [currentTab]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchPackData(currentTab);
+    }, [currentTab]),
+  );
 
   const tabs = [
     { key: 'LOW', title: '초급', component: () => null },
@@ -116,6 +124,7 @@ const TrainingPacks = () => {
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
         gameOutcome={outcome}
+        isLoading={purchaseLoading}
       />
     </Container>
   );
