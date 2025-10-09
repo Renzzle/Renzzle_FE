@@ -131,7 +131,7 @@ string convertPath2String(MoveList path) {
     string str = "";
     for (const auto& pos : path) {
         str += (char)(pos.getY() + 96);
-        str += pos.getX();
+        str += to_string(pos.getX());
     }
     return str;
 }
