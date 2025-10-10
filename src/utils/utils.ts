@@ -97,3 +97,12 @@ export const toWinColorEnum = (key: string): WinColor | undefined => {
       return undefined;
   }
 };
+
+/**
+ * 주어진 수순 문자열의 깊이 (총 이동 횟수)를 계산
+ * @param sequence 수순 문자열
+ * @returns 수순에 포함된 이동 횟수
+ */
+export const getSequenceDepth = (sequence: string): number => {
+  return parseSequence(sequence).length;
+};
