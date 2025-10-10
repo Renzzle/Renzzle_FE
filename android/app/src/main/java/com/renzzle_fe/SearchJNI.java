@@ -21,7 +21,7 @@ public class SearchJNI extends ReactContextBaseJavaModule {
     }
 
     // JNI에서 호출할 메서드
-    public native int findVCF(String boardData); // C++의 JNI 메서드를 호출하는 Java 메서드
+    public native String findWin(String boardData); // C++의 JNI 메서드를 호출하는 Java 메서드
 
     @ReactMethod
     public void findWinWrapper(String boardData, Promise promise) {

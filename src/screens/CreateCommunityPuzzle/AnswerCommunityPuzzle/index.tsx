@@ -21,7 +21,7 @@ const AnswerCommunityPuzzle = () => {
     category: modalCategory,
   } = useModal();
   const { t } = useTranslation();
-  const { VCFSearchJNI } = NativeModules;
+  const { SearchJNI } = NativeModules;
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const problemSequence = route.params.problemSequence;
@@ -52,7 +52,9 @@ const AnswerCommunityPuzzle = () => {
   const transition = [
     {
       text: '검증',
-      onAction: async () => {},
+      onAction: async () => {
+        await verifySequence();
+      },
       disabled: false,
     },
     {
@@ -64,7 +66,7 @@ const AnswerCommunityPuzzle = () => {
 
   const verifySequence = async () => {
     try {
-      const result = await VCFSearchJNI.findVCFWrapper(currentSequence);
+      const result = await SearchJNI.findWinWrapper(currentSequence);
       console.log('VCF Wrapper Result: ', result);
     } catch (error) {
       console.error('VCF search failed: ', error);
