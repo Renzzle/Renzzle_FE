@@ -1,14 +1,49 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import InfiniteScrollList from '../../components/common/InfiniteScrollList';
-import { getUserPuzzles } from '../../apis/user';
+import { deleteMyPuzzle, getUserPuzzles } from '../../apis/user';
 import CommunityCard from '../../components/features/CommunityCard';
 import { CommunityPuzzle } from '../../components/types';
 import { Container } from './index.styles';
+import { CustomModal } from '../../components/common';
+import useModal from '../../hooks/useModal';
+import { useFocusEffect } from '@react-navigation/native';
+import { showBottomToast } from '../../components/common/Toast/toastMessage';
 
 const MyPuzzles = () => {
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleDelete = async (id: number) => {
+    activateModal('DELETE_PUZZLE_CONFIRM', {
+      primaryAction: async () => {
+        try {
+          await deleteMyPuzzle(id);
+          setRefreshKey((prev) => prev + 1);
+          showBottomToast('success', '퍼즐이 삭제되었습니다.');
+        } catch (error) {
+          showBottomToast('error', error as string);
+        }
+      },
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      // list refresh
+      setRefreshKey((prev) => prev + 1);
+    }, []),
+  );
+
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
+        key={refreshKey}
         apiCall={getUserPuzzles}
         renderItem={({ item }) => (
           <CommunityCard
@@ -24,10 +59,18 @@ const MyPuzzles = () => {
             likeCount={item.likeCount}
             isSolved={item.isSolved}
             onPress={() => {}}
-            onDelete={() => {}}
+            onDelete={() => handleDelete(item.id)}
           />
         )}
         keyExtractor={(item) => item && item.id.toString()}
+      />
+
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}
+        gameOutcome={{ price: 100 }}
       />
     </Container>
   );

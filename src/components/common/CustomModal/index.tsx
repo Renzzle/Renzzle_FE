@@ -21,6 +21,9 @@ export type ModalCategoryType =
   | 'PUZZLE_FAILURE'
   | 'VALIDATION_COMPLETE'
   | 'VALIDATION_FAILED'
+  | 'PUZZLE_UPLOAD_SUCCESS'
+  | 'PUZZLE_UPLOAD_FAILED'
+  | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_PUZZLE_OUTRO'
   | 'TRAINING_PACK_PURCHASE'
@@ -43,9 +46,9 @@ export const MODAL_TEXTS = {
     FOOTER: 'modal.rankingPuzzleSuccess.confirm',
   },
   PUZZLE_FAILURE: {
-    TITLE: 'modal.PuzzleFailure.title',
-    BODY: 'modal.PuzzleFailure.message',
-    FOOTER: 'modal.PuzzleFailure.confirm',
+    TITLE: 'modal.puzzleFailure.title',
+    BODY: 'modal.puzzleFailure.message',
+    FOOTER: 'modal.puzzleFailure.confirm',
   },
   VALIDATION_COMPLETE: {
     TITLE: 'modal.validationComplete.title',
@@ -56,6 +59,21 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.validationFailed.title',
     BODY: 'modal.validationFailed.message',
     FOOTER: 'modal.validationFailed.confirm',
+  },
+  PUZZLE_UPLOAD_SUCCESS: {
+    TITLE: 'modal.puzzleUploadSuccess.title',
+    BODY: 'modal.puzzleUploadSuccess.message',
+    FOOTER: 'modal.puzzleUploadSuccess.confirm',
+  },
+  PUZZLE_UPLOAD_FAILED: {
+    TITLE: 'modal.puzzleUploadFailed.title',
+    BODY: 'modal.puzzleUploadFailed.message',
+    FOOTER: 'modal.puzzleUploadFailed.confirm',
+  },
+  DELETE_PUZZLE_CONFIRM: {
+    TITLE: 'modal.deletePuzzleConfirm.title',
+    BODY: 'modal.deletePuzzleConfirm.message',
+    FOOTER: ['modal.deletePuzzleConfirm.cancel', 'modal.deletePuzzleConfirm.confirm'],
   },
   RANKING_PUZZLE_INTRO: {
     TITLE: 'modal.rankingPuzzleIntro.title',

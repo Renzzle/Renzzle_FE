@@ -80,9 +80,9 @@
       "message": "오목을 완성하였습니다!",
       "confirm": "나가기"
     },
-    "PuzzleFailure": {
+    "puzzleFailure": {
       "title": "퍼즐 풀기 실패",
-      "message": "수 제한 이내에 오목을 만들지 못하였습니다.",
+      "message": "오목을 완성하지 못했습니다.",
       "confirm": "나가기"
     },
     "validationComplete": {
@@ -94,6 +94,22 @@
       "title": "검증이 실패하였습니다.",
       "message": "수순을 입력하여 미인증 퍼즐 업로드가 가능합니다.",
       "confirm": "확인",
+      "cancel": "취소"
+    },
+    "puzzleUploadSuccess": {
+      "title": "업로드에 성공하였습니다.",
+      "message": "퍼즐이 성공적으로 등록되었습니다.",
+      "confirm": "확인"
+    },
+    "puzzleUploadFailed": {
+      "title": "업로드에 실패하였습니다.",
+      "message": "다시 시도해 주세요.",
+      "confirm": "확인"
+    },
+    "deletePuzzleConfirm": {
+      "title": "퍼즐 삭제",
+      "message": "해당 퍼즐을 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.",
+      "confirm": "삭제하기",
       "cancel": "취소"
     },
     "rankingPuzzleIntro": {

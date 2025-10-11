@@ -45,24 +45,11 @@ export const getLikedPuzzles = async (id: number | null, size: number) => {
   }
 };
 
-export const getLikePuzzle = async (authStore: string, size?: number, id?: number) => {
+export const deleteMyPuzzle = async (puzzleId: number) => {
   try {
-    const params: Record<string, string | number> = {};
-    if (id !== undefined) {
-      params.id = id;
-    }
-    if (size !== undefined) {
-      params.size = size;
-    }
+    const response = await apiClient.delete(`/api/user/${puzzleId}`);
 
-    const response = await apiClient.get('/api/user/like', {
-      headers: {
-        [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
-      },
-      params,
-    });
-
-    return response.data;
+    return response.data.response;
   } catch (error) {
     throw error;
   }
