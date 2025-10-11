@@ -80,6 +80,7 @@ const RankedPuzzleSolve = () => {
       },
       secondaryAction: () => {
         // TODO: 복습 화면으로 이동
+        activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} });
       },
     });
   };

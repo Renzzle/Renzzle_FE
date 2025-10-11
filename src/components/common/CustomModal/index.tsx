@@ -34,7 +34,7 @@ export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
     TITLE: 'modal.trainingPuzzleSuccess.title',
     BODY: 'modal.trainingPuzzleSuccess.message',
-    FOOTER: ['modal.trainingPuzzleSuccess.cancel', 'modal.trainingPuzzleSuccess.confirm'],
+    FOOTER: 'modal.trainingPuzzleSuccess.cancel',
   },
   COMMUNITY_PUZZLE_SUCCESS: {
     TITLE: 'modal.communityPuzzleSuccess.title',

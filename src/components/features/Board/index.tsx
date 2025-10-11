@@ -23,6 +23,7 @@ import {
 import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
 import { Icon } from '../../common';
 import theme from '../../../styles/theme';
+import { showBottomToast } from '../../common/Toast/toastMessage';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -67,6 +68,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
 
+  const { UserAgainstActionJNI, CheckWinJNI } = NativeModules;
   const [board, setBoard] = useState<StoneType[][]>(
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0)),
   );
@@ -76,9 +78,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const [aiAnswer, setAiAnswer] = useState<number>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const { UserAgainstActionJNI } = NativeModules;
   const [localSequence, setLocalSequence] = useState(sequence);
-  const [confirmPut, setConfirmPut] = useState<boolean>(false);
   const [depth, setDepth] = useState(0);
 
   const [history, setHistory] = useState<string[]>([sequence]);
@@ -157,6 +157,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         setSequence(updatedSequence);
       }
     }
+
+    return updatedSequence;
   };
 
   const handlePut = async () => {
@@ -165,7 +167,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         return;
       }
 
-      addToSequence(stoneX, stoneY);
+      const newSequence = addToSequence(stoneX, stoneY);
       updateBoard(stoneX, stoneY);
       setIsBlackTurn(!isBlackTurn);
       setStoneX(null);
@@ -173,9 +175,15 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
       if (mode === 'solve') {
         setDepth((prevDepth) => prevDepth + 1);
+
+        if (await checkWin(newSequence, 'user')) {
+          setIsWin?.(true);
+          return;
+        }
+
         setIsDisabled(true);
         setIsLoading?.(true);
-        setConfirmPut(true); // user put ok
+        await handleAiTurn(newSequence);
       }
     }
   };
@@ -209,11 +217,23 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     }
   };
 
+  const checkWin = async (sequenceToCheck: string, turn: string) => {
+    try {
+      const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
+      console.log(turn, ' sequence:', sequenceToCheck);
+      console.log(turn, ' :', check);
+      return check === 1;
+    } catch (error) {
+      console.log(error);
+      showBottomToast('error', '수 처리 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
   useEffect(() => {
     const processAiAnswer = async () => {
       if (aiAnswer !== null && aiAnswer !== undefined) {
         if (aiAnswer === 1000 || aiAnswer === -1) {
-          setConfirmPut(false);
           setIsDisabled(false);
           setIsLoading?.(false);
           return;
@@ -225,10 +245,14 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         }
 
         const { x, y } = coordinates;
-        addToSequence(x, y);
+        const newSequence = addToSequence(x, y);
+        if (await checkWin(newSequence, 'ai')) {
+          setIsWin?.(false);
+          return;
+        }
+
         updateBoard(x, y);
         setIsBlackTurn(!isBlackTurn);
-        setConfirmPut(false);
         setIsDisabled(false);
         setIsLoading?.(false);
         setDepth((prevDepth) => prevDepth + 1);
@@ -237,15 +261,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
     processAiAnswer();
   }, [aiAnswer]);
-
-  useEffect(() => {
-    const userPutComplete = async () => {
-      await handleAiTurn(localSequence);
-    };
-    if (confirmPut && mode === 'solve') {
-      userPutComplete();
-    }
-  }, [localSequence, confirmPut]);
 
   useEffect(() => {
     if (winDepth !== undefined && depth > winDepth) {

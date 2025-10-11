@@ -37,7 +37,6 @@ const TrainingPuzzleSolve = () => {
     }
     if (result) {
       const data = await solveTrainingPuzzle(puzzleDetail.id);
-      updateUser();
       if (data.reward) {
         setOutcome({ reward: data.reward });
       } else {
@@ -45,9 +44,10 @@ const TrainingPuzzleSolve = () => {
       }
 
       activateModal('TRAINING_PUZZLE_SUCCESS', {
-        primaryAction: () => {
+        primaryAction: async () => {
           // TODO: 다음 문제 이동
-          console.log('다음문제로 이동');
+          await updateUser();
+          navigation.goBack();
         },
         secondaryAction: () => {
           navigation.goBack();
