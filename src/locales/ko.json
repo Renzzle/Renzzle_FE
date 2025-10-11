@@ -135,6 +135,11 @@
       "message": "정답을 열람하시겠습니까?\n필요 재화: {{price}}피스",
       "confirm": "구매하기",
       "cancel": "취소"
+    },
+    "featureInProgress": {
+      "title": "준비 중",
+      "message": "해당 기능은 현재 개발 중입니다.\n정식 출시에서 만나요!",
+      "confirm": "확인"
     }
   },
   "home": {

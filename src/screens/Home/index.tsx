@@ -121,7 +121,14 @@ const Home = () => {
             const { titleKey, route } = menuThemeMap[menu];
 
             return (
-              <SubMenuButton key={menu} onPress={() => route && navigation.navigate(route)}>
+              <SubMenuButton
+                key={menu}
+                onPress={() =>
+                  route &&
+                  (route === 'Home'
+                    ? activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} })
+                    : navigation.navigate(route))
+                }>
                 <MenuButton type={menu} size={40} />
                 <CustomText size={12} weight="bold" lineHeight="sm">
                   {t(titleKey)}

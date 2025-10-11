@@ -27,7 +27,8 @@ export type ModalCategoryType =
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_PUZZLE_OUTRO'
   | 'TRAINING_PACK_PURCHASE'
-  | 'PUZZLE_REVIEW_PURCHASE';
+  | 'PUZZLE_REVIEW_PURCHASE'
+  | 'FEATURE_IN_PROGRESS';
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -94,6 +95,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.puzzleReviewPurchase.title',
     BODY: 'modal.puzzleReviewPurchase.message',
     FOOTER: ['modal.puzzleReviewPurchase.cancel', 'modal.puzzleReviewPurchase.confirm'],
+  },
+  FEATURE_IN_PROGRESS: {
+    TITLE: 'modal.featureInProgress.title',
+    BODY: 'modal.featureInProgress.message',
+    FOOTER: 'modal.featureInProgress.confirm',
   },
 };
 
