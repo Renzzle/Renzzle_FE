@@ -8,7 +8,7 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { RootStackParamList, TrainingPuzzle } from '../../components/types';
 import { Container } from './index.styles';
 import TrainingCard from '../../components/features/TrainingCard';
@@ -26,6 +26,8 @@ const TrainingPuzzles = () => {
 
   const [puzzles, setPuzzless] = useState<TrainingPuzzle[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const solvedCount = useMemo(() => puzzles.filter((puzzle) => puzzle.isSolved).length, [puzzles]);
 
   const fetchPuzzleData = useCallback(async (packId: number) => {
     setLoading(true);
@@ -82,7 +84,7 @@ const TrainingPuzzles = () => {
             description={pack.description}
             price={pack.price}
             totalPuzzleCount={pack.totalPuzzleCount}
-            solvedPuzzleCount={pack.solvedPuzzleCount}
+            solvedPuzzleCount={solvedCount}
             isLocked={false}
             variant="minimal"
             onPress={() => {}}
