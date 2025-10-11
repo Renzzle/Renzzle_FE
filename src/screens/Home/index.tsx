@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   ArticleTitle,
   ArticleWrapper,
@@ -63,14 +63,12 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    if (!recommendPack) {
+  useFocusEffect(
+    useCallback(() => {
       fetchRecommendPack();
-    }
-    if (!trendPuzzles) {
       fetchTrendPuzzles();
-    }
-  }, [recommendPack, trendPuzzles]);
+    }, []),
+  );
 
   const handleRanking = () => {
     activateModal('RANKING_PUZZLE_INTRO', {
