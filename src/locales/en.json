@@ -47,7 +47,8 @@
     "code": "인증번호",
     "password": "비밀번호",
     "confirmPassword": "비밀번호 확인",
-    "nickname": "닉네임"
+    "nickname": "닉네임",
+    "description": "설명 입력"
   },
   "modal": {
     "filter": {
@@ -79,21 +80,36 @@
       "message": "오목을 완성하였습니다!",
       "confirm": "나가기"
     },
-    "PuzzleFailure": {
+    "puzzleFailure": {
       "title": "퍼즐 풀기 실패",
-      "message": "수 제한 이내에 오목을 만들지 못하였습니다.",
+      "message": "오목을 완성하지 못했습니다.",
       "confirm": "나가기"
     },
     "validationComplete": {
-      "title": "검증이 완료되었습니다.",
+      "title": "검증이 성공하였습니다.",
       "message": "검증한 수순을 확인하고 업로드하세요. 수정 후 업로드 시 미인증 상태로 변경됩니다.",
-      "confirm": "확인",
-      "cancel": "취소"
+      "confirm": "확인"
     },
     "validationFailed": {
       "title": "검증이 실패하였습니다.",
       "message": "수순을 입력하여 미인증 퍼즐 업로드가 가능합니다.",
       "confirm": "확인",
+      "cancel": "취소"
+    },
+    "puzzleUploadSuccess": {
+      "title": "업로드에 성공하였습니다.",
+      "message": "퍼즐이 성공적으로 등록되었습니다.",
+      "confirm": "확인"
+    },
+    "puzzleUploadFailed": {
+      "title": "업로드에 실패하였습니다.",
+      "message": "다시 시도해 주세요.",
+      "confirm": "확인"
+    },
+    "deletePuzzleConfirm": {
+      "title": "퍼즐 삭제",
+      "message": "해당 퍼즐을 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.",
+      "confirm": "삭제하기",
       "cancel": "취소"
     },
     "rankingPuzzleIntro": {
@@ -109,10 +125,21 @@
       "cancel": "복습하기"
     },
     "trainingPackPurchase": {
-      "title": "트레이닝 퍼즐 구매",
-      "message": "이 퍼즐을 구매하시겠습니까?\n필요 재화: {{price}}피스",
+      "title": "트레이닝 팩 구매",
+      "message": "이 팩을 구매하시겠습니까?\n필요 재화: {{price}}피스",
       "confirm": "구매하기",
       "cancel": "취소"
+    },
+    "puzzleReviewPurchase": {
+      "title": "정답 보기 구매",
+      "message": "정답을 열람하시겠습니까?\n필요 재화: {{price}}피스",
+      "confirm": "구매하기",
+      "cancel": "취소"
+    },
+    "featureInProgress": {
+      "title": "준비 중",
+      "message": "해당 기능은 현재 개발 중입니다.\n정식 출시에서 만나요!",
+      "confirm": "확인"
     }
   },
   "home": {
@@ -150,5 +177,8 @@
     "score": "{{score}}점",
     "rank": "{{rank}}위",
     "topPercent": "상위{{percent}}%"
+  },
+  "alert": {
+    "noData": "데이터가 없습니다."
   }
 }

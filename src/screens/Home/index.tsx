@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   ArticleTitle,
   ArticleWrapper,
@@ -63,14 +63,12 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    if (!recommendPack) {
+  useFocusEffect(
+    useCallback(() => {
       fetchRecommendPack();
-    }
-    if (!trendPuzzles) {
       fetchTrendPuzzles();
-    }
-  }, [recommendPack, trendPuzzles]);
+    }, []),
+  );
 
   const handleRanking = () => {
     activateModal('RANKING_PUZZLE_INTRO', {
@@ -121,7 +119,14 @@ const Home = () => {
             const { titleKey, route } = menuThemeMap[menu];
 
             return (
-              <SubMenuButton key={menu} onPress={() => route && navigation.navigate(route)}>
+              <SubMenuButton
+                key={menu}
+                onPress={() =>
+                  route &&
+                  (route === 'Home'
+                    ? activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} })
+                    : navigation.navigate(route))
+                }>
                 <MenuButton type={menu} size={40} />
                 <CustomText size={12} weight="bold" lineHeight="sm">
                   {t(titleKey)}
@@ -147,9 +152,7 @@ const Home = () => {
               totalPuzzleCount={recommendPack.totalPuzzleCount}
               solvedPuzzleCount={recommendPack.solvedPuzzleCount}
               isLocked={recommendPack.locked}
-              onPress={() => {
-                navigation.navigate('TrainingPuzzles', { pack: recommendPack });
-              }}
+              onPress={() => navigation.navigate('TrainingPuzzles', { pack: recommendPack })}
             />
           </ArticleWrapper>
         )}
@@ -176,7 +179,7 @@ const Home = () => {
                 solvedCount={puzzle.solvedCount}
                 likeCount={puzzle.likeCount}
                 isSolved={puzzle.isSolved}
-                onPress={() => {}}
+                onPress={() => navigation.navigate('CommunityPuzzleSolve', { puzzle })}
               />
             ))}
           </ArticleWrapper>

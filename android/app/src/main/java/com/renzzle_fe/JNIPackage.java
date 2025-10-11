@@ -14,7 +14,7 @@ public class JNIPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new VCFSearchJNI(reactContext));
+        modules.add(new SearchJNI(reactContext));
         modules.add(new UserAgainstActionJNI(reactContext));
         modules.add(new CheckWinJNI(reactContext));
         return modules;

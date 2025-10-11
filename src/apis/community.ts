@@ -1,5 +1,4 @@
 import { ApiCallParams } from '../components/common/InfiniteScrollList';
-import { HTTP_HEADERS } from './constants';
 import { apiClient } from './interceptor';
 
 const cleanParams = (params: ApiCallParams): Record<string, any> => {
@@ -60,24 +59,43 @@ export const updateDislike = async (puzzleId: number) => {
   }
 };
 
+export const solveCommunityPuzzle = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/community/puzzle/${puzzleId}/solve`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const openCommunityAnswer = async (puzzleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/community/puzzle/${puzzleId}/answer`);
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const uploadPuzzle = async (
-  authStore: string,
-  title: string,
   boardStatus: string,
+  answer: string,
   depth: number,
-  difficulty: string,
+  description: string,
   winColor: string,
+  isVerified: boolean,
 ) => {
   try {
-    const response = await apiClient.post(
-      '/api/community/puzzle',
-      { title, boardStatus, depth, difficulty, winColor },
-      {
-        headers: {
-          [HTTP_HEADERS.AUTHORIZATION]: `Bearer ${authStore}`,
-        },
-      },
-    );
+    const response = await apiClient.post('/api/community/puzzle', {
+      boardStatus,
+      answer,
+      depth,
+      description,
+      winColor,
+      isVerified,
+    });
 
     return response.data;
   } catch (error) {
