@@ -175,7 +175,7 @@ const CommunityPuzzleSolve = () => {
   if (!puzzleDetail) {
     return (
       <Container>
-        <ActivityIndicator color={theme.color['main_color/yellow_p']} />
+        <ActivityIndicator color={theme.color['gray/gray300']} />
       </Container>
     );
   }

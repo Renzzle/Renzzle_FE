@@ -2,6 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, FlatListProps, View } from 'react-native';
+import theme from '../../../styles/theme';
 
 export interface ApiCallParams {
   id?: number | null;
@@ -83,7 +84,7 @@ const InfiniteScrollList = <T,>({
 
   const renderFooter = () =>
     loading ? (
-      <ActivityIndicator style={{ marginVertical: 16 }} />
+      <ActivityIndicator color={theme.color['gray/gray300']} style={{ marginVertical: 16 }} />
     ) : (
       <View style={{ marginBottom: 15 }} />
     );

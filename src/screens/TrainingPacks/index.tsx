@@ -14,6 +14,7 @@ import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
 import { GameOutcome } from '../../components/types/Ranking';
 import { useUserStore } from '../../store/useUserStore';
+import theme from '../../styles/theme';
 
 const TrainingPacks = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -93,7 +94,7 @@ const TrainingPacks = () => {
       <TabBar tabs={tabs} currentTab={currentTab} onTabPress={setCurrentTab} />
       <ActiveTabContainer>
         {loading ? (
-          <ActivityIndicator style={{ marginVertical: 16 }} />
+          <ActivityIndicator color={theme.color['gray/gray300']} style={{ marginVertical: 16 }} />
         ) : (
           <FlatList
             data={packs}

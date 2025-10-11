@@ -17,6 +17,7 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import theme from '../../styles/theme';
 
 const TrainingPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -72,7 +73,7 @@ const TrainingPuzzles = () => {
   return (
     <Container>
       {loading ? (
-        <ActivityIndicator style={{ marginVertical: 16 }} />
+        <ActivityIndicator color={theme.color['gray/gray300']} style={{ marginVertical: 16 }} />
       ) : (
         <>
           <PackCard

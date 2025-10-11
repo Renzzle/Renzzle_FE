@@ -10,6 +10,7 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import RankingListItem from '../../components/features/RankingListItem';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import theme from '../../styles/theme';
 
 const Ranking = () => {
   const insets = useSafeAreaInsets();
@@ -116,7 +117,7 @@ const Ranking = () => {
       </DescText>
       <ActiveTabContainer>
         {loading ? (
-          <ActivityIndicator style={{ marginVertical: 16 }} />
+          <ActivityIndicator color={theme.color['gray/gray300']} style={{ marginVertical: 16 }} />
         ) : currentTab === 'RATING' ? (
           <FlatList
             data={ratingRankingResponse?.top100 ?? []}
