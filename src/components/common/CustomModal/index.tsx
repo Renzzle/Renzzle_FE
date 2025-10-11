@@ -111,6 +111,7 @@ interface CustomModalProps {
   gameOutcome?: GameOutcome;
   bodyText?: string;
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 export const ModalCard = ({
@@ -119,6 +120,7 @@ export const ModalCard = ({
   onSecondaryAction: onSecondaryClose = () => {},
   isLoading,
   gameOutcome,
+  children,
 }: Omit<CustomModalProps, 'isVisible'>) => {
   const width = useDeviceWidth();
   const { t } = useTranslation();
@@ -135,18 +137,6 @@ export const ModalCard = ({
           {t(titleText)}
         </CustomText>
       </ModalTitleContainer>
-      {category === 'RANKING_PUZZLE_SUCCESS' ? (
-        // <ModalExitContainer onPress={onPrimaryClose}>
-        //   {/* TODO: onPress 출제화면으로 이동 */}
-        //   <CustomText size={12} lineHeight="sm" color="gray/gray600">
-        //     바로출제
-        //   </CustomText>
-        //   <LogoutIcon color="gray/gray400" />
-        // </ModalExitContainer>
-        <View />
-      ) : (
-        <View />
-      )}
     </ModalTopContainer>
   );
 
@@ -158,6 +148,7 @@ export const ModalCard = ({
           reward: gameOutcome?.reward,
           price: gameOutcome?.price,
         })}
+        {children}
       </CustomText>
     </ModalBodyContainer>
   );
@@ -191,10 +182,10 @@ export const ModalCard = ({
   );
 };
 
-const CustomModal = ({ isVisible, ...props }: CustomModalProps) => {
+const CustomModal = ({ isVisible, children, ...props }: CustomModalProps) => {
   return (
     <Modal visible={isVisible} transparent={true} animationType="fade">
-      {isVisible && <ModalCard {...props} />}
+      {isVisible && <ModalCard {...props}>{children}</ModalCard>}
     </Modal>
   );
 };
