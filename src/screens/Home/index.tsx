@@ -152,9 +152,7 @@ const Home = () => {
               totalPuzzleCount={recommendPack.totalPuzzleCount}
               solvedPuzzleCount={recommendPack.solvedPuzzleCount}
               isLocked={recommendPack.locked}
-              onPress={() => {
-                navigation.navigate('TrainingPuzzles', { pack: recommendPack });
-              }}
+              onPress={() => navigation.navigate('TrainingPuzzles', { pack: recommendPack })}
             />
           </ArticleWrapper>
         )}
@@ -181,7 +179,7 @@ const Home = () => {
                 solvedCount={puzzle.solvedCount}
                 likeCount={puzzle.likeCount}
                 isSolved={puzzle.isSolved}
-                onPress={() => {}}
+                onPress={() => navigation.navigate('CommunityPuzzleSolve', { puzzle })}
               />
             ))}
           </ArticleWrapper>

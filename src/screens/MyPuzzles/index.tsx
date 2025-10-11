@@ -6,10 +6,12 @@ import { CommunityPuzzle } from '../../components/types';
 import { Container } from './index.styles';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { useFocusEffect } from '@react-navigation/native';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const MyPuzzles = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
     isModalVisible,
     activateModal,
@@ -58,7 +60,7 @@ const MyPuzzles = () => {
             solvedCount={item.solvedCount}
             likeCount={item.likeCount}
             isSolved={item.isSolved}
-            onPress={() => {}}
+            onPress={() => navigation.navigate('CommunityPuzzleSolve', { puzzle: item })}
             onDelete={() => handleDelete(item.id)}
           />
         )}
