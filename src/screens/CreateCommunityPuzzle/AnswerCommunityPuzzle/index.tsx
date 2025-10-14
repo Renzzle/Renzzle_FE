@@ -132,6 +132,8 @@ const AnswerCommunityPuzzle = () => {
               navigation.navigate('CommunityPuzzles');
             },
           });
+        } else {
+          showBottomToast('error', t('modal.puzzleUploadFailed.title'));
         }
       } catch (error) {
         console.error('Puzzle Upload Error:', error);
