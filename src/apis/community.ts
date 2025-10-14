@@ -2,23 +2,12 @@ import { ApiCallParams } from '../components/common/InfiniteScrollList';
 import { apiClient } from './interceptor';
 
 const cleanParams = (params: ApiCallParams): Record<string, any> => {
-  return Object.fromEntries(
-    Object.entries(params).filter(([_, value]) => value !== null && value !== undefined),
-  );
+  return Object.fromEntries(Object.entries(params).filter(([_, value]) => value != null));
 };
 
 export const getCommunityPuzzles = async (params: ApiCallParams) => {
   try {
     const filteredParams = cleanParams(params);
-
-    // TODO: 서버 수정 후 if문 두개 삭제 !!
-    if (params.stone === null || params.stone === undefined) {
-      filteredParams.stone = 'BLACK';
-    }
-    if (params.sort === null || params.sort === undefined) {
-      filteredParams.sort = 'LATEST';
-    }
-    console.log('filteredparams: ', filteredParams);
 
     const response = await apiClient.get('/api/community/puzzle', { params: filteredParams });
 
