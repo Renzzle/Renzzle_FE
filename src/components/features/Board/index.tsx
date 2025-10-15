@@ -178,6 +178,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
         if (await checkWin(newSequence, 'user')) {
           setIsWin?.(true);
+          setIsLoading?.(false);
+          setIsDisabled(false);
           return;
         }
 
@@ -206,10 +208,14 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       if (result === -1) {
         console.log('졌다!');
         setIsWin?.(false);
+        setIsLoading?.(false);
+        setIsDisabled(false);
       }
       if (result === 1000) {
         console.log('이겼다!');
         setIsWin?.(true);
+        setIsLoading?.(false);
+        setIsDisabled(false);
       }
       setAiAnswer(result);
     } catch (error) {
@@ -248,6 +254,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         const newSequence = addToSequence(x, y);
         if (await checkWin(newSequence, 'ai')) {
           setIsWin?.(false);
+          setIsLoading?.(false);
+          setIsDisabled(false);
           return;
         }
 
