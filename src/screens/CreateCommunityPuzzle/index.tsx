@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Container, InputWrapper, RedoButton, UndoButton, UndoRedoWrapper } from './index.styles';
 import Board, { BoardRef } from '../../components/features/Board';
 import { BottomButtonBar, CustomTextInput, Icon } from '../../components/common';
@@ -13,6 +13,7 @@ const CreateCommunityPuzzle = () => {
   const [currentSequence, setCurrentSequence] = useState(''); // 현재 시퀀스
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [isTransitionDisabled, setIsTransitionDisabled] = useState(true);
 
   const boardRef = useRef<BoardRef>(null);
 
@@ -40,8 +41,17 @@ const CreateCommunityPuzzle = () => {
           problemSequence: currentSequence,
           description: description,
         }),
+      disabled: isTransitionDisabled,
     },
   ];
+
+  useEffect(() => {
+    if (currentSequence.length !== 0) {
+      setIsTransitionDisabled(false);
+    } else {
+      setIsTransitionDisabled(true);
+    }
+  }, [currentSequence]);
 
   return (
     <Container>
