@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import RankingResultButton from '../../components/features/RankingResultButton';
 import TimerWithProgressBar from '../../components/features/TimerWithProgressBar';
 import {
@@ -18,6 +18,7 @@ import { GameOutcome, GameResult } from '../../components/types/Ranking';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface PuzzleData {
   boardStatus: string;
@@ -34,6 +35,7 @@ const RankedPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const scrollRef = useRef<ScrollView>(null);
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
   const [outcome, setOutcome] = useState<GameOutcome>();
@@ -70,6 +72,12 @@ const RankedPuzzleSolve = () => {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollToEnd({ animated: true });
+    }
+  }, [results]);
+
   const handleFinish = async () => {
     const data = await finishRankingGame();
     setOutcome(data);
@@ -98,6 +106,7 @@ const RankedPuzzleSolve = () => {
 
       <BoardWrapper>
         <HorizontalScrollContainer
+          ref={scrollRef}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}>
