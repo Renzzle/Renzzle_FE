@@ -15,6 +15,7 @@ export const CenteredView = styled(View)`
   flex: 1;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   background-color: rgba(0, 0, 0, 0.8);
 `;
 

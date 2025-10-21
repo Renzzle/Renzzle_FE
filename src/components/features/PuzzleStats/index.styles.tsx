@@ -12,4 +12,5 @@ export const StatsWrapper = styled(View)`
 export const StatsItemWrapper = styled(View)`
   display: flex;
   flex-direction: row;
+  align-items: center;
 `;
