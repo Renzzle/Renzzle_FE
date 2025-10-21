@@ -19,6 +19,7 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 
 interface PuzzleData {
   boardStatus: string;
@@ -26,6 +27,7 @@ interface PuzzleData {
 }
 
 const RankedPuzzleSolve = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
     isModalVisible,
@@ -64,12 +66,20 @@ const RankedPuzzleSolve = () => {
     }
     if (result) {
       setBonusTrigger((prev) => prev + 1);
+      showBottomToast('success', t('modal.rankingPuzzleSuccess.message'));
+    } else {
+      showBottomToast('error', t('modal.puzzleFailure.message'));
     }
 
-    const data = await submitRankingGameResult(result);
-    setPuzzleData(data);
-    setResults((prev) => [...prev, { variant: result ? 'success' : 'error' }]);
-    setIsLoading(false);
+    try {
+      const data = await submitRankingGameResult(result);
+      setPuzzleData(data);
+      setResults((prev) => [...prev, { variant: result ? 'success' : 'error' }]);
+    } catch (error) {
+      showBottomToast('error', error as string);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -79,18 +89,22 @@ const RankedPuzzleSolve = () => {
   }, [results]);
 
   const handleFinish = async () => {
-    const data = await finishRankingGame();
-    setOutcome(data);
-    updateUser();
-    activateModal('RANKING_PUZZLE_OUTRO', {
-      primaryAction: () => {
-        navigation.navigate('Home');
-      },
-      secondaryAction: () => {
-        // TODO: 복습 화면으로 이동
-        activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} });
-      },
-    });
+    try {
+      const data = await finishRankingGame();
+      setOutcome(data);
+      updateUser();
+      activateModal('RANKING_PUZZLE_OUTRO', {
+        primaryAction: () => {
+          navigation.navigate('Home');
+        },
+        secondaryAction: () => {
+          // TODO: 복습 화면으로 이동
+          activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} });
+        },
+      });
+    } catch (error) {
+      showBottomToast('error', error as string);
+    }
   };
 
   return (
