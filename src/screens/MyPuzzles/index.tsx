@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import InfiniteScrollList from '../../components/common/InfiniteScrollList';
 import { deleteMyPuzzle, getUserPuzzles } from '../../apis/user';
 import CommunityCard from '../../components/features/CommunityCard';
-import { CommunityPuzzle } from '../../components/types';
+import { CommunityPuzzle } from '../../types';
 import { Container } from './index.styles';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';

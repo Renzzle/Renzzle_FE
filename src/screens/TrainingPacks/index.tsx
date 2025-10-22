@@ -7,12 +7,11 @@ import { getPack, purchaseTrainingPack } from '../../apis/training';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
-import { TrainingPack } from '../../components/types';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { GameOutcome } from '../../components/types/Ranking';
+import { GameOutcome, TrainingPack } from '../../types';
 import { useUserStore } from '../../store/useUserStore';
 import theme from '../../styles/theme';
 
@@ -40,7 +39,7 @@ const TrainingPacks = () => {
           setPurchaseLoading(true);
           const isSuccess = await handlePurchase(item.id);
           if (isSuccess) {
-            updateUser();
+            await updateUser();
             showBottomToast('success', '구매가 완료되었습니다.');
             navigation.navigate('TrainingPuzzles', { pack: item });
           } else {

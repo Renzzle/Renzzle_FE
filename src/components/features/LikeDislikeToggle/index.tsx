@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactionType } from '../../types/Community';
+import { ReactionType } from '../../../types';
 import { Container, DislikeButton, LikeButton, VerticalDivider } from './index.styles';
 import { CustomText, Icon } from '../../common';
 

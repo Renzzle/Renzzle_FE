@@ -96,7 +96,7 @@ const RankedPuzzleSolve = () => {
     try {
       const data = await finishRankingGame();
       setOutcome(data);
-      updateUser();
+      await updateUser();
       activateModal('RANKING_PUZZLE_OUTRO', {
         primaryAction: () => {
           navigation.navigate('Home');

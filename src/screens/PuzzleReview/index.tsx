@@ -3,7 +3,7 @@ import { Container, RedoButton, UndoButton, UndoRedoWrapper } from './index.styl
 import Board, { BoardRef } from '../../components/features/Board';
 import { Icon } from '../../components/common';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../../components/types';
+import { RootStackParamList } from '../../types';
 
 const PuzzleReview = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'PuzzleReview'>>();
