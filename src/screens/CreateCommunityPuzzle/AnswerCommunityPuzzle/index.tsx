@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Container, InputWrapper, RedoButton, UndoButton, UndoRedoWrapper } from '../index.styles';
+import {
+  BoardHeaderWrapper,
+  Container,
+  InputWrapper,
+  RedoButton,
+  UndoButton,
+  UndoRedoWrapper,
+} from '../index.styles';
 import { BottomButtonBar, CustomModal, CustomTextInput, Icon } from '../../../components/common';
 import Board, { BoardRef } from '../../../components/features/Board';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -11,6 +18,7 @@ import { RootStackParamList } from '../../../types';
 import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 import { getSequenceDepth } from '../../../utils/utils';
 import { uploadPuzzle } from '../../../apis/community';
+import HelperText from '../../../components/common/HelperText';
 
 const AnswerCommunityPuzzle = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -178,6 +186,10 @@ const AnswerCommunityPuzzle = () => {
           disabled
         />
       </InputWrapper>
+
+      <BoardHeaderWrapper>
+        <HelperText type="info">{t('puzzle.verifyDescription')}</HelperText>
+      </BoardHeaderWrapper>
 
       <Board
         ref={boardRef}
