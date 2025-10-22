@@ -15,7 +15,7 @@ import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { GameOutcome, GameResult } from '../../components/types/Ranking';
+import { GameOutcome, GameResult } from '../../types';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';

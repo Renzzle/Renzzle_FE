@@ -13,7 +13,6 @@ import { CustomModal, CustomText } from '../../components/common';
 import PuzzleStats from '../../components/features/PuzzleStats';
 import Board from '../../components/features/Board';
 import LikeDislikeToggle from '../../components/features/LikeDislikeToggle';
-import { ReactionType } from '../../components/types/Community';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import {
   getCommunityPuzzle,
@@ -23,7 +22,7 @@ import {
   updateLike,
 } from '../../apis/community';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { CommunityPuzzle, RootStackParamList } from '../../components/types';
+import { CommunityPuzzle, ReactionType, RootStackParamList } from '../../types';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import useModal from '../../hooks/useModal';

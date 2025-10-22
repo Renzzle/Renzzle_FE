@@ -1,6 +1,6 @@
 import { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import React from 'react';
-import { menuThemeMap, MenuType } from '../../types/MenuThemeMap';
+import { menuThemeMap, MenuType } from '../../../types';
 import { CurrencyWrapper, HeaderContainer, MenuWrapper } from './index.styles';
 import MenuButton from '../../features/MenuButton';
 import CustomText from '../CustomText';

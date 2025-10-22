@@ -9,7 +9,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
-import { RootStackParamList, TrainingPuzzle } from '../../components/types';
+import { RootStackParamList, TrainingPuzzle } from '../../types';
 import { Container } from './index.styles';
 import TrainingCard from '../../components/features/TrainingCard';
 import { getTrainingPuzzles } from '../../apis/training';

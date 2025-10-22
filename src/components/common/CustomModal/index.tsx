@@ -12,7 +12,7 @@ import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
-import { GameOutcome } from '../../types/Ranking';
+import { GameOutcome } from '../../../types';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'

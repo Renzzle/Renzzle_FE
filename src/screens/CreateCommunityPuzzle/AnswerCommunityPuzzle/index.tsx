@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useModal from '../../../hooks/useModal';
 import { useTranslation } from 'react-i18next';
 import { NativeModules } from 'react-native';
-import { RootStackParamList } from '../../../components/types';
+import { RootStackParamList } from '../../../types';
 import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 import { getSequenceDepth } from '../../../utils/utils';
 import { uploadPuzzle } from '../../../apis/community';

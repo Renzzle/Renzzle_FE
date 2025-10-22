@@ -1,6 +1,6 @@
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components';
-import { RankingResultTheme, ResultVariant } from '../../types/Ranking';
+import { RankingResultTheme, ResultVariant } from '../../../types';
 import theme from '../../../styles/theme';
 
 export const Container = styled(TouchableOpacity)<{ variant: ResultVariant }>`
