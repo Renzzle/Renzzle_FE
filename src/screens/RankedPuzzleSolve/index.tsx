@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import RankingResultButton from '../../components/features/RankingResultButton';
 import TimerWithProgressBar from '../../components/features/TimerWithProgressBar';
 import {
@@ -12,7 +12,7 @@ import Board from '../../components/features/Board';
 import { finishRankingGame, startRankingGame, submitRankingGameResult } from '../../apis/rank';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GameOutcome, GameResult } from '../../components/types/Ranking';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
@@ -20,6 +20,7 @@ import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
+import { BackHandler, Platform, ToastAndroid } from 'react-native';
 
 interface PuzzleData {
   boardStatus: string;
@@ -27,6 +28,7 @@ interface PuzzleData {
 }
 
 const RankedPuzzleSolve = () => {
+  const backHandlerPressedOnce = useRef(false);
   const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
@@ -106,6 +108,37 @@ const RankedPuzzleSolve = () => {
       showBottomToast('error', error as string);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') {
+        return;
+      }
+
+      const onBackPress = () => {
+        if (backHandlerPressedOnce.current) {
+          navigation.goBack();
+          return true;
+        }
+
+        backHandlerPressedOnce.current = true;
+        ToastAndroid.show('한 번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
+
+        setTimeout(() => {
+          backHandlerPressedOnce.current = false;
+        }, 2000);
+
+        // 기본 뒤로가기 동작 막기
+        return true;
+      };
+
+      // 리스너 등록
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      // 화면이 포커스를 잃을 때 리스너 제거
+      return () => subscription.remove();
+    }, [navigation]),
+  );
 
   return (
     <Container>
