@@ -50,12 +50,14 @@ const TrainingPuzzles = () => {
   );
 
   const navigateToTrainingDetail = useCallback(
-    (puzzle: TrainingPuzzle, index: number) => {
+    (puzzleNumber: number) => {
       navigation.navigate('TrainingPuzzleSolve', {
-        puzzle: { ...puzzle, title: pack.title, index: index },
+        puzzles: puzzles,
+        title: pack.title,
+        puzzleNumber: puzzleNumber,
       });
     },
-    [navigation, pack.title],
+    [navigation, pack.title, puzzles],
   );
 
   const renderItem = useCallback(
@@ -66,7 +68,7 @@ const TrainingPuzzles = () => {
         depth={item.depth}
         winColor={item.winColor}
         isSolved={item.isSolved}
-        onPress={() => navigateToTrainingDetail(item, index + 1)}
+        onPress={() => navigateToTrainingDetail(index + 1)}
       />
     ),
     [navigateToTrainingDetail],

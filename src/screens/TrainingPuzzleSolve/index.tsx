@@ -24,7 +24,10 @@ const TrainingPuzzleSolve = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
-  const puzzleParam = useMemo(() => route.params?.puzzle, [route.params]);
+  const puzzles = route.params.puzzles;
+  const puzzleIndex = route.params.puzzleNumber - 1;
+  const puzzleParam = useMemo(() => puzzles[puzzleIndex], [puzzles, puzzleIndex]);
+  const [currentPuzzleNumber, setCurrentPuzzleNumber] = useState(puzzleIndex + 1);
   const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [outcome, setOutcome] = useState<GameOutcome>();
@@ -43,16 +46,23 @@ const TrainingPuzzleSolve = () => {
         setOutcome({ reward: 0 });
       }
 
-      activateModal('TRAINING_PUZZLE_SUCCESS', {
-        primaryAction: async () => {
-          // TODO: 다음 문제 이동
-          await updateUser();
-          navigation.goBack();
-        },
-        secondaryAction: () => {
-          navigation.goBack();
-        },
-      });
+      if (puzzles.length > currentPuzzleNumber) {
+        activateModal('TRAINING_PUZZLE_SUCCESS', {
+          primaryAction: async () => {
+            setPuzzleDetail(puzzles[currentPuzzleNumber]);
+            setCurrentPuzzleNumber(currentPuzzleNumber + 1);
+          },
+          secondaryAction: () => {
+            navigation.goBack();
+          },
+        });
+        await updateUser();
+      } else {
+        activateModal('TRAINING_PACK_COMPLETE', {
+          primaryAction: () => navigation.goBack(),
+        });
+        await updateUser();
+      }
     } else {
       activateModal('PUZZLE_FAILURE', {
         primaryAction: async () => {
@@ -116,10 +126,10 @@ const TrainingPuzzleSolve = () => {
     <Container>
       <HeaderWrapper>
         <PuzzleHeader
-          title={puzzleDetail.title ?? puzzleDetail.id.toString()}
+          title={route.params.title ?? puzzleDetail.id.toString()}
           depth={puzzleDetail.depth}
           winColor={puzzleDetail.winColor}
-          displayNumber={puzzleDetail.index}
+          displayNumber={currentPuzzleNumber}
           isSolved={puzzleDetail.isSolved}
           isCommunityPuzzle={false}
           handleRetry={handleRetry}

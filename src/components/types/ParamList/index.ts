@@ -5,7 +5,9 @@ export type RootStackParamList = {
     puzzle: CommunityPuzzle;
   };
   TrainingPuzzleSolve: {
-    puzzle: TrainingPuzzle;
+    puzzles: TrainingPuzzle[];
+    title: string;
+    puzzleNumber: number;
   };
   TrainingPuzzles: {
     pack: TrainingPack;

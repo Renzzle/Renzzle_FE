@@ -16,6 +16,7 @@ import { GameOutcome } from '../../types/Ranking';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
+  | 'TRAINING_PACK_COMPLETE'
   | 'COMMUNITY_PUZZLE_SUCCESS'
   | 'RANKING_PUZZLE_SUCCESS'
   | 'PUZZLE_FAILURE'
@@ -32,6 +33,11 @@ export type ModalCategoryType =
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
+    TITLE: 'modal.trainingPuzzleSuccess.title',
+    BODY: 'modal.trainingPuzzleSuccess.message',
+    FOOTER: ['modal.trainingPuzzleSuccess.cancel', 'modal.trainingPuzzleSuccess.confirm'],
+  },
+  TRAINING_PACK_COMPLETE: {
     TITLE: 'modal.trainingPuzzleSuccess.title',
     BODY: 'modal.trainingPuzzleSuccess.message',
     FOOTER: 'modal.trainingPuzzleSuccess.cancel',
