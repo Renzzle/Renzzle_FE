@@ -20,7 +20,7 @@ const PuzzleActionButton = ({ mode, onPress }: PuzzleActionButtonProps) => {
   const modeIcon: Record<PuzzleActionMode, IconName> = {
     showAnswer: 'LightbulbAlertIcon',
     retry: 'RefreshIcon',
-    giveUp: 'RefreshIcon',
+    giveUp: 'FlagIcon',
   };
 
   return (

@@ -18,6 +18,7 @@ import ConfusedInactiveIcon from './ico-confused-inactive.svg';
 import CorrectIcon from './ico-correct.svg';
 import DepthIcon from './ico-depth.svg';
 import ErrorIcon from './ico-error.svg';
+import FlagIcon from './ico-flag.svg';
 import FocusIcon from './ico-focus.svg';
 import HashTagIcon from './ico-hashtag.svg';
 import HeartActiveIcon from './ico-heart-active.svg';
@@ -83,6 +84,7 @@ const Icons = {
   CorrectIcon,
   DepthIcon,
   ErrorIcon,
+  FlagIcon,
   FocusIcon,
   HashTagIcon,
   HeartActiveIcon,
