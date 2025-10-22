@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import RankingResultButton from '../../components/features/RankingResultButton';
 import TimerWithProgressBar from '../../components/features/TimerWithProgressBar';
 import {
+  BoardFooterWrapper,
   BoardWrapper,
   Container,
   HorizontalScrollContainer,
@@ -21,6 +22,7 @@ import { useUserStore } from '../../store/useUserStore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import { BackHandler, Platform, ToastAndroid } from 'react-native';
+import PuzzleActionButton from '../../components/features/PuzzleActionButton';
 
 interface PuzzleData {
   boardStatus: string;
@@ -179,7 +181,10 @@ const RankedPuzzleSolve = () => {
               setIsLoading={setIsLoading}
               winDepth={225}
             />
-            <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
+            <BoardFooterWrapper>
+              <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
+              <PuzzleActionButton mode="giveUp" onPress={() => handleResult(false)} />
+            </BoardFooterWrapper>
           </>
         )}
       </BoardWrapper>

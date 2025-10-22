@@ -16,7 +16,13 @@ export const ProgressBarContainer = styled(View)`
   width: 100%;
 `;
 
-export const HorizontalScrollContainer = styled(ScrollView)`
+export const HorizontalScrollContainer = styled(ScrollView).attrs({
+  contentContainerStyle: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    minHeight: 80,
+  },
+})`
   flex-grow: 0;
 `;
 
@@ -24,11 +30,15 @@ export const RankingResultButtonWrapper = styled(View)`
   flex-direction: row;
   gap: 7px;
   padding: 0 20px;
-  min-height: 24px;
 `;
 
 export const BoardWrapper = styled(View)`
   flex: 1;
   justify-content: center;
   align-items: center;
+`;
+
+export const BoardFooterWrapper = styled(View)`
+  gap: 20px;
+  min-height: 80px;
 `;

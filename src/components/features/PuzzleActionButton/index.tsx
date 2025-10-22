@@ -3,20 +3,24 @@ import { ActionButtonWrapper } from './index.styles';
 import { CustomText, Icon } from '../../common';
 import { IconName } from '../../../assets/icons';
 
+type PuzzleActionMode = 'showAnswer' | 'retry' | 'giveUp';
+
 interface PuzzleActionButtonProps {
-  mode: 'showAnswer' | 'retry';
+  mode: PuzzleActionMode;
   onPress: () => void;
 }
 
 const PuzzleActionButton = ({ mode, onPress }: PuzzleActionButtonProps) => {
-  const modeLabel: Record<'showAnswer' | 'retry', string> = {
+  const modeLabel: Record<PuzzleActionMode, string> = {
     showAnswer: '정답열기',
     retry: '새로하기',
+    giveUp: '포기하기',
   };
 
-  const modeIcon: Record<'showAnswer' | 'retry', IconName> = {
+  const modeIcon: Record<PuzzleActionMode, IconName> = {
     showAnswer: 'LightbulbAlertIcon',
     retry: 'RefreshIcon',
+    giveUp: 'RefreshIcon',
   };
 
   return (
