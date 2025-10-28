@@ -7,6 +7,7 @@ type BottomButtonBarType = {
     text: string;
     onAction: () => void | Promise<void>;
     disabled?: boolean;
+    loading?: boolean;
   }[];
 };
 
@@ -22,12 +23,14 @@ export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
         <CustomButton
           onPress={secondaryTransition.onAction}
           disabled={secondaryTransition.disabled}
+          loading={secondaryTransition.loading}
           category="secondary">
           {secondaryTransition.text}
         </CustomButton>
         <CustomButton
           onPress={primaryTransition.onAction}
           disabled={primaryTransition.disabled}
+          loading={primaryTransition.loading}
           category="primary">
           {primaryTransition.text}
         </CustomButton>
@@ -42,6 +45,7 @@ export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
         <CustomButton
           onPress={primaryTransition.onAction}
           disabled={primaryTransition.disabled}
+          loading={primaryTransition.loading}
           category="secondary">
           {primaryTransition.text}
         </CustomButton>
