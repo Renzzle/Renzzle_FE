@@ -40,6 +40,7 @@ const AnswerCommunityPuzzle = () => {
   const [answerSequence, setAnswerSequence] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifyDisabled, setIsVerifyDisabled] = useState<boolean>(false);
+  const [isVerifyLoading, setIsVerifyLoading] = useState<boolean>(false);
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(true);
   const [depth, setDepth] = useState<number>(0);
 
@@ -73,6 +74,7 @@ const AnswerCommunityPuzzle = () => {
         await verifySequence();
       },
       disabled: isVerifyDisabled,
+      loading: isVerifyLoading,
     },
     {
       text: isVerified ? '인증 업로드' : '미인증 업로드',
@@ -86,30 +88,35 @@ const AnswerCommunityPuzzle = () => {
   const verifySequence = async () => {
     setIsVerifyDisabled(true);
     setIsUploadDisabled(true);
-    try {
-      const result = await SearchJNI.findWinWrapper(problemSequence);
-      console.log('VCF Wrapper Result: ', result);
+    setIsVerifyLoading(true);
 
-      if (result.length === 0) {
-        // Verification Failed
-        activateModal('VALIDATION_FAILED', {
+    setTimeout(async () => {
+      try {
+        const result = await SearchJNI.findWinWrapper(problemSequence);
+        console.log('VCF Wrapper Result: ', result);
+
+        if (result.length === 0) {
+          // Verification Failed
+          activateModal('VALIDATION_FAILED', {
+            primaryAction: () => {},
+          });
+          return;
+        }
+        // Verification Succeeded
+        handleVerificationSuccess(result);
+
+        activateModal('VALIDATION_COMPLETE', {
           primaryAction: () => {},
         });
-        return;
+      } catch (error) {
+        console.error('VCF search failed: ', error);
+        showBottomToast('error', '검증 중 오류가 발생했습니다.');
+      } finally {
+        setIsVerifyDisabled(false);
+        setIsUploadDisabled(false);
+        setIsVerifyLoading(false);
       }
-      // Verification Succeeded
-      handleVerificationSuccess(result);
-
-      activateModal('VALIDATION_COMPLETE', {
-        primaryAction: () => {},
-      });
-    } catch (error) {
-      console.error('VCF search failed: ', error);
-      showBottomToast('error', '검증 중 오류가 발생했습니다.');
-    } finally {
-      setIsVerifyDisabled(false);
-      setIsUploadDisabled(false);
-    }
+    }, 0);
   };
 
   const handleVerificationSuccess = (result: string) => {

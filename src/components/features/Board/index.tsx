@@ -203,37 +203,43 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   };
 
   const handleAiTurn = async (userSequence: string) => {
-    try {
-      const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
-      if (result === -1) {
-        console.log('졌다!');
-        setIsWin?.(false);
-        setIsLoading?.(false);
-        setIsDisabled(false);
+    setTimeout(async () => {
+      try {
+        const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
+        if (result === -1) {
+          console.log('졌다!');
+          setIsWin?.(false);
+          setIsLoading?.(false);
+          setIsDisabled(false);
+        }
+        if (result === 1000) {
+          console.log('이겼다!');
+          setIsWin?.(true);
+          setIsLoading?.(false);
+          setIsDisabled(false);
+        }
+        setAiAnswer(result);
+      } catch (error) {
+        console.error('AI computation failed: ', error);
       }
-      if (result === 1000) {
-        console.log('이겼다!');
-        setIsWin?.(true);
-        setIsLoading?.(false);
-        setIsDisabled(false);
-      }
-      setAiAnswer(result);
-    } catch (error) {
-      console.error('AI computation failed: ', error);
-    }
+    }, 0);
   };
 
-  const checkWin = async (sequenceToCheck: string, turn: string) => {
-    try {
-      const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
-      console.log(turn, ' sequence:', sequenceToCheck);
-      console.log(turn, ' :', check);
-      return check === 1;
-    } catch (error) {
-      console.log(error);
-      showBottomToast('error', '수 처리 중 오류가 발생했습니다.');
-      return false;
-    }
+  const checkWin = (sequenceToCheck: string, turn: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        try {
+          const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
+          console.log(turn, ' sequence:', sequenceToCheck);
+          console.log(turn, ' :', check);
+          resolve(check === 1);
+        } catch (error) {
+          console.log(error);
+          showBottomToast('error', '수 처리 중 오류가 발생했습니다.');
+          resolve(false);
+        }
+      }, 0);
+    });
   };
 
   useEffect(() => {
