@@ -38,6 +38,7 @@ const AnswerCommunityPuzzle = () => {
   const description = route.params.description;
   const [currentSequence, setCurrentSequence] = useState(problemSequence);
   const [answerSequence, setAnswerSequence] = useState('');
+  const [mainSequence, setMainSequence] = useState(problemSequence);
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifyDisabled, setIsVerifyDisabled] = useState<boolean>(false);
   const [isVerifyLoading, setIsVerifyLoading] = useState<boolean>(false);
@@ -69,7 +70,7 @@ const AnswerCommunityPuzzle = () => {
 
   const transition = [
     {
-      text: '검증',
+      text: '검증', // TODO: locales로 빼기
       onAction: async () => {
         await verifySequence();
       },
@@ -77,7 +78,7 @@ const AnswerCommunityPuzzle = () => {
       loading: isVerifyLoading,
     },
     {
-      text: isVerified ? '인증 업로드' : '미인증 업로드',
+      text: isVerified ? '인증 업로드' : '미인증 업로드', // TODO: locales로 빼기
       onAction: async () => {
         await handleUpload();
       },
@@ -113,7 +114,6 @@ const AnswerCommunityPuzzle = () => {
         showBottomToast('error', '검증 중 오류가 발생했습니다.');
       } finally {
         setIsVerifyDisabled(false);
-        setIsUploadDisabled(false);
         setIsVerifyLoading(false);
       }
     }, 0);
@@ -123,47 +123,67 @@ const AnswerCommunityPuzzle = () => {
     console.log('Verification successful with sequence: ' + result);
     setCurrentSequence(problemSequence + result);
     setAnswerSequence(result);
+    setMainSequence(problemSequence + result);
     setDepth(getSequenceDepth(result));
     setIsVerified(true);
   };
 
   const handleUpload = async () => {
-    if (answerSequence.length > 0 && depth > 0 && winColor !== null) {
-      setIsVerifyDisabled(true);
-      setIsUploadDisabled(true);
-      try {
-        const data = await uploadPuzzle(
-          problemSequence,
-          answerSequence,
-          depth,
-          description,
-          winColor,
-          isVerified,
-        );
+    const { uploadAnswerSequence, uploadDepth } = getUploadData();
 
-        if (data.isSuccess) {
-          activateModal('PUZZLE_UPLOAD_SUCCESS', {
-            primaryAction: () => {
-              navigation.navigate('CommunityPuzzles');
-            },
-          });
-        } else {
-          showBottomToast('error', t('modal.puzzleUploadFailed.title'));
-        }
-      } catch (error) {
-        console.error('Puzzle Upload Error:', error);
-        showBottomToast('error', error as string);
-      } finally {
-        setIsVerifyDisabled(false);
-        setIsUploadDisabled(false);
-      }
-    } else {
+    if (uploadAnswerSequence.length === 0 || uploadDepth === 0 || !winColor) {
       activateModal('PUZZLE_UPLOAD_FAILED', {
         primaryAction: () => {
           navigation.goBack();
         },
       });
+      return;
     }
+
+    setIsVerifyDisabled(true);
+    setIsUploadDisabled(true);
+    try {
+      console.log('uploadAnswerSequence: ', uploadAnswerSequence);
+      console.log('uploadDepth: ', uploadDepth);
+      const data = await uploadPuzzle(
+        problemSequence,
+        uploadAnswerSequence,
+        uploadDepth,
+        description,
+        winColor,
+        isVerified,
+      );
+
+      if (data.isSuccess) {
+        activateModal('PUZZLE_UPLOAD_SUCCESS', {
+          primaryAction: () => {
+            navigation.navigate('CommunityPuzzles');
+          },
+        });
+      } else {
+        showBottomToast('error', t('modal.puzzleUploadFailed.title'));
+      }
+    } catch (error) {
+      showBottomToast('error', '이미 있는 퍼즐이에요. 새로 만들어 주세요.'); // TODO: locales로 빼기
+    } finally {
+      setIsVerifyDisabled(false);
+      setIsUploadDisabled(false);
+    }
+  };
+
+  const getUploadData = () => {
+    if (isVerified && mainSequence.startsWith(problemSequence)) {
+      const result = mainSequence.substring(problemSequence.length);
+      return {
+        uploadAnswerSequence: result,
+        uploadDepth: getSequenceDepth(result),
+      };
+    }
+
+    return {
+      uploadAnswerSequence: answerSequence,
+      uploadDepth: depth,
+    };
   };
 
   const handleSequenceChangeByUser = (newSequence: string) => {
@@ -171,7 +191,12 @@ const AnswerCommunityPuzzle = () => {
     const slicedAnswer = newSequence.slice(problemSequence.length);
     setAnswerSequence(slicedAnswer);
     setDepth(getSequenceDepth(slicedAnswer));
-    setIsVerified(false); // 사용자가 수정했으므로 미인증 처리
+
+    if (mainSequence.startsWith(newSequence) && newSequence !== problemSequence) {
+      setIsVerified(true);
+    } else {
+      setIsVerified(false); // 사용자가 수정했으므로 미인증 처리
+    }
   };
 
   useEffect(() => {
@@ -203,6 +228,7 @@ const AnswerCommunityPuzzle = () => {
         mode="make"
         makeMode="review"
         sequence={currentSequence}
+        mainSequence={mainSequence}
         setSequence={handleSequenceChangeByUser}
         problemSequence={problemSequence}
         onUndoRedoStateChange={(undo, redo) => {

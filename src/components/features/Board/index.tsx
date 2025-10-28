@@ -97,7 +97,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       } else if (makeMode === 'review') {
         // 현재 시퀀스가 문제 시퀀스보다 길 때만 undo 가능
         if (localSequence.length > problemSequence.length) {
-          const lastMoveMatch = localSequence.match(/[a-o]([1-9]|1[0-5])$/);
+          const lastMoveMatch = localSequence.match(/[a-o](?:1[0-5]|[1-9])$/);
           if (lastMoveMatch) {
             const lastMove = lastMoveMatch[0];
             const newSequence = localSequence.slice(0, -lastMove.length);
@@ -122,7 +122,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           // 다음 수를 메인 시퀀스에서 가져와 추가
           const nextMoveMatch = mainSequence
             .substring(localSequence.length)
-            .match(/^[a-o]([1-9]|1[0-5])/);
+            .match(/^[a-o](?:1[0-5]|[1-9])/);
           if (nextMoveMatch) {
             const nextMove = nextMoveMatch[0];
             const newSequence = localSequence + nextMove;
