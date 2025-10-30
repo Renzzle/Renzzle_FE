@@ -95,6 +95,10 @@ const TrainingPuzzleSolve = () => {
         navigation.navigate('TrainingPuzzleReview', {
           problemSequence,
           mainSequence,
+          puzzle: puzzleDetail,
+          isCommunityPuzzle: false,
+          title: route.params.title,
+          puzzleNumber: currentPuzzleNumber,
         });
       } catch (error) {
         console.error('정답 보기 처리 중 오류 발생:', error);

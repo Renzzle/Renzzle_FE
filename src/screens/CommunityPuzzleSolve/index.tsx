@@ -130,6 +130,8 @@ const CommunityPuzzleSolve = () => {
         navigation.navigate('CommunityPuzzleReview', {
           problemSequence,
           mainSequence,
+          puzzle: puzzleDetail,
+          isCommunityPuzzle: true,
         });
       } catch (error) {
         console.error('정답 보기 처리 중 오류 발생:', error);

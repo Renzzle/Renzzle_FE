@@ -10,8 +10,16 @@ export const Container = styled(View)`
   padding-top: 65px;
 `;
 
+export const HeaderWrapper = styled(View)`
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
 export const BoardWrapper = styled(View)`
   flex: 1;
+  justify-content: center;
 `;
 
 export const UndoRedoWrapper = styled(View)`

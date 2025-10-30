@@ -15,6 +15,10 @@ export type RootStackParamList = {
   PuzzleReview: {
     problemSequence: string;
     mainSequence: string;
+    puzzle: CommunityPuzzle | TrainingPuzzle;
+    isCommunityPuzzle: boolean;
+    title?: string;
+    puzzleNumber?: number;
   };
   AnswerCommunityPuzzle: {
     problemSequence: string;
