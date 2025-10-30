@@ -63,9 +63,12 @@ const TrainingPuzzleSolve = () => {
         await updateUser();
       }
     } else {
-      activateModal('PUZZLE_FAILURE', {
+      activateModal('TRAINING_PUZZLE_FAILURE', {
         primaryAction: async () => {
           navigation.goBack();
+        },
+        secondaryAction: () => {
+          handleRetry();
         },
       });
     }

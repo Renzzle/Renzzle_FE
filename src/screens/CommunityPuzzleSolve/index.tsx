@@ -57,7 +57,7 @@ const CommunityPuzzleSolve = () => {
         },
       });
     } else {
-      activateModal('PUZZLE_FAILURE', {
+      activateModal('COMMUNITY_PUZZLE_FAILURE', {
         primaryAction: async () => {
           navigation.goBack();
         },

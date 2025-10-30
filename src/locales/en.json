@@ -80,7 +80,13 @@
       "message": "오목을 완성하였습니다!",
       "confirm": "나가기"
     },
-    "puzzleFailure": {
+    "trainingPuzzleFailure": {
+      "title": "퍼즐 풀기 실패",
+      "message": "오목을 완성하지 못했습니다.",
+      "confirm": "나가기",
+      "cancel": "재도전"
+    },
+    "communityPuzzleFailure": {
       "title": "퍼즐 풀기 실패",
       "message": "오목을 완성하지 못했습니다.",
       "confirm": "나가기"
