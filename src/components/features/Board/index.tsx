@@ -18,19 +18,34 @@ import {
   convertLowercaseAlphabetToNumber,
   convertToLowercaseAlphabet,
   convertToReverseNumber,
+  getSequenceDepth,
   valueToCoordinates,
 } from '../../../utils/utils';
 import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
-import { Icon } from '../../common';
+import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
+interface CellType {
+  stone: StoneType;
+  moveNumber: number | null;
+}
+
 export interface BoardRef {
   undo: () => void;
   redo: () => void;
 }
+
+const createEmptyBoard = (): CellType[][] => {
+  return Array.from({ length: BOARD_SIZE }, () =>
+    Array.from({ length: BOARD_SIZE }, () => ({
+      stone: 0, // 비어있음
+      moveNumber: null, // 순서없음
+    })),
+  );
+};
 
 interface BoardProps {
   mode: 'make' | 'solve';
@@ -39,7 +54,6 @@ interface BoardProps {
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
   setIsLoading?: (isLoading: boolean) => void;
-  winDepth?: number;
 
   // 'review' mode
   mainSequence?: string; // 정답까지 포함된 전체 시퀀스
@@ -57,7 +71,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setSequence,
     setIsWin,
     setIsLoading,
-    winDepth,
     mainSequence = '',
     problemSequence = '',
     onUndoRedoStateChange,
@@ -69,9 +82,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const cellWidth = (boardWidth - 26) / 14;
 
   const { UserAgainstActionJNI, CheckWinJNI } = NativeModules;
-  const [board, setBoard] = useState<StoneType[][]>(
-    Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0)),
-  );
+  const [board, setBoard] = useState<CellType[][]>(createEmptyBoard());
   const [isBlackTurn, setIsBlackTurn] = useState(true);
   const [stoneX, setStoneX] = useState<number | null>(null);
   const [stoneY, setStoneY] = useState<number | null>(null);
@@ -79,7 +90,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const [aiAnswer, setAiAnswer] = useState<number>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [localSequence, setLocalSequence] = useState(sequence);
-  const [depth, setDepth] = useState(0);
 
   const [history, setHistory] = useState<string[]>([sequence]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -134,9 +144,12 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     },
   }));
 
-  const updateBoard = (x: number, y: number) => {
+  const updateBoard = (x: number, y: number, moveNumber: number | null) => {
     const newBoard = board.map((row) => [...row]); // copy row
-    newBoard[x][y] = isBlackTurn ? 1 : 2;
+    newBoard[x][y] = {
+      stone: isBlackTurn ? 1 : 2,
+      moveNumber: moveNumber,
+    };
     setBoard(newBoard);
   };
 
@@ -163,19 +176,17 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const handlePut = async () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
-      if (board[stoneX][stoneY] !== 0) {
+      if (board[stoneX][stoneY].stone !== 0) {
         return;
       }
 
       const newSequence = addToSequence(stoneX, stoneY);
-      updateBoard(stoneX, stoneY);
+      updateBoard(stoneX, stoneY, null);
       setIsBlackTurn(!isBlackTurn);
       setStoneX(null);
       setStoneY(null);
 
       if (mode === 'solve') {
-        setDepth((prevDepth) => prevDepth + 1);
-
         if (await checkWin(newSequence, 'user')) {
           setIsWin?.(true);
           setIsLoading?.(false);
@@ -265,22 +276,15 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           return;
         }
 
-        updateBoard(x, y);
+        updateBoard(x, y, null);
         setIsBlackTurn(!isBlackTurn);
         setIsDisabled(false);
         setIsLoading?.(false);
-        setDepth((prevDepth) => prevDepth + 1);
       }
     };
 
     processAiAnswer();
   }, [aiAnswer]);
-
-  useEffect(() => {
-    if (winDepth !== undefined && depth > winDepth) {
-      setIsWin?.(false);
-    }
-  }, [depth, winDepth]);
 
   useEffect(() => {
     if (mode === 'make' && makeMode === 'create') {
@@ -322,9 +326,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const initializeBoard = () => {
     console.log('보드 초기화 - 시퀀스: ' + sequence);
-    const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
+    const newBoard = createEmptyBoard();
     let turn = true;
+    const problemSequenceLength = problemSequence ? getSequenceDepth(problemSequence) : 0;
 
+    let moveIndex = 0;
     let i = 0;
     while (i < sequence.length) {
       const letter = sequence[i];
@@ -338,9 +344,15 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       const x = convertToReverseNumber(parseInt(number, 10));
       const y = convertLowercaseAlphabetToNumber(letter);
 
+      let moveNumber = null;
+      if (mode === 'make' && moveIndex >= problemSequenceLength) {
+        moveNumber = moveIndex + 1 - problemSequenceLength;
+      }
+
       if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
-        newBoard[x][y] = turn ? 1 : 2;
+        newBoard[x][y] = { stone: turn ? 1 : 2, moveNumber: moveNumber };
         turn = !turn;
+        moveIndex++;
       }
       i += 1 + number.length;
     }
@@ -348,7 +360,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setLocalSequence(sequence);
     setBoard(newBoard);
     setIsBlackTurn(turn);
-    setDepth(0);
   };
 
   useEffect(() => {
@@ -374,10 +385,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
             <Cell
               key={`${x}-${y}`}
               pos={`${x}-${y}`}
-              stone={cell}
+              stone={cell.stone}
               cellWidth={cellWidth}
               stoneX={stoneX}
               stoneY={stoneY}
+              sequence={cell.moveNumber}
               onPress={() => handleCellPress(x, y)}
             />
           ))}
@@ -398,6 +410,7 @@ interface CellProps {
   cellWidth: number;
   stoneX: number | null | undefined;
   stoneY: number | null | undefined;
+  sequence: number | null;
   onPress: () => void;
   showHighlights?: boolean;
   style?: ViewStyle;
@@ -409,6 +422,7 @@ export const Cell = ({
   cellWidth,
   stoneX,
   stoneY,
+  sequence,
   onPress,
   showHighlights = true,
   style,
@@ -416,7 +430,11 @@ export const Cell = ({
   return (
     <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
-        <Stone stone={stone} cellWidth={cellWidth} />
+        <Stone stone={stone} cellWidth={cellWidth}>
+          <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
+            {sequence}
+          </CustomText>
+        </Stone>
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
         <Icon name="FocusIcon" color="error/error_color" />
       ) : showHighlights &&

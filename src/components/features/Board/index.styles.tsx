@@ -77,6 +77,9 @@ export const Stone = styled(View)<{ stone: StoneType; cellWidth: number }>`
       : stone === 2
       ? theme.color['gray/white']
       : 'transparent'};
+
+  align-items: center;
+  justify-content: center;
 `;
 
 export const IndicatePoint = styled(View)`
