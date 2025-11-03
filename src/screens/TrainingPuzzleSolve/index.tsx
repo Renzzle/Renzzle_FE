@@ -151,7 +151,6 @@ const TrainingPuzzleSolve = () => {
           setSequence={() => {}}
           setIsWin={handleResult}
           setIsLoading={() => {}}
-          winDepth={225}
         />
       </BoardWrapper>
 

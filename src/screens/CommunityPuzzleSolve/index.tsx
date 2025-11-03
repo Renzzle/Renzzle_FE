@@ -217,7 +217,6 @@ const CommunityPuzzleSolve = () => {
           setSequence={() => {}}
           setIsWin={handleResult}
           setIsLoading={setIsLoading}
-          winDepth={225}
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle

@@ -72,7 +72,7 @@ const RankedPuzzleSolve = () => {
       setBonusTrigger((prev) => prev + 1);
       showBottomToast('success', t('modal.rankingPuzzleSuccess.message'));
     } else {
-      showBottomToast('error', t('modal.puzzleFailure.message'));
+      showBottomToast('error', t('modal.rankingPuzzleFailure.message'));
     }
 
     try {
@@ -179,7 +179,6 @@ const RankedPuzzleSolve = () => {
               setSequence={() => {}}
               setIsWin={handleResult}
               setIsLoading={setIsLoading}
-              winDepth={225}
             />
             <BoardFooterWrapper>
               <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
