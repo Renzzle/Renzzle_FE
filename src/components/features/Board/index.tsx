@@ -7,6 +7,7 @@ import {
   FrameCell,
   FrameRow,
   IndicatePoint,
+  LastMoveHighlight,
   LoadingWrapper,
   Stone,
   StoneRow,
@@ -144,11 +145,13 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     },
   }));
 
-  const updateBoard = (x: number, y: number, moveNumber: number | null) => {
-    const newBoard = board.map((row) => [...row]); // copy row
+  const updateBoard = (x: number, y: number) => {
+    const newBoard: CellType[][] = board.map((row) =>
+      row.map((cell) => ({ ...cell, moveNumber: null })),
+    ); // copy row
     newBoard[x][y] = {
       stone: isBlackTurn ? 1 : 2,
-      moveNumber: moveNumber,
+      moveNumber: -1, // highlight last move
     };
     setBoard(newBoard);
   };
@@ -181,7 +184,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       }
 
       const newSequence = addToSequence(stoneX, stoneY);
-      updateBoard(stoneX, stoneY, null);
+      updateBoard(stoneX, stoneY);
       setIsBlackTurn(!isBlackTurn);
       setStoneX(null);
       setStoneY(null);
@@ -276,7 +279,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           return;
         }
 
-        updateBoard(x, y, null);
+        updateBoard(x, y);
         setIsBlackTurn(!isBlackTurn);
         setIsDisabled(false);
         setIsLoading?.(false);
@@ -431,9 +434,14 @@ export const Cell = ({
     <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth}>
-          <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
-            {sequence}
-          </CustomText>
+          {sequence &&
+            (sequence > 0 ? (
+              <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
+                {sequence}
+              </CustomText>
+            ) : (
+              <LastMoveHighlight width={cellWidth / 2.4} />
+            ))}
         </Stone>
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
         <Icon name="FocusIcon" color="error/error_color" />

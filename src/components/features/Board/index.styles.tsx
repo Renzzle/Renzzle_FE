@@ -90,3 +90,9 @@ export const IndicatePoint = styled(View)`
 `;
 
 export const PutButtonContainer = styled(View)``;
+
+export const LastMoveHighlight = styled(View)<{ width: number }>`
+  width: ${({ width }) => width}px;
+  height: ${({ width }) => width}px;
+  background-color: ${theme.color['main_color/yellow_s']};
+`;
