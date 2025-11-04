@@ -146,13 +146,24 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   }));
 
   const updateBoard = (x: number, y: number) => {
-    const newBoard: CellType[][] = board.map((row) =>
-      row.map((cell) => ({ ...cell, moveNumber: null })),
-    ); // copy row
+    // copy board
+    const newBoard: CellType[][] = board.map((row) => row.map((cell) => ({ ...cell })));
+
+    // 기존 마지막 수 표시 제거
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      for (let j = 0; j < BOARD_SIZE; j++) {
+        if (newBoard[i][j].moveNumber === -1) {
+          newBoard[i][j].moveNumber = null;
+        }
+      }
+    }
+
+    // 새 돌 추가 및 마지막 수 표시
     newBoard[x][y] = {
       stone: isBlackTurn ? 1 : 2,
-      moveNumber: -1, // highlight last move
+      moveNumber: -1,
     };
+
     setBoard(newBoard);
   };
 
