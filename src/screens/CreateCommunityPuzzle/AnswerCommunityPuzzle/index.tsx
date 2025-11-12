@@ -110,7 +110,6 @@ const AnswerCommunityPuzzle = () => {
           primaryAction: () => {},
         });
       } catch (error) {
-        console.error('VCF search failed: ', error);
         showBottomToast('error', '검증 중 오류가 발생했습니다.');
       } finally {
         setIsVerifyDisabled(false);

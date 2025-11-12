@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, FlatListProps, View } from 'react-native';
 import theme from '../../../styles/theme';
+import { showBottomToast } from '../Toast/toastMessage';
 
 export interface ApiCallParams {
   id?: number | null;
@@ -64,7 +65,7 @@ const InfiniteScrollList = <T,>({
         setCursorId(last.id ?? null);
       }
     } catch (err) {
-      console.error('InfiniteScrollList fetch error:', err);
+      showBottomToast('error', '리스트 불러오기 오류'); // TODO: locales
     } finally {
       setLoading(false);
     }

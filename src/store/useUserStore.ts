@@ -30,7 +30,7 @@ export const useUserStore = create<UserStore>((set) => ({
       const user = await getUser();
       set({ user });
     } catch (error) {
-      console.error('Failed to update user in store:', error);
+      console.log('Failed to update user in store:', error);
       set({ user: null });
     }
   },

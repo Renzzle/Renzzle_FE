@@ -4,6 +4,7 @@ import { getUser } from '../../apis/user';
 import { reissueToken } from '../../apis/auth';
 import useAuthStore from '../../store/useAuthStore';
 import { useUserStore, User } from '../../store/useUserStore';
+import { showBottomToast } from '../../components/common/Toast/toastMessage';
 
 const validateAccessToken = async (): Promise<User | null> => {
   try {
@@ -78,7 +79,7 @@ const useInitializeApp = (): boolean => {
           }
         }
       } catch (err) {
-        console.error('Error occurred during app initialization: ', err);
+        showBottomToast('error', '어플리케이션 시작 오류 발생'); // TODO: locales
         await clearTokens();
       } finally {
         SplashScreen.hide();

@@ -245,7 +245,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         }
         setAiAnswer(result);
       } catch (error) {
-        console.error('AI computation failed: ', error);
+        showBottomToast('error', 'AI 계산 실패!'); // TODO: locales
       }
     }, 0);
   };
@@ -350,7 +350,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       const letter = sequence[i];
       const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/);
       if (!numberMatch) {
-        console.error(`Invalid sequence format at index ${i}: ${sequence}`);
+        showBottomToast('error', '문제 형식이 올바르지 않습니다.'); // TODO: locales
         break;
       }
 

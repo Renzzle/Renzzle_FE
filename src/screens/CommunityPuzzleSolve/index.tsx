@@ -104,7 +104,6 @@ const CommunityPuzzleSolve = () => {
         await updateDislike(puzzleDetail.id);
       }
     } catch (error) {
-      console.error(error);
       showBottomToast('error', error as string);
     }
   };
@@ -134,7 +133,6 @@ const CommunityPuzzleSolve = () => {
           isCommunityPuzzle: true,
         });
       } catch (error) {
-        console.error('정답 보기 처리 중 오류 발생:', error);
         showBottomToast('error', error as string);
       } finally {
         setIsLoading(false);
