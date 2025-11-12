@@ -57,4 +57,5 @@ export interface GameOutcome {
   rating?: number;
   reward?: number;
   price?: number;
+  puzzleCount?: number;
 }

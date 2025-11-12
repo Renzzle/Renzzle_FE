@@ -159,6 +159,7 @@ export const ModalCard = ({
           rating: gameOutcome?.rating,
           reward: gameOutcome?.reward,
           price: gameOutcome?.price,
+          puzzleCount: gameOutcome?.puzzleCount,
         })}
         {children}
       </CustomText>

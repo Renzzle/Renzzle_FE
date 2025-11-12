@@ -32,7 +32,8 @@ const TrainingPacks = () => {
   const [purchaseLoading, setPurchaseLoading] = useState(false);
 
   const handlePackClick = (item: TrainingPack) => {
-    setOutcome({ price: item.price });
+    console.log(item);
+    setOutcome({ price: item.price, puzzleCount: item.totalPuzzleCount });
     if (item.locked) {
       activateModal('TRAINING_PACK_PURCHASE', {
         primaryAction: async () => {

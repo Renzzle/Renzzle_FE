@@ -135,7 +135,7 @@
     },
     "trainingPackPurchase": {
       "title": "트레이닝 팩 구매",
-      "message": "이 팩을 구매하시겠습니까?\n필요 재화: {{price}}피스",
+      "message": "이 팩을 구매하시겠습니까? ({{puzzleCount}}개 퍼즐)\n필요 재화: {{price}}피스",
       "confirm": "구매하기",
       "cancel": "취소"
     },
