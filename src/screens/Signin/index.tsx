@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import CustomTextInput from '../../components/common/CustomTextInput';
-import useAuthStore from '../../store/useAuthStore';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
@@ -16,6 +15,7 @@ import CustomText from '../../components/common/CustomText';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '../../components/common';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import { useLogin } from '../../hooks/useLogin';
 
 const Signin = () => {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ const Signin = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [password, setPassword] = useState<string>(''); //login용
 
-  const { signin } = useAuthStore();
+  const { login } = useLogin();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const handleLogin = async () => {
@@ -38,7 +38,7 @@ const Signin = () => {
 
     try {
       setLoading(true);
-      await signin(email, password);
+      await login(email, password);
 
       navigation.navigate('Home');
     } catch (error) {

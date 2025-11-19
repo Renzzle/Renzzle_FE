@@ -34,7 +34,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
       prom.resolve(token);
     }
   });
-  failedQueue = []; // clear queue
+  failedQueue = []; // Clear queue
 };
 
 apiClient.interceptors.response.use(
@@ -64,11 +64,11 @@ apiClient.interceptors.response.use(
         originalRequest._retry = true;
         isRefreshing = true;
 
-        const { refreshToken, setTokens, signout } = useAuthStore.getState();
+        const { refreshToken, setTokens, clearTokens } = useAuthStore.getState();
 
         if (!refreshToken) {
           console.log('No refresh token available, signing out.');
-          await signout();
+          await clearTokens();
           isRefreshing = false;
           processQueue(new Error('No refresh token available for reissue.')); // Fail all queued requests as no refresh token
           return Promise.reject(error);
@@ -94,7 +94,7 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest); // Retry the original request with the new token
         } catch (refreshError) {
           console.log('토큰 재발급 실패:', refreshError);
-          await signout();
+          await clearTokens();
           processQueue(refreshError as Error); // Fail all queued requests
           isRefreshing = false;
           return Promise.reject(refreshError);

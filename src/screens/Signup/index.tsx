@@ -8,8 +8,8 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DeviceInfo from 'react-native-device-info';
 import { registerUser } from '../../apis/auth';
-import useAuthStore from '../../store/useAuthStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import { useLogin } from '../../hooks/useLogin';
 
 enum SignupStep {
   Email,
@@ -20,7 +20,7 @@ enum SignupStep {
 
 const Signup = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const { signin } = useAuthStore();
+  const { login } = useLogin();
   const [step, setStep] = useState<SignupStep>(SignupStep.Email);
   const [email, setEmail] = useState<string>('');
   const [code, setCode] = useState<string>('');
@@ -40,7 +40,7 @@ const Signup = () => {
     try {
       const response = await registerUser(email, password, nickname, authVerityToken, deviceId);
       if (response?.isSuccess) {
-        await signin(email, password);
+        await login(email, password);
         navigation.navigate('Home');
       }
     } catch (error) {
