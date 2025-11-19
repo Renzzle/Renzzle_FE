@@ -1,10 +1,18 @@
-import React, { useRef, useState } from 'react';
-import { Container, InputWrapper, RedoButton, UndoButton, UndoRedoWrapper } from './index.styles';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  BoardHeaderWrapper,
+  Container,
+  InputWrapper,
+  RedoButton,
+  UndoButton,
+  UndoRedoWrapper,
+} from './index.styles';
 import Board, { BoardRef } from '../../components/features/Board';
 import { BottomButtonBar, CustomTextInput, Icon } from '../../components/common';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import HelperText from '../../components/common/HelperText';
 
 const CreateCommunityPuzzle = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -13,6 +21,7 @@ const CreateCommunityPuzzle = () => {
   const [currentSequence, setCurrentSequence] = useState(''); // 현재 시퀀스
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [isTransitionDisabled, setIsTransitionDisabled] = useState(true);
 
   const boardRef = useRef<BoardRef>(null);
 
@@ -40,8 +49,17 @@ const CreateCommunityPuzzle = () => {
           problemSequence: currentSequence,
           description: description,
         }),
+      disabled: isTransitionDisabled,
     },
   ];
+
+  useEffect(() => {
+    if (currentSequence.length !== 0) {
+      setIsTransitionDisabled(false);
+    } else {
+      setIsTransitionDisabled(true);
+    }
+  }, [currentSequence]);
 
   return (
     <Container>
@@ -53,6 +71,10 @@ const CreateCommunityPuzzle = () => {
           maxLength={100}
         />
       </InputWrapper>
+
+      <BoardHeaderWrapper>
+        <HelperText type="info">{t('puzzle.createDescription')}</HelperText>
+      </BoardHeaderWrapper>
 
       <Board
         ref={boardRef}

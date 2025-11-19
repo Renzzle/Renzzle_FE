@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { ButtonWrapper, Container, EmptyContainer } from './index.styles';
 import InfiniteScrollList from '../../components/common/InfiniteScrollList';
-import { CommunityPuzzle } from '../../components/types';
+import { CommunityPuzzle } from '../../types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';

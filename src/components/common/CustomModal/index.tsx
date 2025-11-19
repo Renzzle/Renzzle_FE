@@ -12,13 +12,15 @@ import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
-import { GameOutcome } from '../../types/Ranking';
+import { GameOutcome } from '../../../types';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
+  | 'TRAINING_PACK_COMPLETE'
   | 'COMMUNITY_PUZZLE_SUCCESS'
   | 'RANKING_PUZZLE_SUCCESS'
-  | 'PUZZLE_FAILURE'
+  | 'TRAINING_PUZZLE_FAILURE'
+  | 'COMMUNITY_PUZZLE_FAILURE'
   | 'VALIDATION_COMPLETE'
   | 'VALIDATION_FAILED'
   | 'PUZZLE_UPLOAD_SUCCESS'
@@ -34,6 +36,11 @@ export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
     TITLE: 'modal.trainingPuzzleSuccess.title',
     BODY: 'modal.trainingPuzzleSuccess.message',
+    FOOTER: ['modal.trainingPuzzleSuccess.cancel', 'modal.trainingPuzzleSuccess.confirm'],
+  },
+  TRAINING_PACK_COMPLETE: {
+    TITLE: 'modal.trainingPuzzleSuccess.title',
+    BODY: 'modal.trainingPuzzleSuccess.message',
     FOOTER: 'modal.trainingPuzzleSuccess.cancel',
   },
   COMMUNITY_PUZZLE_SUCCESS: {
@@ -46,10 +53,15 @@ export const MODAL_TEXTS = {
     BODY: 'modal.rankingPuzzleSuccess.message',
     FOOTER: 'modal.rankingPuzzleSuccess.confirm',
   },
-  PUZZLE_FAILURE: {
-    TITLE: 'modal.puzzleFailure.title',
-    BODY: 'modal.puzzleFailure.message',
-    FOOTER: 'modal.puzzleFailure.confirm',
+  TRAINING_PUZZLE_FAILURE: {
+    TITLE: 'modal.trainingPuzzleFailure.title',
+    BODY: 'modal.trainingPuzzleFailure.message',
+    FOOTER: ['modal.trainingPuzzleFailure.cancel', 'modal.trainingPuzzleFailure.confirm'],
+  },
+  COMMUNITY_PUZZLE_FAILURE: {
+    TITLE: 'modal.communityPuzzleFailure.title',
+    BODY: 'modal.communityPuzzleFailure.message',
+    FOOTER: 'modal.communityPuzzleFailure.confirm',
   },
   VALIDATION_COMPLETE: {
     TITLE: 'modal.validationComplete.title',
@@ -147,6 +159,7 @@ export const ModalCard = ({
           rating: gameOutcome?.rating,
           reward: gameOutcome?.reward,
           price: gameOutcome?.price,
+          puzzleCount: gameOutcome?.puzzleCount,
         })}
         {children}
       </CustomText>

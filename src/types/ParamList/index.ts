@@ -5,7 +5,9 @@ export type RootStackParamList = {
     puzzle: CommunityPuzzle;
   };
   TrainingPuzzleSolve: {
-    puzzle: TrainingPuzzle;
+    puzzles: TrainingPuzzle[];
+    title: string;
+    puzzleNumber: number;
   };
   TrainingPuzzles: {
     pack: TrainingPack;
@@ -13,6 +15,10 @@ export type RootStackParamList = {
   PuzzleReview: {
     problemSequence: string;
     mainSequence: string;
+    puzzle: CommunityPuzzle | TrainingPuzzle;
+    isCommunityPuzzle: boolean;
+    title?: string;
+    puzzleNumber?: number;
   };
   AnswerCommunityPuzzle: {
     problemSequence: string;

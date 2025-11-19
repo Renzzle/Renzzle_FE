@@ -3,12 +3,11 @@ import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 import Board from '../../components/features/Board';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { RootStackParamList, TrainingPuzzle } from '../../components/types';
+import { GameOutcome, RootStackParamList, TrainingPuzzle } from '../../types';
 import { CustomModal } from '../../components/common';
 import { openTrainingAnswer, solveTrainingPuzzle } from '../../apis/training';
 import { useUserStore } from '../../store/useUserStore';
 import useModal from '../../hooks/useModal';
-import { GameOutcome } from '../../components/types/Ranking';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
@@ -24,7 +23,10 @@ const TrainingPuzzleSolve = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
-  const puzzleParam = useMemo(() => route.params?.puzzle, [route.params]);
+  const puzzles = route.params.puzzles;
+  const puzzleIndex = route.params.puzzleNumber - 1;
+  const puzzleParam = useMemo(() => puzzles[puzzleIndex], [puzzles, puzzleIndex]);
+  const [currentPuzzleNumber, setCurrentPuzzleNumber] = useState(puzzleIndex + 1);
   const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [outcome, setOutcome] = useState<GameOutcome>();
@@ -43,20 +45,30 @@ const TrainingPuzzleSolve = () => {
         setOutcome({ reward: 0 });
       }
 
-      activateModal('TRAINING_PUZZLE_SUCCESS', {
+      if (puzzles.length > currentPuzzleNumber) {
+        activateModal('TRAINING_PUZZLE_SUCCESS', {
+          primaryAction: async () => {
+            setPuzzleDetail(puzzles[currentPuzzleNumber]);
+            setCurrentPuzzleNumber(currentPuzzleNumber + 1);
+          },
+          secondaryAction: () => {
+            navigation.goBack();
+          },
+        });
+        await updateUser();
+      } else {
+        activateModal('TRAINING_PACK_COMPLETE', {
+          primaryAction: () => navigation.goBack(),
+        });
+        await updateUser();
+      }
+    } else {
+      activateModal('TRAINING_PUZZLE_FAILURE', {
         primaryAction: async () => {
-          // TODO: 다음 문제 이동
-          await updateUser();
           navigation.goBack();
         },
         secondaryAction: () => {
-          navigation.goBack();
-        },
-      });
-    } else {
-      activateModal('PUZZLE_FAILURE', {
-        primaryAction: async () => {
-          navigation.goBack();
+          handleRetry();
         },
       });
     }
@@ -83,9 +95,12 @@ const TrainingPuzzleSolve = () => {
         navigation.navigate('TrainingPuzzleReview', {
           problemSequence,
           mainSequence,
+          puzzle: puzzleDetail,
+          isCommunityPuzzle: false,
+          title: route.params.title,
+          puzzleNumber: currentPuzzleNumber,
         });
       } catch (error) {
-        console.error('정답 보기 처리 중 오류 발생:', error);
         showBottomToast('error', error as string);
       } finally {
         setIsLoading(false);
@@ -116,10 +131,10 @@ const TrainingPuzzleSolve = () => {
     <Container>
       <HeaderWrapper>
         <PuzzleHeader
-          title={puzzleDetail.title ?? puzzleDetail.id.toString()}
+          title={route.params.title ?? puzzleDetail.id.toString()}
           depth={puzzleDetail.depth}
           winColor={puzzleDetail.winColor}
-          displayNumber={puzzleDetail.index}
+          displayNumber={currentPuzzleNumber}
           isSolved={puzzleDetail.isSolved}
           isCommunityPuzzle={false}
           handleRetry={handleRetry}
@@ -135,7 +150,6 @@ const TrainingPuzzleSolve = () => {
           setSequence={() => {}}
           setIsWin={handleResult}
           setIsLoading={() => {}}
-          winDepth={225}
         />
       </BoardWrapper>
 

@@ -9,7 +9,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
-import { RootStackParamList, TrainingPuzzle } from '../../components/types';
+import { RootStackParamList, TrainingPuzzle } from '../../types';
 import { Container } from './index.styles';
 import TrainingCard from '../../components/features/TrainingCard';
 import { getTrainingPuzzles } from '../../apis/training';
@@ -50,12 +50,14 @@ const TrainingPuzzles = () => {
   );
 
   const navigateToTrainingDetail = useCallback(
-    (puzzle: TrainingPuzzle, index: number) => {
+    (puzzleNumber: number) => {
       navigation.navigate('TrainingPuzzleSolve', {
-        puzzle: { ...puzzle, title: pack.title, index: index },
+        puzzles: puzzles,
+        title: pack.title,
+        puzzleNumber: puzzleNumber,
       });
     },
-    [navigation, pack.title],
+    [navigation, pack.title, puzzles],
   );
 
   const renderItem = useCallback(
@@ -66,7 +68,7 @@ const TrainingPuzzles = () => {
         depth={item.depth}
         winColor={item.winColor}
         isSolved={item.isSolved}
-        onPress={() => navigateToTrainingDetail(item, index + 1)}
+        onPress={() => navigateToTrainingDetail(index + 1)}
       />
     ),
     [navigateToTrainingDetail],

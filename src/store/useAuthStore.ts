@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { getAuth } from '../apis/auth';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { useUserStore } from './useUserStore';
+import { showBottomToast } from '../components/common/Toast/toastMessage';
+import apiClient from '../apis/interceptor';
+import { HTTP_HEADERS } from '../apis/constants';
 
 const initialState = {
   accessToken: undefined,
@@ -25,6 +28,8 @@ const useAuthStore = create<AuthStateType>((set) => ({
     try {
       const { response } = await getAuth(email, password);
       const { accessToken, refreshToken } = response;
+
+      apiClient.defaults.headers.common[HTTP_HEADERS.AUTHORIZATION] = `Bearer ${accessToken}`;
 
       await EncryptedStorage.setItem('tokens', JSON.stringify({ accessToken, refreshToken }));
 
@@ -59,11 +64,9 @@ const useAuthStore = create<AuthStateType>((set) => ({
         refreshToken,
       }));
 
-      await useUserStore.getState().updateUser();
-
       return { accessToken, refreshToken };
     } catch (error) {
-      console.error('Failed to restore credentials:', error);
+      console.log('Failed to restore credentials:', error);
       await EncryptedStorage.removeItem('tokens');
       set(initialState);
       useUserStore.getState().clearUser();
@@ -78,7 +81,8 @@ const useAuthStore = create<AuthStateType>((set) => ({
 
       useUserStore.getState().clearUser();
     } catch (error) {
-      console.error('Failed to sign out:', error);
+      console.log('Failed to sign out:', error);
+      showBottomToast('error', '로그아웃 오류'); // TODO: locales
     }
   },
 
@@ -87,7 +91,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
       await EncryptedStorage.setItem('tokens', JSON.stringify({ accessToken, refreshToken }));
       set((state) => ({ ...state, accessToken, refreshToken }));
     } catch (error) {
-      console.error('Failed to set tokens:', error);
+      console.log('Failed to set tokens:', error);
     }
   },
 
@@ -98,7 +102,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
 
       useUserStore.getState().clearUser();
     } catch (error) {
-      console.error('Failed to clear tokens:', error);
+      console.log('Failed to clear tokens:', error);
     }
   },
 }));

@@ -13,7 +13,6 @@ import { CustomModal, CustomText } from '../../components/common';
 import PuzzleStats from '../../components/features/PuzzleStats';
 import Board from '../../components/features/Board';
 import LikeDislikeToggle from '../../components/features/LikeDislikeToggle';
-import { ReactionType } from '../../components/types/Community';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import {
   getCommunityPuzzle,
@@ -23,7 +22,7 @@ import {
   updateLike,
 } from '../../apis/community';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { CommunityPuzzle, RootStackParamList } from '../../components/types';
+import { CommunityPuzzle, ReactionType, RootStackParamList } from '../../types';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import useModal from '../../hooks/useModal';
@@ -58,7 +57,7 @@ const CommunityPuzzleSolve = () => {
         },
       });
     } else {
-      activateModal('PUZZLE_FAILURE', {
+      activateModal('COMMUNITY_PUZZLE_FAILURE', {
         primaryAction: async () => {
           navigation.goBack();
         },
@@ -105,7 +104,6 @@ const CommunityPuzzleSolve = () => {
         await updateDislike(puzzleDetail.id);
       }
     } catch (error) {
-      console.error(error);
       showBottomToast('error', error as string);
     }
   };
@@ -131,9 +129,10 @@ const CommunityPuzzleSolve = () => {
         navigation.navigate('CommunityPuzzleReview', {
           problemSequence,
           mainSequence,
+          puzzle: puzzleDetail,
+          isCommunityPuzzle: true,
         });
       } catch (error) {
-        console.error('정답 보기 처리 중 오류 발생:', error);
         showBottomToast('error', error as string);
       } finally {
         setIsLoading(false);
@@ -216,7 +215,6 @@ const CommunityPuzzleSolve = () => {
           setSequence={() => {}}
           setIsWin={handleResult}
           setIsLoading={setIsLoading}
-          winDepth={225}
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle

@@ -77,6 +77,9 @@ export const Stone = styled(View)<{ stone: StoneType; cellWidth: number }>`
       : stone === 2
       ? theme.color['gray/white']
       : 'transparent'};
+
+  align-items: center;
+  justify-content: center;
 `;
 
 export const IndicatePoint = styled(View)`
@@ -87,3 +90,10 @@ export const IndicatePoint = styled(View)`
 `;
 
 export const PutButtonContainer = styled(View)``;
+
+export const LastMoveHighlight = styled(View)<{ width: number }>`
+  width: ${({ width }) => width}px;
+  height: ${({ width }) => width}px;
+  border-radius: 1000px;
+  background-color: ${theme.color['main_color/yellow_s']};
+`;

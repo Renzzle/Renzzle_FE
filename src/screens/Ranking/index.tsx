@@ -5,7 +5,7 @@ import { ActivityIndicator, FlatList, View } from 'react-native';
 import { ActiveTabContainer, Container, DescText, MyRankingContainer } from './index.styles';
 import TabBar from '../../components/common/TabBar';
 import { getCommunityRanking, getRatingRanking } from '../../apis/rank';
-import { BestRankingResponse, RatingRankingResponse } from '../../components/types/Ranking';
+import { BestRankingResponse, RatingRankingResponse } from '../../types';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import RankingListItem from '../../components/features/RankingListItem';
 import { useTranslation } from 'react-i18next';

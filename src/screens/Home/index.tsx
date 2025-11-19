@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   ArticleTitle,
@@ -14,17 +14,18 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MenuButton from '../../components/features/MenuButton';
 import { CustomModal, CustomText, Icon } from '../../components/common';
-import { menuThemeMap, MenuType } from '../../components/types/MenuThemeMap';
+import { CommunityPuzzle, menuThemeMap, MenuType, TrainingPack } from '../../types';
 import { useTranslation } from 'react-i18next';
 import theme, { ColorType } from '../../styles/theme';
-import { CommunityPuzzle, TrainingPack } from '../../components/types';
 import { getRecommendPack, getTrendPuzzles } from '../../apis/content';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PackCard from '../../components/features/PackCard';
 import CommunityCard from '../../components/features/CommunityCard';
 import useModal from '../../hooks/useModal';
+import { BackHandler, Platform, ToastAndroid } from 'react-native';
 
 const Home = () => {
+  const backHandlerPressedOnce = useRef(false);
   const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
@@ -53,6 +54,14 @@ const Home = () => {
     }
   };
 
+  const handleRanking = () => {
+    activateModal('RANKING_PUZZLE_INTRO', {
+      primaryAction: () => {
+        navigation.navigate('RankedPuzzleSolve');
+      },
+    });
+  };
+
   const fetchTrendPuzzles = async () => {
     try {
       const data = await getTrendPuzzles();
@@ -70,13 +79,36 @@ const Home = () => {
     }, []),
   );
 
-  const handleRanking = () => {
-    activateModal('RANKING_PUZZLE_INTRO', {
-      primaryAction: () => {
-        navigation.navigate('RankedPuzzleSolve');
-      },
-    });
-  };
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') {
+        return;
+      }
+
+      const onBackPress = () => {
+        if (backHandlerPressedOnce.current) {
+          BackHandler.exitApp();
+          return true;
+        }
+
+        backHandlerPressedOnce.current = true;
+        ToastAndroid.show('한 번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
+
+        setTimeout(() => {
+          backHandlerPressedOnce.current = false;
+        }, 2000);
+
+        // 기본 뒤로가기 동작 막기
+        return true;
+      };
+
+      // 리스너 등록
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      // 화면이 포커스를 잃을 때 리스너 제거
+      return () => subscription.remove();
+    }, []),
+  );
 
   return (
     <ScrollContainer showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>

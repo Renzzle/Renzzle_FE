@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import RankingResultButton from '../../components/features/RankingResultButton';
 import TimerWithProgressBar from '../../components/features/TimerWithProgressBar';
 import {
+  BoardFooterWrapper,
   BoardWrapper,
   Container,
   HorizontalScrollContainer,
@@ -12,12 +13,16 @@ import Board from '../../components/features/Board';
 import { finishRankingGame, startRankingGame, submitRankingGameResult } from '../../apis/rank';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { GameOutcome, GameResult } from '../../components/types/Ranking';
+import { GameOutcome, GameResult } from '../../types';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
+import { BackHandler, Platform, ToastAndroid } from 'react-native';
+import PuzzleActionButton from '../../components/features/PuzzleActionButton';
 
 interface PuzzleData {
   boardStatus: string;
@@ -25,6 +30,8 @@ interface PuzzleData {
 }
 
 const RankedPuzzleSolve = () => {
+  const backHandlerPressedOnce = useRef(false);
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
     isModalVisible,
@@ -34,6 +41,7 @@ const RankedPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const scrollRef = useRef<ScrollView>(null);
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
   const [outcome, setOutcome] = useState<GameOutcome>();
@@ -62,28 +70,81 @@ const RankedPuzzleSolve = () => {
     }
     if (result) {
       setBonusTrigger((prev) => prev + 1);
+      showBottomToast('success', t('modal.rankingPuzzleSuccess.message'));
+    } else {
+      showBottomToast('error', t('modal.rankingPuzzleFailure.message'));
     }
 
-    const data = await submitRankingGameResult(result);
-    setPuzzleData(data);
-    setResults((prev) => [...prev, { variant: result ? 'success' : 'error' }]);
-    setIsLoading(false);
+    try {
+      const data = await submitRankingGameResult(result);
+      setPuzzleData(data);
+      setResults((prev) => [...prev, { variant: result ? 'success' : 'error' }]);
+    } catch (error) {
+      showBottomToast('error', error as string);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollToEnd({ animated: true });
+    }
+  }, [results]);
+
   const handleFinish = async () => {
-    const data = await finishRankingGame();
-    setOutcome(data);
-    updateUser();
-    activateModal('RANKING_PUZZLE_OUTRO', {
-      primaryAction: () => {
-        navigation.navigate('Home');
-      },
-      secondaryAction: () => {
-        // TODO: 복습 화면으로 이동
-        activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} });
-      },
-    });
+    try {
+      const data = await finishRankingGame();
+      setOutcome(data);
+      await updateUser();
+      activateModal('RANKING_PUZZLE_OUTRO', {
+        primaryAction: () => {
+          navigation.navigate('Home');
+        },
+        secondaryAction: () => {
+          // TODO: 복습 화면으로 이동
+          activateModal('FEATURE_IN_PROGRESS', {
+            primaryAction: () => {
+              navigation.goBack();
+            },
+          });
+        },
+      });
+    } catch (error) {
+      showBottomToast('error', error as string);
+    }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') {
+        return;
+      }
+
+      const onBackPress = () => {
+        if (backHandlerPressedOnce.current) {
+          navigation.goBack();
+          return true;
+        }
+
+        backHandlerPressedOnce.current = true;
+        ToastAndroid.show('한 번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
+
+        setTimeout(() => {
+          backHandlerPressedOnce.current = false;
+        }, 2000);
+
+        // 기본 뒤로가기 동작 막기
+        return true;
+      };
+
+      // 리스너 등록
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      // 화면이 포커스를 잃을 때 리스너 제거
+      return () => subscription.remove();
+    }, [navigation]),
+  );
 
   return (
     <Container>
@@ -98,6 +159,7 @@ const RankedPuzzleSolve = () => {
 
       <BoardWrapper>
         <HorizontalScrollContainer
+          ref={scrollRef}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}>
@@ -121,9 +183,11 @@ const RankedPuzzleSolve = () => {
               setSequence={() => {}}
               setIsWin={handleResult}
               setIsLoading={setIsLoading}
-              winDepth={225}
             />
-            <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
+            <BoardFooterWrapper>
+              <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
+              <PuzzleActionButton mode="giveUp" onPress={() => handleResult(false)} />
+            </BoardFooterWrapper>
           </>
         )}
       </BoardWrapper>

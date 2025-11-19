@@ -2,11 +2,11 @@ import React from 'react';
 import { CardContainer, DescriptionContainer } from './index.styles';
 import BoardPreview from '../BoardPreview';
 import { CustomText } from '../../common';
-import { Dimensions } from 'react-native';
 import { IconName } from '../../../assets/icons';
 import { useTranslation } from 'react-i18next';
 import { ColorType } from '../../../styles/theme';
 import PuzzleAttributes from '../PuzzleAttributes';
+import useDeviceWidth from '../../../hooks/useDeviceWidth';
 
 interface TrainingCardProps {
   title: string;
@@ -27,7 +27,7 @@ const TrainingCard = ({
 }: TrainingCardProps) => {
   const { t } = useTranslation();
 
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = useDeviceWidth();
   const cardMargin = 15;
   const cardPadding = 15;
   const cardGap = 10;

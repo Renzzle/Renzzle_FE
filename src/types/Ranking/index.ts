@@ -1,5 +1,5 @@
-import { IconName } from '../../../assets/icons';
-import { ColorType } from '../../../styles/theme';
+import { IconName } from '../../assets/icons';
+import { ColorType } from '../../styles/theme';
 
 export interface RatingRanking {
   rank: number;
@@ -57,4 +57,5 @@ export interface GameOutcome {
   rating?: number;
   reward?: number;
   price?: number;
+  puzzleCount?: number;
 }

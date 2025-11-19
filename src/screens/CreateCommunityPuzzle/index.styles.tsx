@@ -7,7 +7,12 @@ export const Container = styled(View)`
   background-color: ${theme.color['gray/grayBG']};
   position: relative;
   justify-content: center;
-  padding-top: 65px;
+`;
+
+export const BoardHeaderWrapper = styled(View)`
+  height: 120px;
+  justify-content: flex-end;
+  padding: 0 40px 0 20px;
 `;
 
 export const BoardWrapper = styled(View)`
@@ -21,7 +26,7 @@ export const UndoRedoWrapper = styled(View)`
   gap: 60px;
   margin-top: 15px;
 
-  height: 65px;
+  height: 120px;
 `;
 
 export const Button = styled(TouchableOpacity)`

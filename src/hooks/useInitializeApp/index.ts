@@ -1,35 +1,8 @@
 import { useState, useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
-import { getUser } from '../../apis/user';
-import { reissueToken } from '../../apis/auth';
 import useAuthStore from '../../store/useAuthStore';
-import { useUserStore, User } from '../../store/useUserStore';
-
-const validateAccessToken = async (): Promise<User | null> => {
-  try {
-    const user = await getUser();
-    console.log('User verified with existing access token');
-    return user;
-  } catch {
-    console.log('Access token validation failed');
-    return null;
-  }
-};
-
-const tryReissueToken = async (
-  refreshToken: string,
-): Promise<{ accessToken: string; refreshToken: string } | null> => {
-  try {
-    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await reissueToken(
-      refreshToken,
-    );
-    console.log('Token reissue successful');
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-  } catch (err) {
-    console.log('Token reissue failed', err);
-    return null;
-  }
-};
+import { useUserStore } from '../../store/useUserStore';
+import { showBottomToast } from '../../components/common/Toast/toastMessage';
 
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
@@ -40,45 +13,18 @@ const useInitializeApp = (): boolean => {
     const initApp = async () => {
       try {
         const credentials = await restoreCredentials();
-        const accessToken = credentials?.accessToken;
-        const refreshToken = credentials?.refreshToken;
+        const { accessToken, refreshToken } = credentials;
 
-        const handleSuccessfulLogin = (user: User) => {
-          setUser(user);
-        };
-
-        const handleLogout = async () => {
-          await clearTokens();
-        };
-
-        if (accessToken) {
-          const user = await validateAccessToken();
-          if (user) {
-            handleSuccessfulLogin(user);
-          } else if (refreshToken) {
-            const tokens = await tryReissueToken(refreshToken);
-            if (tokens) {
-              await setTokens(tokens.accessToken, tokens.refreshToken);
-              const newUser = await getUser();
-              handleSuccessfulLogin(newUser);
-            } else {
-              await handleLogout();
-            }
-          } else {
-            await handleLogout();
-          }
-        } else if (refreshToken) {
-          const tokens = await tryReissueToken(refreshToken);
-          if (tokens) {
-            await setTokens(tokens.accessToken, tokens.refreshToken);
-            const newUser = await getUser();
-            handleSuccessfulLogin(newUser);
-          } else {
-            await handleLogout();
+        if (accessToken || refreshToken) {
+          try {
+            await useUserStore.getState().updateUser();
+          } catch (error) {
+            console.log('자동 로그인 실패:', error);
+            await clearTokens();
           }
         }
-      } catch (err) {
-        console.error('Error occurred during app initialization: ', err);
+      } catch (error) {
+        showBottomToast('error', '어플리케이션 시작 오류 발생'); // TODO: locales
         await clearTokens();
       } finally {
         SplashScreen.hide();

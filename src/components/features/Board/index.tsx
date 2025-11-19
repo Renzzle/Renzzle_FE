@@ -7,6 +7,7 @@ import {
   FrameCell,
   FrameRow,
   IndicatePoint,
+  LastMoveHighlight,
   LoadingWrapper,
   Stone,
   StoneRow,
@@ -18,19 +19,34 @@ import {
   convertLowercaseAlphabetToNumber,
   convertToLowercaseAlphabet,
   convertToReverseNumber,
+  getSequenceDepth,
   valueToCoordinates,
 } from '../../../utils/utils';
 import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
-import { Icon } from '../../common';
+import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
+interface CellType {
+  stone: StoneType;
+  moveNumber: number | null;
+}
+
 export interface BoardRef {
   undo: () => void;
   redo: () => void;
 }
+
+const createEmptyBoard = (): CellType[][] => {
+  return Array.from({ length: BOARD_SIZE }, () =>
+    Array.from({ length: BOARD_SIZE }, () => ({
+      stone: 0, // 비어있음
+      moveNumber: null, // 순서없음
+    })),
+  );
+};
 
 interface BoardProps {
   mode: 'make' | 'solve';
@@ -39,7 +55,6 @@ interface BoardProps {
   setSequence: (sequence: string) => void;
   setIsWin?: (isWin: boolean | null) => void;
   setIsLoading?: (isLoading: boolean) => void;
-  winDepth?: number;
 
   // 'review' mode
   mainSequence?: string; // 정답까지 포함된 전체 시퀀스
@@ -57,7 +72,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setSequence,
     setIsWin,
     setIsLoading,
-    winDepth,
     mainSequence = '',
     problemSequence = '',
     onUndoRedoStateChange,
@@ -69,9 +83,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const cellWidth = (boardWidth - 26) / 14;
 
   const { UserAgainstActionJNI, CheckWinJNI } = NativeModules;
-  const [board, setBoard] = useState<StoneType[][]>(
-    Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0)),
-  );
+  const [board, setBoard] = useState<CellType[][]>(createEmptyBoard());
   const [isBlackTurn, setIsBlackTurn] = useState(true);
   const [stoneX, setStoneX] = useState<number | null>(null);
   const [stoneY, setStoneY] = useState<number | null>(null);
@@ -79,7 +91,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const [aiAnswer, setAiAnswer] = useState<number>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [localSequence, setLocalSequence] = useState(sequence);
-  const [depth, setDepth] = useState(0);
 
   const [history, setHistory] = useState<string[]>([sequence]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -97,7 +108,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       } else if (makeMode === 'review') {
         // 현재 시퀀스가 문제 시퀀스보다 길 때만 undo 가능
         if (localSequence.length > problemSequence.length) {
-          const lastMoveMatch = localSequence.match(/[a-o]([1-9]|1[0-5])$/);
+          const lastMoveMatch = localSequence.match(/[a-o](?:1[0-5]|[1-9])$/);
           if (lastMoveMatch) {
             const lastMove = lastMoveMatch[0];
             const newSequence = localSequence.slice(0, -lastMove.length);
@@ -122,7 +133,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           // 다음 수를 메인 시퀀스에서 가져와 추가
           const nextMoveMatch = mainSequence
             .substring(localSequence.length)
-            .match(/^[a-o]([1-9]|1[0-5])/);
+            .match(/^[a-o](?:1[0-5]|[1-9])/);
           if (nextMoveMatch) {
             const nextMove = nextMoveMatch[0];
             const newSequence = localSequence + nextMove;
@@ -135,8 +146,24 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   }));
 
   const updateBoard = (x: number, y: number) => {
-    const newBoard = board.map((row) => [...row]); // copy row
-    newBoard[x][y] = isBlackTurn ? 1 : 2;
+    // copy board
+    const newBoard: CellType[][] = board.map((row) => row.map((cell) => ({ ...cell })));
+
+    // 기존 마지막 수 표시 제거
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      for (let j = 0; j < BOARD_SIZE; j++) {
+        if (newBoard[i][j].moveNumber === -1) {
+          newBoard[i][j].moveNumber = null;
+        }
+      }
+    }
+
+    // 새 돌 추가 및 마지막 수 표시
+    newBoard[x][y] = {
+      stone: isBlackTurn ? 1 : 2,
+      moveNumber: -1,
+    };
+
     setBoard(newBoard);
   };
 
@@ -163,7 +190,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const handlePut = async () => {
     if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
-      if (board[stoneX][stoneY] !== 0) {
+      if (board[stoneX][stoneY].stone !== 0) {
         return;
       }
 
@@ -174,10 +201,10 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       setStoneY(null);
 
       if (mode === 'solve') {
-        setDepth((prevDepth) => prevDepth + 1);
-
         if (await checkWin(newSequence, 'user')) {
           setIsWin?.(true);
+          setIsLoading?.(false);
+          setIsDisabled(false);
           return;
         }
 
@@ -201,33 +228,43 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   };
 
   const handleAiTurn = async (userSequence: string) => {
-    try {
-      const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
-      if (result === -1) {
-        console.log('졌다!');
-        setIsWin?.(false);
+    setTimeout(async () => {
+      try {
+        const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
+        if (result === -1) {
+          console.log('졌다!');
+          setIsWin?.(false);
+          setIsLoading?.(false);
+          setIsDisabled(false);
+        }
+        if (result === 1000) {
+          console.log('이겼다!');
+          setIsWin?.(true);
+          setIsLoading?.(false);
+          setIsDisabled(false);
+        }
+        setAiAnswer(result);
+      } catch (error) {
+        showBottomToast('error', 'AI 계산 실패!'); // TODO: locales
       }
-      if (result === 1000) {
-        console.log('이겼다!');
-        setIsWin?.(true);
-      }
-      setAiAnswer(result);
-    } catch (error) {
-      console.error('AI computation failed: ', error);
-    }
+    }, 0);
   };
 
-  const checkWin = async (sequenceToCheck: string, turn: string) => {
-    try {
-      const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
-      console.log(turn, ' sequence:', sequenceToCheck);
-      console.log(turn, ' :', check);
-      return check === 1;
-    } catch (error) {
-      console.log(error);
-      showBottomToast('error', '수 처리 중 오류가 발생했습니다.');
-      return false;
-    }
+  const checkWin = (sequenceToCheck: string, turn: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        try {
+          const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
+          console.log(turn, ' sequence:', sequenceToCheck);
+          console.log(turn, ' :', check);
+          resolve(check === 1);
+        } catch (error) {
+          console.log(error);
+          showBottomToast('error', '수 처리 중 오류가 발생했습니다.');
+          resolve(false);
+        }
+      }, 0);
+    });
   };
 
   useEffect(() => {
@@ -248,6 +285,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         const newSequence = addToSequence(x, y);
         if (await checkWin(newSequence, 'ai')) {
           setIsWin?.(false);
+          setIsLoading?.(false);
+          setIsDisabled(false);
           return;
         }
 
@@ -255,18 +294,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         setIsBlackTurn(!isBlackTurn);
         setIsDisabled(false);
         setIsLoading?.(false);
-        setDepth((prevDepth) => prevDepth + 1);
       }
     };
 
     processAiAnswer();
   }, [aiAnswer]);
-
-  useEffect(() => {
-    if (winDepth !== undefined && depth > winDepth) {
-      setIsWin?.(false);
-    }
-  }, [depth, winDepth]);
 
   useEffect(() => {
     if (mode === 'make' && makeMode === 'create') {
@@ -308,15 +340,17 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const initializeBoard = () => {
     console.log('보드 초기화 - 시퀀스: ' + sequence);
-    const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
+    const newBoard = createEmptyBoard();
     let turn = true;
+    const problemSequenceLength = problemSequence ? getSequenceDepth(problemSequence) : 0;
 
+    let moveIndex = 0;
     let i = 0;
     while (i < sequence.length) {
       const letter = sequence[i];
       const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/);
       if (!numberMatch) {
-        console.error(`Invalid sequence format at index ${i}: ${sequence}`);
+        showBottomToast('error', '문제 형식이 올바르지 않습니다.'); // TODO: locales
         break;
       }
 
@@ -324,9 +358,15 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       const x = convertToReverseNumber(parseInt(number, 10));
       const y = convertLowercaseAlphabetToNumber(letter);
 
+      let moveNumber = null;
+      if (mode === 'make' && moveIndex >= problemSequenceLength) {
+        moveNumber = moveIndex + 1 - problemSequenceLength;
+      }
+
       if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
-        newBoard[x][y] = turn ? 1 : 2;
+        newBoard[x][y] = { stone: turn ? 1 : 2, moveNumber: moveNumber };
         turn = !turn;
+        moveIndex++;
       }
       i += 1 + number.length;
     }
@@ -334,7 +374,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setLocalSequence(sequence);
     setBoard(newBoard);
     setIsBlackTurn(turn);
-    setDepth(0);
   };
 
   useEffect(() => {
@@ -360,10 +399,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
             <Cell
               key={`${x}-${y}`}
               pos={`${x}-${y}`}
-              stone={cell}
+              stone={cell.stone}
               cellWidth={cellWidth}
               stoneX={stoneX}
               stoneY={stoneY}
+              sequence={cell.moveNumber}
               onPress={() => handleCellPress(x, y)}
             />
           ))}
@@ -384,6 +424,7 @@ interface CellProps {
   cellWidth: number;
   stoneX: number | null | undefined;
   stoneY: number | null | undefined;
+  sequence: number | null;
   onPress: () => void;
   showHighlights?: boolean;
   style?: ViewStyle;
@@ -395,6 +436,7 @@ export const Cell = ({
   cellWidth,
   stoneX,
   stoneY,
+  sequence,
   onPress,
   showHighlights = true,
   style,
@@ -402,7 +444,16 @@ export const Cell = ({
   return (
     <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
-        <Stone stone={stone} cellWidth={cellWidth} />
+        <Stone stone={stone} cellWidth={cellWidth}>
+          {sequence &&
+            (sequence > 0 ? (
+              <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
+                {sequence}
+              </CustomText>
+            ) : (
+              sequence === 0 && <LastMoveHighlight width={cellWidth / 3.3} />
+            ))}
+        </Stone>
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
         <Icon name="FocusIcon" color="error/error_color" />
       ) : showHighlights &&

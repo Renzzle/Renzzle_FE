@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Container, InputWrapper, RedoButton, UndoButton, UndoRedoWrapper } from '../index.styles';
+import {
+  BoardHeaderWrapper,
+  Container,
+  InputWrapper,
+  RedoButton,
+  UndoButton,
+  UndoRedoWrapper,
+} from '../index.styles';
 import { BottomButtonBar, CustomModal, CustomTextInput, Icon } from '../../../components/common';
 import Board, { BoardRef } from '../../../components/features/Board';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -7,10 +14,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useModal from '../../../hooks/useModal';
 import { useTranslation } from 'react-i18next';
 import { NativeModules } from 'react-native';
-import { RootStackParamList } from '../../../components/types';
+import { RootStackParamList } from '../../../types';
 import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 import { getSequenceDepth } from '../../../utils/utils';
 import { uploadPuzzle } from '../../../apis/community';
+import HelperText from '../../../components/common/HelperText';
 
 const AnswerCommunityPuzzle = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -30,8 +38,10 @@ const AnswerCommunityPuzzle = () => {
   const description = route.params.description;
   const [currentSequence, setCurrentSequence] = useState(problemSequence);
   const [answerSequence, setAnswerSequence] = useState('');
+  const [mainSequence, setMainSequence] = useState(problemSequence);
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifyDisabled, setIsVerifyDisabled] = useState<boolean>(false);
+  const [isVerifyLoading, setIsVerifyLoading] = useState<boolean>(false);
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(true);
   const [depth, setDepth] = useState<number>(0);
 
@@ -60,14 +70,15 @@ const AnswerCommunityPuzzle = () => {
 
   const transition = [
     {
-      text: '검증',
+      text: '검증', // TODO: locales로 빼기
       onAction: async () => {
         await verifySequence();
       },
       disabled: isVerifyDisabled,
+      loading: isVerifyLoading,
     },
     {
-      text: isVerified ? '인증 업로드' : '미인증 업로드',
+      text: isVerified ? '인증 업로드' : '미인증 업로드', // TODO: locales로 빼기
       onAction: async () => {
         await handleUpload();
       },
@@ -78,75 +89,100 @@ const AnswerCommunityPuzzle = () => {
   const verifySequence = async () => {
     setIsVerifyDisabled(true);
     setIsUploadDisabled(true);
-    try {
-      const result = await SearchJNI.findWinWrapper(problemSequence);
-      console.log('VCF Wrapper Result: ', result);
+    setIsVerifyLoading(true);
 
-      if (result.length === 0) {
-        // Verification Failed
-        activateModal('VALIDATION_FAILED', {
+    setTimeout(async () => {
+      try {
+        const result = await SearchJNI.findWinWrapper(problemSequence);
+        console.log('VCF Wrapper Result: ', result);
+
+        if (result.length === 0) {
+          // Verification Failed
+          activateModal('VALIDATION_FAILED', {
+            primaryAction: () => {},
+          });
+          return;
+        }
+        // Verification Succeeded
+        handleVerificationSuccess(result);
+
+        activateModal('VALIDATION_COMPLETE', {
           primaryAction: () => {},
         });
-        return;
+      } catch (error) {
+        showBottomToast('error', '검증 중 오류가 발생했습니다.');
+      } finally {
+        setIsVerifyDisabled(false);
+        setIsVerifyLoading(false);
       }
-      // Verification Succeeded
-      handleVerificationSuccess(result);
-
-      activateModal('VALIDATION_COMPLETE', {
-        primaryAction: () => {},
-      });
-    } catch (error) {
-      console.error('VCF search failed: ', error);
-      showBottomToast('error', '검증 중 오류가 발생했습니다.');
-    } finally {
-      setIsVerifyDisabled(false);
-      setIsUploadDisabled(false);
-    }
+    }, 0);
   };
 
   const handleVerificationSuccess = (result: string) => {
     console.log('Verification successful with sequence: ' + result);
     setCurrentSequence(problemSequence + result);
     setAnswerSequence(result);
+    setMainSequence(problemSequence + result);
     setDepth(getSequenceDepth(result));
     setIsVerified(true);
   };
 
   const handleUpload = async () => {
-    if (answerSequence.length > 0 && depth > 0 && winColor !== null) {
-      setIsVerifyDisabled(true);
-      setIsUploadDisabled(true);
-      try {
-        const data = await uploadPuzzle(
-          problemSequence,
-          answerSequence,
-          depth,
-          description,
-          winColor,
-          isVerified,
-        );
+    const { uploadAnswerSequence, uploadDepth } = getUploadData();
 
-        if (data.isSuccess) {
-          activateModal('PUZZLE_UPLOAD_SUCCESS', {
-            primaryAction: () => {
-              navigation.navigate('CommunityPuzzles');
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Puzzle Upload Error:', error);
-        showBottomToast('error', error as string);
-      } finally {
-        setIsVerifyDisabled(false);
-        setIsUploadDisabled(false);
-      }
-    } else {
+    if (uploadAnswerSequence.length === 0 || uploadDepth === 0 || !winColor) {
       activateModal('PUZZLE_UPLOAD_FAILED', {
         primaryAction: () => {
           navigation.goBack();
         },
       });
+      return;
     }
+
+    setIsVerifyDisabled(true);
+    setIsUploadDisabled(true);
+    try {
+      console.log('uploadAnswerSequence: ', uploadAnswerSequence);
+      console.log('uploadDepth: ', uploadDepth);
+      const data = await uploadPuzzle(
+        problemSequence,
+        uploadAnswerSequence,
+        uploadDepth,
+        description,
+        winColor,
+        isVerified,
+      );
+
+      if (data.isSuccess) {
+        activateModal('PUZZLE_UPLOAD_SUCCESS', {
+          primaryAction: () => {
+            navigation.navigate('CommunityPuzzles');
+          },
+        });
+      } else {
+        showBottomToast('error', t('modal.puzzleUploadFailed.title'));
+      }
+    } catch (error) {
+      showBottomToast('error', '이미 있는 퍼즐이에요. 새로 만들어 주세요.'); // TODO: locales로 빼기
+    } finally {
+      setIsVerifyDisabled(false);
+      setIsUploadDisabled(false);
+    }
+  };
+
+  const getUploadData = () => {
+    if (isVerified && mainSequence.startsWith(problemSequence)) {
+      const result = mainSequence.substring(problemSequence.length);
+      return {
+        uploadAnswerSequence: result,
+        uploadDepth: getSequenceDepth(result),
+      };
+    }
+
+    return {
+      uploadAnswerSequence: answerSequence,
+      uploadDepth: depth,
+    };
   };
 
   const handleSequenceChangeByUser = (newSequence: string) => {
@@ -154,7 +190,12 @@ const AnswerCommunityPuzzle = () => {
     const slicedAnswer = newSequence.slice(problemSequence.length);
     setAnswerSequence(slicedAnswer);
     setDepth(getSequenceDepth(slicedAnswer));
-    setIsVerified(false); // 사용자가 수정했으므로 미인증 처리
+
+    if (mainSequence.startsWith(newSequence) && newSequence !== problemSequence) {
+      setIsVerified(true);
+    } else {
+      setIsVerified(false); // 사용자가 수정했으므로 미인증 처리
+    }
   };
 
   useEffect(() => {
@@ -177,11 +218,16 @@ const AnswerCommunityPuzzle = () => {
         />
       </InputWrapper>
 
+      <BoardHeaderWrapper>
+        <HelperText type="info">{t('puzzle.verifyDescription')}</HelperText>
+      </BoardHeaderWrapper>
+
       <Board
         ref={boardRef}
         mode="make"
         makeMode="review"
         sequence={currentSequence}
+        mainSequence={mainSequence}
         setSequence={handleSequenceChangeByUser}
         problemSequence={problemSequence}
         onUndoRedoStateChange={(undo, redo) => {
