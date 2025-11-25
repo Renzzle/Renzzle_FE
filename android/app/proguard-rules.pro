@@ -8,3 +8,7 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# Google Tink (react-native-encrypted-storage 관련) 에러 방지
+-dontwarn com.google.errorprone.annotations.Immutable
+-dontwarn com.google.crypto.tink.**
