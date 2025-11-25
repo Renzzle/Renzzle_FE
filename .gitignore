@@ -77,3 +77,6 @@ yarn-error.log
 .env
 env.d.ts
 .env.local
+
+# Gradle keystore configs
+gradle.properties
