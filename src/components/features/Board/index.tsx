@@ -451,7 +451,7 @@ export const Cell = ({
                 {sequence}
               </CustomText>
             ) : (
-              sequence === 0 && <LastMoveHighlight width={cellWidth / 3.3} />
+              sequence === -1 && <LastMoveHighlight width={cellWidth / 3.3} />
             ))}
         </Stone>
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
