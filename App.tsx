@@ -31,6 +31,8 @@ import CreateCommunityPuzzle from './src/screens/CreateCommunityPuzzle/index.tsx
 import RankedPuzzleSolve from './src/screens/RankedPuzzleSolve/index.tsx';
 import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
+import { StatusBar } from 'react-native';
+import theme from './src/styles/theme.ts';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +50,12 @@ function App(): React.JSX.Element | null {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppWrapper>
+          <StatusBar
+            barStyle={'dark-content'}
+            backgroundColor={theme.color['gray/grayBG']}
+            translucent={false}
+          />
+
           <Stack.Navigator
             screenOptions={{
               header: renderCustomHeader,
