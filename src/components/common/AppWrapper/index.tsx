@@ -6,7 +6,7 @@ const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const width = useDeviceWidth();
 
   return (
-    <AppBackground>
+    <AppBackground edges={['top', 'bottom', 'left', 'right']}>
       <Wrapper maxWidth={width}>{children}</Wrapper>
     </AppBackground>
   );
