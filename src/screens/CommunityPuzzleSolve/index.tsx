@@ -61,6 +61,9 @@ const CommunityPuzzleSolve = () => {
         primaryAction: async () => {
           navigation.goBack();
         },
+        secondaryAction: () => {
+          handleRetry();
+        },
       });
     }
   };

@@ -61,7 +61,7 @@ export const MODAL_TEXTS = {
   COMMUNITY_PUZZLE_FAILURE: {
     TITLE: 'modal.communityPuzzleFailure.title',
     BODY: 'modal.communityPuzzleFailure.message',
-    FOOTER: 'modal.communityPuzzleFailure.confirm',
+    FOOTER: ['modal.communityPuzzleFailure.cancel', 'modal.communityPuzzleFailure.confirm'],
   },
   VALIDATION_COMPLETE: {
     TITLE: 'modal.validationComplete.title',
