@@ -3,6 +3,10 @@ import { CommunityPuzzle, TrainingPack, TrainingPuzzle } from '../Puzzle';
 export type RootStackParamList = {
   CommunityPuzzleSolve: {
     puzzle: CommunityPuzzle;
+    fromScreen?: 'CommunityPuzzles' | 'MyPuzzles' | 'LikedPuzzles';
+  };
+  CommunityPuzzles: {
+    updatedItem?: CommunityPuzzle;
   };
   TrainingPuzzleSolve: {
     puzzles: TrainingPuzzle[];

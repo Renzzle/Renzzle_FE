@@ -1,10 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ButtonWrapper, Container, EmptyContainer } from './index.styles';
-import InfiniteScrollList from '../../components/common/InfiniteScrollList';
-import { CommunityPuzzle } from '../../types';
+import InfiniteScrollList, {
+  ApiCallParams,
+  InfiniteScrollListRef,
+} from '../../components/common/InfiniteScrollList';
+import { CommunityPuzzle, RootStackParamList } from '../../types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomText, Icon } from '../../components/common';
 import { useTranslation } from 'react-i18next';
@@ -12,25 +15,39 @@ import CircleButton from '../../components/features/CircleButton';
 
 const CommunityPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzles'>>();
   const { t } = useTranslation();
-  const [refreshKey, setRefreshKey] = useState(0);
+  const listRef = useRef<InfiniteScrollListRef<CommunityPuzzle>>(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      // list refresh
-      setRefreshKey((prev) => prev + 1);
-    }, []),
-  );
+  // TODO: 검색 기능 추가 시 변수화 필요
+  const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
 
   const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
-    navigation.navigate('CommunityPuzzleSolve', { puzzle });
+    navigation.navigate('CommunityPuzzleSolve', { puzzle, fromScreen: 'CommunityPuzzles' });
   };
+
+  // Optimistic update
+  useEffect(() => {
+    if (route.params?.updatedItem) {
+      const { id, likeCount, views, isSolved } = route.params.updatedItem;
+
+      listRef.current?.updateItem(id, (prevItem) => ({
+        ...prevItem,
+        likeCount: likeCount,
+        views: views,
+        isSolved: isSolved,
+      }));
+
+      navigation.setParams({ updatedItem: null });
+    }
+  }, [route.params?.updatedItem, navigation]);
 
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
-        key={refreshKey}
+        ref={listRef}
         apiCall={getCommunityPuzzles}
+        defaultParams={apiParams}
         renderItem={({ item }) => (
           <CommunityCard
             title={item.authorName}

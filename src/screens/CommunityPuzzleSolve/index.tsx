@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   BoardReactionWrapper,
   BoardStatsWrapper,
@@ -22,7 +22,12 @@ import {
   updateLike,
 } from '../../apis/community';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { CommunityPuzzle, ReactionType, RootStackParamList } from '../../types';
+import {
+  CommunityPuzzle,
+  CommunityPuzzlePatch,
+  ReactionType,
+  RootStackParamList,
+} from '../../types';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import useModal from '../../hooks/useModal';
@@ -40,9 +45,20 @@ const CommunityPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const { fromScreen = 'CommunityPuzzles' } = route.params;
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
+  const puzzleDetailRef = useRef(puzzleDetail);
+
+  const markSolved = () => {
+    setPuzzleDetail((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      return { ...prev, isSolved: true };
+    });
+  };
 
   const handleResult = async (result: boolean | null) => {
     if (result === null || !puzzleDetail) {
@@ -50,6 +66,8 @@ const CommunityPuzzleSolve = () => {
     }
     if (result) {
       await solveCommunityPuzzle(puzzleDetail.id);
+
+      markSolved();
 
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
         primaryAction: () => {
@@ -124,6 +142,9 @@ const CommunityPuzzleSolve = () => {
       setIsLoading(true);
       try {
         const data = await openCommunityAnswer(puzzleDetail.id);
+
+        markSolved();
+
         const problemSequence = puzzleDetail.boardStatus;
         const mainSequence = problemSequence + data.answer;
 
@@ -146,6 +167,29 @@ const CommunityPuzzleSolve = () => {
       primaryAction: openAnswer,
     });
   };
+
+  useEffect(() => {
+    puzzleDetailRef.current = puzzleDetail;
+  }, [puzzleDetail]);
+
+  useEffect(() => {
+    return () => {
+      const lastDetail = puzzleDetailRef.current;
+
+      if (!lastDetail) {
+        return;
+      }
+
+      navigation.navigate(fromScreen, {
+        updatedItem: {
+          id: lastDetail.id,
+          likeCount: lastDetail.likeCount,
+          views: lastDetail.views,
+          isSolved: lastDetail.isSolved,
+        } satisfies CommunityPuzzlePatch,
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const getDetail = async () => {

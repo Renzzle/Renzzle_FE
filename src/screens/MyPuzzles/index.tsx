@@ -1,17 +1,23 @@
-import React, { useCallback, useState } from 'react';
-import InfiniteScrollList from '../../components/common/InfiniteScrollList';
+import React, { useEffect, useMemo, useRef } from 'react';
+import InfiniteScrollList, {
+  ApiCallParams,
+  InfiniteScrollListRef,
+} from '../../components/common/InfiniteScrollList';
 import { deleteMyPuzzle, getUserPuzzles } from '../../apis/user';
 import CommunityCard from '../../components/features/CommunityCard';
-import { CommunityPuzzle } from '../../types';
+import { CommunityPuzzle, RootStackParamList } from '../../types';
 import { Container } from './index.styles';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const MyPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzles'>>();
+  const listRef = useRef<InfiniteScrollListRef<CommunityPuzzle>>(null);
+  const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
   const {
     isModalVisible,
     activateModal,
@@ -19,14 +25,21 @@ const MyPuzzles = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
-  const [refreshKey, setRefreshKey] = useState(0);
+
+  const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
+    navigation.navigate('CommunityPuzzleSolve', {
+      puzzle: puzzle,
+      fromScreen: 'Mypuzzles',
+    });
+  };
 
   const handleDelete = async (id: number) => {
     activateModal('DELETE_PUZZLE_CONFIRM', {
       primaryAction: async () => {
         try {
           await deleteMyPuzzle(id);
-          setRefreshKey((prev) => prev + 1);
+          listRef.current?.removeItem(id);
+
           showBottomToast('success', '퍼즐이 삭제되었습니다.');
         } catch (error) {
           showBottomToast('error', error as string);
@@ -35,18 +48,28 @@ const MyPuzzles = () => {
     });
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      // list refresh
-      setRefreshKey((prev) => prev + 1);
-    }, []),
-  );
+  // Optimistic update
+  useEffect(() => {
+    if (route.params?.updatedItem) {
+      const { id, likeCount, views, isSolved } = route.params.updatedItem;
+
+      listRef.current?.updateItem(id, (prevItem) => ({
+        ...prevItem,
+        likeCount: likeCount,
+        views: views,
+        isSolved: isSolved,
+      }));
+
+      navigation.setParams({ updatedItem: null });
+    }
+  }, [route.params?.updatedItem, navigation]);
 
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
-        key={refreshKey}
+        ref={listRef}
         apiCall={getUserPuzzles}
+        defaultParams={apiParams}
         renderItem={({ item }) => (
           <CommunityCard
             title={item.authorName}
@@ -60,7 +83,7 @@ const MyPuzzles = () => {
             solvedCount={item.solvedCount}
             likeCount={item.likeCount}
             isSolved={item.isSolved}
-            onPress={() => navigation.navigate('CommunityPuzzleSolve', { puzzle: item })}
+            onPress={() => navigateToCommunityDetail(item)}
             onDelete={() => handleDelete(item.id)}
           />
         )}

@@ -16,6 +16,9 @@ export interface CommunityPuzzle {
   myDislike?: boolean;
 }
 
+export type CommunityPuzzlePatch = Pick<CommunityPuzzle, 'id'> &
+  Partial<Omit<CommunityPuzzle, 'id'>>;
+
 export interface TrainingPack {
   id: number;
   title: string;
