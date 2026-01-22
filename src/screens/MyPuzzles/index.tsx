@@ -1,22 +1,19 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import InfiniteScrollList, {
-  ApiCallParams,
-  InfiniteScrollListRef,
-} from '../../components/common/InfiniteScrollList';
+import React, { useMemo } from 'react';
+import InfiniteScrollList, { ApiCallParams } from '../../components/common/InfiniteScrollList';
 import { deleteMyPuzzle, getUserPuzzles } from '../../apis/user';
 import CommunityCard from '../../components/features/CommunityCard';
-import { CommunityPuzzle, RootStackParamList } from '../../types';
+import { CommunityPuzzle } from '../../types';
 import { Container } from './index.styles';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
 
 const MyPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzles'>>();
-  const listRef = useRef<InfiniteScrollListRef<CommunityPuzzle>>(null);
+  const listRef = useOptimisticCommunityUpdate();
   const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
   const {
     isModalVisible,
@@ -29,7 +26,7 @@ const MyPuzzles = () => {
   const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
     navigation.navigate('CommunityPuzzleSolve', {
       puzzle: puzzle,
-      fromScreen: 'Mypuzzles',
+      fromScreen: 'MyPuzzles',
     });
   };
 
@@ -47,22 +44,6 @@ const MyPuzzles = () => {
       },
     });
   };
-
-  // Optimistic update
-  useEffect(() => {
-    if (route.params?.updatedItem) {
-      const { id, likeCount, views, isSolved } = route.params.updatedItem;
-
-      listRef.current?.updateItem(id, (prevItem) => ({
-        ...prevItem,
-        likeCount: likeCount,
-        views: views,
-        isSolved: isSolved,
-      }));
-
-      navigation.setParams({ updatedItem: null });
-    }
-  }, [route.params?.updatedItem, navigation]);
 
   return (
     <Container>

@@ -1,19 +1,16 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Container } from './index.styles';
-import InfiniteScrollList, {
-  ApiCallParams,
-  InfiniteScrollListRef,
-} from '../../components/common/InfiniteScrollList';
-import { CommunityPuzzle, RootStackParamList } from '../../types';
+import InfiniteScrollList, { ApiCallParams } from '../../components/common/InfiniteScrollList';
+import { CommunityPuzzle } from '../../types';
 import { getLikedPuzzles } from '../../apis/user';
 import CommunityCard from '../../components/features/CommunityCard';
-import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
 
 const LikedPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzles'>>();
-  const listRef = useRef<InfiniteScrollListRef<CommunityPuzzle>>(null);
+  const listRef = useOptimisticCommunityUpdate();
 
   const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
 
@@ -23,22 +20,6 @@ const LikedPuzzles = () => {
       fromScreen: 'LikedPuzzles',
     });
   };
-
-  // Optimistic update
-  useEffect(() => {
-    if (route.params?.updatedItem) {
-      const { id, likeCount, views, isSolved } = route.params.updatedItem;
-
-      listRef.current?.updateItem(id, (prevItem) => ({
-        ...prevItem,
-        likeCount: likeCount,
-        views: views,
-        isSolved: isSolved,
-      }));
-
-      navigation.setParams({ updatedItem: null });
-    }
-  }, [route.params?.updatedItem, navigation]);
 
   return (
     <Container>
