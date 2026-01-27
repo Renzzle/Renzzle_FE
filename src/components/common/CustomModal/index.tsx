@@ -30,7 +30,8 @@ export type ModalCategoryType =
   | 'RANKING_PUZZLE_OUTRO'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
-  | 'FEATURE_IN_PROGRESS';
+  | 'FEATURE_IN_PROGRESS'
+  | 'NETWORK_ERROR';
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -112,6 +113,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.featureInProgress.title',
     BODY: 'modal.featureInProgress.message',
     FOOTER: 'modal.featureInProgress.confirm',
+  },
+  NETWORK_ERROR: {
+    TITLE: 'modal.networkError.title',
+    BODY: 'modal.networkError.message',
+    FOOTER: 'modal.networkError.confirm',
   },
 };
 
