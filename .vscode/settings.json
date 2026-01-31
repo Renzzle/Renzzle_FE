@@ -7,5 +7,6 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp"
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
