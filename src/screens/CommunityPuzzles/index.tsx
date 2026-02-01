@@ -1,36 +1,34 @@
-import React, { useCallback, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ButtonWrapper, Container, EmptyContainer } from './index.styles';
-import InfiniteScrollList from '../../components/common/InfiniteScrollList';
+import InfiniteScrollList, { ApiCallParams } from '../../components/common/InfiniteScrollList';
 import { CommunityPuzzle } from '../../types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomText, Icon } from '../../components/common';
 import { useTranslation } from 'react-i18next';
 import CircleButton from '../../components/features/CircleButton';
+import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
 
 const CommunityPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { t } = useTranslation();
-  const [refreshKey, setRefreshKey] = useState(0);
+  const listRef = useOptimisticCommunityUpdate();
 
-  useFocusEffect(
-    useCallback(() => {
-      // list refresh
-      setRefreshKey((prev) => prev + 1);
-    }, []),
-  );
+  // TODO: 검색 기능 추가 시 변수화 필요
+  const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
 
   const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
-    navigation.navigate('CommunityPuzzleSolve', { puzzle });
+    navigation.navigate('CommunityPuzzleSolve', { puzzle, fromScreen: 'CommunityPuzzles' });
   };
 
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
-        key={refreshKey}
+        ref={listRef}
         apiCall={getCommunityPuzzles}
+        defaultParams={apiParams}
         renderItem={({ item }) => (
           <CommunityCard
             title={item.authorName}
