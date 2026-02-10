@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardContainer, ContentWrapper, TitleWrapper } from './index.styles';
+import { CardContainer, ContentWrapper, DeleteButton, TitleWrapper } from './index.styles';
 import BoardPreview from '../BoardPreview';
 import { CustomText, Icon } from '../../common';
 import { useTranslation } from 'react-i18next';
@@ -93,7 +93,11 @@ const CommunityCard = ({
             <CustomText size={14} weight="bold">
               {title}
             </CustomText>
-            {onDelete && <Icon onPress={onDelete} name="WasteBinIcon" size={15} />}
+            {onDelete && (
+              <DeleteButton onPress={onDelete}>
+                <Icon name="WasteBinIcon" size={15} />
+              </DeleteButton>
+            )}
           </TitleWrapper>
           <PuzzleAttributes depth={depth} winColor={winColor} isVerified={isVerified} />
           <CustomText size={8} lineHeight="sm" color="gray/gray500">
