@@ -74,6 +74,11 @@ def enableSeparateBuildPerCPUArchitecture = true
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+// Jetifier 비활성화 시 일부 라이브러리가 구 support를 가져와 AndroidX와 중복 이슈 해결
+configurations.all {
+    exclude group: 'com.android.support'
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
