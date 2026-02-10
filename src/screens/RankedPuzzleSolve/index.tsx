@@ -186,7 +186,11 @@ const RankedPuzzleSolve = () => {
             />
             <BoardFooterWrapper>
               <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
-              <PuzzleActionButton mode="giveUp" onPress={() => handleResult(false)} />
+              <PuzzleActionButton
+                mode="giveUp"
+                disabled={!!isLoading}
+                onPress={() => handleResult(false)}
+              />
             </BoardFooterWrapper>
           </>
         )}

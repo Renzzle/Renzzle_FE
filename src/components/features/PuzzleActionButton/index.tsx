@@ -7,10 +7,11 @@ type PuzzleActionMode = 'showAnswer' | 'retry' | 'giveUp';
 
 interface PuzzleActionButtonProps {
   mode: PuzzleActionMode;
+  disabled?: boolean;
   onPress: () => void;
 }
 
-const PuzzleActionButton = ({ mode, onPress }: PuzzleActionButtonProps) => {
+const PuzzleActionButton = ({ mode, disabled = false, onPress }: PuzzleActionButtonProps) => {
   const modeLabel: Record<PuzzleActionMode, string> = {
     showAnswer: '정답열기',
     retry: '새로하기',
@@ -23,10 +24,12 @@ const PuzzleActionButton = ({ mode, onPress }: PuzzleActionButtonProps) => {
     giveUp: 'FlagIcon',
   };
 
+  const color = disabled ? 'gray/gray200' : 'gray/gray500';
+
   return (
-    <ActionButtonWrapper onPress={onPress}>
-      <Icon name={modeIcon[mode]} color="gray/gray500" size={24} />
-      <CustomText size={8} lineHeight="sm" color="gray/gray500">
+    <ActionButtonWrapper onPress={onPress} disabled={!!disabled}>
+      <Icon name={modeIcon[mode]} color={color} size={24} />
+      <CustomText size={8} lineHeight="sm" color={color}>
         {modeLabel[mode]}
       </CustomText>
     </ActionButtonWrapper>
