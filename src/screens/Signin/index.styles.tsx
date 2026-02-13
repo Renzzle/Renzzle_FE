@@ -1,16 +1,17 @@
 import { TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import DismissKeyboardView from '../../components/common/DismissKeyboadView';
 
-export const SigninContainer = styled(View)`
+export const SigninContainer = styled(DismissKeyboardView)`
   background-color: ${theme.color['gray/grayBG']};
   flex: 1;
 `;
 
 export const SigninWrapper = styled(View)`
   display: flex;
-  flex: 1;
-  justify-content: center;
+  width: 100%;
+  padding-top: 150px;
   margin-bottom: 68px;
 `;
 

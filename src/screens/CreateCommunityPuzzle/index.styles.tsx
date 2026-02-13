@@ -1,12 +1,12 @@
 import { TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import DismissKeyboardView from '../../components/common/DismissKeyboadView';
 
-export const Container = styled(View)`
+export const Container = styled(DismissKeyboardView)`
   flex: 1;
   background-color: ${theme.color['gray/grayBG']};
   position: relative;
-  justify-content: center;
 `;
 
 export const BoardHeaderWrapper = styled(View)`
