@@ -33,6 +33,16 @@ export type ModalCategoryType =
   | 'FEATURE_IN_PROGRESS'
   | 'NETWORK_ERROR';
 
+const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
+  'NETWORK_ERROR',
+  'RANKING_PUZZLE_OUTRO',
+  'TRAINING_PUZZLE_SUCCESS',
+  'COMMUNITY_PUZZLE_SUCCESS',
+  'RANKING_PUZZLE_SUCCESS',
+  'TRAINING_PUZZLE_FAILURE',
+  'COMMUNITY_PUZZLE_FAILURE',
+];
+
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
     TITLE: 'modal.trainingPuzzleSuccess.title',
@@ -203,10 +213,15 @@ const CustomModal = ({
   isVisible,
   onPrimaryAction,
   onSecondaryAction,
+  category,
   children,
   ...props
 }: CustomModalProps) => {
   const handleDismiss = () => {
+    if (category && NON_DISMISSIBLE_CATEGORIES.includes(category)) {
+      return;
+    }
+
     if (onSecondaryAction) {
       onSecondaryAction();
     } else {
@@ -225,6 +240,7 @@ const CustomModal = ({
           <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
             <View>
               <ModalCard
+                category={category}
                 onPrimaryAction={onPrimaryAction}
                 onSecondaryAction={onSecondaryAction}
                 {...props}>
