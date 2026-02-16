@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View } from 'react-native';
+import { Modal, TouchableWithoutFeedback, View } from 'react-native';
 import {
   CenteredView,
   ModalBodyContainer,
@@ -191,20 +191,49 @@ export const ModalCard = ({
     );
 
   return (
-    <CenteredView>
-      <ModalContainer screenWidth={width}>
-        {title}
-        {body}
-        {footer}
-      </ModalContainer>
-    </CenteredView>
+    <ModalContainer screenWidth={width}>
+      {title}
+      {body}
+      {footer}
+    </ModalContainer>
   );
 };
 
-const CustomModal = ({ isVisible, children, ...props }: CustomModalProps) => {
+const CustomModal = ({
+  isVisible,
+  onPrimaryAction,
+  onSecondaryAction,
+  children,
+  ...props
+}: CustomModalProps) => {
+  const handleDismiss = () => {
+    if (onSecondaryAction) {
+      onSecondaryAction();
+    } else {
+      onPrimaryAction();
+    }
+  };
+
   return (
-    <Modal visible={isVisible} transparent={true} animationType="fade">
-      {isVisible && <ModalCard {...props}>{children}</ModalCard>}
+    <Modal
+      visible={isVisible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={handleDismiss}>
+      {isVisible && (
+        <CenteredView onPress={handleDismiss}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View>
+              <ModalCard
+                onPrimaryAction={onPrimaryAction}
+                onSecondaryAction={onSecondaryAction}
+                {...props}>
+                {children}
+              </ModalCard>
+            </View>
+          </TouchableWithoutFeedback>
+        </CenteredView>
+      )}
     </Modal>
   );
 };

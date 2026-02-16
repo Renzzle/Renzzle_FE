@@ -1,4 +1,4 @@
-import { TouchableOpacity, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
 
@@ -11,7 +11,7 @@ export const ModalContainer = styled(View)<{ screenWidth: number }>`
   gap: 12px;
 `;
 
-export const CenteredView = styled(View)`
+export const CenteredView = styled(Pressable)`
   flex: 1;
   flex-direction: row;
   align-items: center;
