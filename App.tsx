@@ -24,6 +24,7 @@ import Home from './src/screens/Home/index.tsx';
 import MyPuzzles from './src/screens/MyPuzzles/index.tsx';
 import LikedPuzzles from './src/screens/LikedPuzzles/index.tsx';
 import Ranking from './src/screens/Ranking/index.tsx';
+import Settings from './src/screens/Settings/index.tsx';
 import TrainingPacks from './src/screens/TrainingPacks/index.tsx';
 import TrainingPuzzles from './src/screens/TrainingPuzzles/index.tsx';
 import TrainingPuzzleSolve from './src/screens/TrainingPuzzleSolve/index.tsx';
@@ -90,6 +91,11 @@ function App(): React.JSX.Element | null {
                     name="Ranking"
                     component={Ranking}
                     options={{ title: 'common.ranking' }}
+                  />
+                  <Stack.Screen
+                    name="Settings"
+                    component={Settings}
+                    options={{ title: 'common.settings' }}
                   />
                   <Stack.Screen
                     name="TrainingPacks"

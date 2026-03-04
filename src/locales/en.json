@@ -35,6 +35,15 @@
     "notice": "공지",
     "settings": "설정"
   },
+  "settings": {
+    "language": "언어 설정",
+    "changeNickname": "닉네임 변경",
+    "removeAds": "광고 제거",
+    "privacyPolicy": "개인정보 처리방침",
+    "termsOfService": "이용 약관",
+    "feedback": "개발자에게 피드백하기",
+    "deleteAccount": "탈퇴하기"
+  },
   "button": {
     "createPuzzle": "출제",
     "uploadPuzzle": "업로드",

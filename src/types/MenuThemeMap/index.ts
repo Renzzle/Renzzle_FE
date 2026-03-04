@@ -53,7 +53,7 @@ export const menuThemeMap = {
     background: 'gray/gray100',
     iconColor: 'gray/gray400',
     iconName: 'SettingIcon',
-    route: 'Home',
+    route: 'Settings',
   },
   signup: {
     titleKey: 'auth.signup',
