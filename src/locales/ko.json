@@ -205,6 +205,7 @@
     "topPercent": "상위{{percent}}%"
   },
   "alert": {
-    "noData": "데이터가 없습니다."
+    "noData": "데이터가 없습니다.",
+    "languageChanged": "언어가 변경되었습니다"
   }
 }

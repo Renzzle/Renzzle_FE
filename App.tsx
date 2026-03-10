@@ -37,6 +37,7 @@ import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCom
 import theme from './src/styles/theme.ts';
 import useNetworkStore from './src/store/useNetworkStore.ts';
 import { CustomModal } from './src/components/common/index.ts';
+import Language from './src/screens/Settings/Language/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +97,11 @@ function App(): React.JSX.Element | null {
                     name="Settings"
                     component={Settings}
                     options={{ title: 'common.settings' }}
+                  />
+                  <Stack.Screen
+                    name="Language"
+                    component={Language}
+                    options={{ title: 'settings.language' }}
                   />
                   <Stack.Screen
                     name="TrainingPacks"

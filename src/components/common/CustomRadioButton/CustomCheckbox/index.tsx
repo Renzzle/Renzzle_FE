@@ -20,7 +20,7 @@ const CustomRadioButton = ({ label, value, selectedValue, onSelect }: CustomRadi
         color={isSelected ? 'main_color/blue_p' : 'gray/gray500'}
         size={24}
       />
-      <CustomText size={14} lineHeight="sm" color="gray/gray500">
+      <CustomText size={14} lineHeight="sm">
         {label}
       </CustomText>
     </StyledRadiobutton>

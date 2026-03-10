@@ -3,6 +3,7 @@ import SplashScreen from 'react-native-splash-screen';
 import useAuthStore from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import { initI18n } from '../../locales/i18n';
 
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
@@ -12,6 +13,8 @@ const useInitializeApp = (): boolean => {
   useEffect(() => {
     const initApp = async () => {
       try {
+        await initI18n();
+
         const credentials = await restoreCredentials();
         const { accessToken, refreshToken } = credentials;
 

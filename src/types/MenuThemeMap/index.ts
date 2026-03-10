@@ -55,6 +55,13 @@ export const menuThemeMap = {
     iconName: 'SettingIcon',
     route: 'Settings',
   },
+  language: {
+    titleKey: 'settings.language',
+    background: 'gray/gray100',
+    iconColor: 'gray/gray400',
+    iconName: 'SettingIcon',
+    route: 'Language',
+  },
   signup: {
     titleKey: 'auth.signup',
     background: 'sub_color/indigo/bg',
