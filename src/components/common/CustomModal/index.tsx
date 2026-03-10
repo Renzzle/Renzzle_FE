@@ -30,6 +30,7 @@ export type ModalCategoryType =
   | 'RANKING_PUZZLE_OUTRO'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
+  | 'NICKNAME_CHANGE_PURCHASE'
   | 'FEATURE_IN_PROGRESS'
   | 'NETWORK_ERROR';
 
@@ -118,6 +119,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.puzzleReviewPurchase.title',
     BODY: 'modal.puzzleReviewPurchase.message',
     FOOTER: ['modal.puzzleReviewPurchase.cancel', 'modal.puzzleReviewPurchase.confirm'],
+  },
+  NICKNAME_CHANGE_PURCHASE: {
+    TITLE: 'modal.nicknameChangePurchase.title',
+    BODY: 'modal.nicknameChangePurchase.message',
+    FOOTER: ['modal.nicknameChangePurchase.cancel', 'modal.nicknameChangePurchase.confirm'],
   },
   FEATURE_IN_PROGRESS: {
     TITLE: 'modal.featureInProgress.title',

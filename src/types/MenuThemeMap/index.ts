@@ -62,6 +62,13 @@ export const menuThemeMap = {
     iconName: 'SettingIcon',
     route: 'Language',
   },
+  changeNickname: {
+    titleKey: 'settings.changeNickname',
+    background: 'gray/gray100',
+    iconColor: 'gray/gray400',
+    iconName: 'SettingIcon',
+    route: 'ChangeNickname',
+  },
   signup: {
     titleKey: 'auth.signup',
     background: 'sub_color/indigo/bg',

@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { HelperWrapper, InputWithHelperWrapper, LabelWrapper } from '../index.styles';
-import { BottomButtonBar, CustomText, CustomTextInput } from '../../../components/common';
-import HelperText from '../../../components/common/HelperText';
-import { nicknameRegex } from '../../../utils/validators';
+import React, { useState } from 'react';
 import { checkNicknameDuplicate } from '../../../apis/auth';
 import { showBottomToast } from '../../../components/common/Toast/toastMessage';
+import NicknameInputStep from '../../../components/features/NicknameInputStep';
 
 interface SignupNicknameStepProps {
   nickname: string;
@@ -14,21 +10,9 @@ interface SignupNicknameStepProps {
 }
 
 const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknameStepProps) => {
-  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isNicknameValid, setIsNicknameValid] = useState<boolean>(false);
 
-  const transition = [
-    {
-      text: t('button.confirm'),
-      onAction: async () => {
-        handleNicknameConfirm();
-      },
-      disabled: !isNicknameValid || isLoading,
-    },
-  ];
-
-  const handleNicknameConfirm = async () => {
+  const handleConfirm = async () => {
     try {
       setIsLoading(true);
       const response = await checkNicknameDuplicate(nickname);
@@ -36,55 +20,22 @@ const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknam
       if (!response?.response) {
         onComplete();
       } else {
-        showBottomToast('error', '이미 사용된 닉네임입니다.');
+        showBottomToast('error', '이미 사용된 닉네임입니다.'); // TODO: locales
       }
     } catch (error) {
       showBottomToast('error', error as string);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (nicknameRegex.test(nickname)) {
-      setIsNicknameValid(true);
-    } else {
-      setIsNicknameValid(false);
-    }
-  }, [nickname]);
-
-  const nicknameHelper = () => {
-    if (nickname === '') {
-      return <HelperText type="info">{t('auth.enterNickname.description')}</HelperText>;
-    }
-    if (nicknameRegex.test(nickname)) {
-      return <HelperText type="checked">{t('auth.enterNickname.description')}</HelperText>;
-    } else {
-      return <HelperText type="error">{t('auth.enterNickname.description')}</HelperText>;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <LabelWrapper>
-        <CustomText size={18} lineHeight="lg">
-          {t('auth.enterNickname.prefix')}
-        </CustomText>
-        <CustomText size={18} lineHeight="lg" weight="bold">
-          {t('auth.enterNickname.title')}
-        </CustomText>
-      </LabelWrapper>
-
-      <InputWithHelperWrapper>
-        <CustomTextInput
-          placeholder={t('placeholder.nickname')}
-          value={nickname}
-          onChangeText={setNickname}
-        />
-        <HelperWrapper>{nicknameHelper()}</HelperWrapper>
-      </InputWithHelperWrapper>
-
-      <BottomButtonBar transitions={transition} />
-    </>
+    <NicknameInputStep
+      nickname={nickname}
+      setNickname={setNickname}
+      onConfirm={handleConfirm}
+      isLoading={isLoading}
+    />
   );
 };
 

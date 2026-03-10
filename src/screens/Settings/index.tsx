@@ -31,7 +31,7 @@ const Settings = () => {
           </CustomText>
         </CustomListItem>
 
-        <CustomListItem>
+        <CustomListItem onPress={() => navigation.navigate('ChangeNickname')}>
           <CustomText size={14} lineHeight="sm">
             {t('settings.changeNickname')}
           </CustomText>
