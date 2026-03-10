@@ -9,6 +9,12 @@ export const Container = styled(View)`
   position: relative;
 `;
 
+export const UserInfoWrapper = styled(View)`
+  align-items: center;
+  padding: 20px 0 30px;
+  gap: 4px;
+`;
+
 export const ListWrapper = styled(View)`
   gap: 10px;
 `;
