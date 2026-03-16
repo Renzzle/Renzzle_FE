@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View } from 'react-native';
+import { Modal, TouchableWithoutFeedback, View } from 'react-native';
 import {
   CenteredView,
   ModalBodyContainer,
@@ -30,7 +30,18 @@ export type ModalCategoryType =
   | 'RANKING_PUZZLE_OUTRO'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
-  | 'FEATURE_IN_PROGRESS';
+  | 'FEATURE_IN_PROGRESS'
+  | 'NETWORK_ERROR';
+
+const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
+  'NETWORK_ERROR',
+  'RANKING_PUZZLE_OUTRO',
+  'TRAINING_PUZZLE_SUCCESS',
+  'COMMUNITY_PUZZLE_SUCCESS',
+  'RANKING_PUZZLE_SUCCESS',
+  'TRAINING_PUZZLE_FAILURE',
+  'COMMUNITY_PUZZLE_FAILURE',
+];
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -113,6 +124,11 @@ export const MODAL_TEXTS = {
     BODY: 'modal.featureInProgress.message',
     FOOTER: 'modal.featureInProgress.confirm',
   },
+  NETWORK_ERROR: {
+    TITLE: 'modal.networkError.title',
+    BODY: 'modal.networkError.message',
+    FOOTER: 'modal.networkError.confirm',
+  },
 };
 
 interface CustomModalProps {
@@ -185,20 +201,55 @@ export const ModalCard = ({
     );
 
   return (
-    <CenteredView>
-      <ModalContainer screenWidth={width}>
-        {title}
-        {body}
-        {footer}
-      </ModalContainer>
-    </CenteredView>
+    <ModalContainer screenWidth={width}>
+      {title}
+      {body}
+      {footer}
+    </ModalContainer>
   );
 };
 
-const CustomModal = ({ isVisible, children, ...props }: CustomModalProps) => {
+const CustomModal = ({
+  isVisible,
+  onPrimaryAction,
+  onSecondaryAction,
+  category,
+  children,
+  ...props
+}: CustomModalProps) => {
+  const handleDismiss = () => {
+    if (category && NON_DISMISSIBLE_CATEGORIES.includes(category)) {
+      return;
+    }
+
+    if (onSecondaryAction) {
+      onSecondaryAction();
+    } else {
+      onPrimaryAction();
+    }
+  };
+
   return (
-    <Modal visible={isVisible} transparent={true} animationType="fade">
-      {isVisible && <ModalCard {...props}>{children}</ModalCard>}
+    <Modal
+      visible={isVisible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={handleDismiss}>
+      {isVisible && (
+        <CenteredView onPress={handleDismiss}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View>
+              <ModalCard
+                category={category}
+                onPrimaryAction={onPrimaryAction}
+                onSecondaryAction={onSecondaryAction}
+                {...props}>
+                {children}
+              </ModalCard>
+            </View>
+          </TouchableWithoutFeedback>
+        </CenteredView>
+      )}
     </Modal>
   );
 };

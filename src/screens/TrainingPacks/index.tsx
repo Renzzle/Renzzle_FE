@@ -1,22 +1,23 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TabBar from '../../components/common/TabBar';
 import { ActiveTabContainer, Container } from './index.styles';
 import { getPack, purchaseTrainingPack } from '../../apis/training';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { GameOutcome, TrainingPack } from '../../types';
+import { GameOutcome, RootStackParamList, TrainingPack } from '../../types';
 import { useUserStore } from '../../store/useUserStore';
 import theme from '../../styles/theme';
 
 const TrainingPacks = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'TrainingPacks'>>();
   const {
     isModalVisible,
     activateModal,
@@ -77,11 +78,23 @@ const TrainingPacks = () => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchPackData(currentTab);
-    }, [currentTab]),
-  );
+  // Fetch data on initial mount
+  useEffect(() => {
+    fetchPackData(currentTab);
+  }, [currentTab]);
+
+  // Optimistic update
+  useEffect(() => {
+    const updatedPack = route.params?.updatedPack;
+
+    if (updatedPack) {
+      setPacks((prevPacks) =>
+        prevPacks.map((prevPack) => (prevPack.id === updatedPack.id ? updatedPack : prevPack)),
+      );
+
+      navigation.setParams({ updatedPack: undefined });
+    }
+  }, [route.params?.updatedPack, navigation]);
 
   const tabs = [
     { key: 'LOW', title: '초급', component: () => null },

@@ -10,11 +10,15 @@ export type RootStackParamList = {
   };
   TrainingPuzzleSolve: {
     puzzles: TrainingPuzzle[];
-    title: string;
+    pack: TrainingPack;
     puzzleNumber: number;
   };
   TrainingPuzzles: {
     pack: TrainingPack;
+    updatedItems?: TrainingPuzzle[];
+  };
+  TrainingPacks: {
+    updatedPack?: TrainingPack;
   };
   PuzzleReview: {
     problemSequence: string;

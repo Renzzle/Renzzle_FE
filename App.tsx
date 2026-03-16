@@ -34,14 +34,21 @@ import RankedPuzzleSolve from './src/screens/RankedPuzzleSolve/index.tsx';
 import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
 import theme from './src/styles/theme.ts';
+import useNetworkStore from './src/store/useNetworkStore.ts';
+import { CustomModal } from './src/components/common/index.ts';
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element | null {
   const { accessToken } = useAuthStore();
   const isLoading = useInitializeApp();
+  const { isNetworkError, setNetworkError } = useNetworkStore();
 
   const renderCustomHeader = (props: NativeStackHeaderProps) => <CustomHeader {...props} />;
+
+  const handleCloseNetworkError = () => {
+    setNetworkError(false);
+  };
 
   if (isLoading) {
     return null;
@@ -146,6 +153,12 @@ function App(): React.JSX.Element | null {
                 </>
               )}
             </Stack.Navigator>
+
+            <CustomModal
+              isVisible={isNetworkError}
+              category="NETWORK_ERROR"
+              onPrimaryAction={handleCloseNetworkError}
+            />
           </AppWrapper>
           <Toast config={toastConfig} />
         </NavigationContainer>

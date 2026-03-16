@@ -18,11 +18,11 @@ export const DescText = styled(CustomText)`
   padding: 13px 15px;
 `;
 
-export const MyRankingContainer = styled(View)<{ insetsBottom: number }>`
+export const MyRankingContainer = styled(View)`
   position: absolute;
   left: 15px;
   right: 0;
   z-index: 100;
   width: 100%;
-  bottom: ${({ insetsBottom }) => `${insetsBottom + 15}px`};
+  bottom: 15px;
 `;
