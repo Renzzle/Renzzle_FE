@@ -161,6 +161,12 @@
       "confirm": "구매하기",
       "cancel": "취소"
     },
+    "userDeleteConfirm": {
+      "title": "회원 탈퇴",
+      "message": "정말로 회원 탈퇴를 진행하시겠습니까?\n탈퇴 후에는 계정을 복구할 수 없습니다.",
+      "confirm": "탈퇴하기",
+      "cancel": "취소"
+    },
     "featureInProgress": {
       "title": "준비 중",
       "message": "해당 기능은 현재 개발 중입니다.\n정식 출시에서 만나요!",

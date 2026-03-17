@@ -3,15 +3,43 @@ import { Container, ListWrapper, UserInfoWrapper } from './index.styles';
 import CustomListItem from '../../components/common/CustomListItem';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../../store/useUserStore';
-import { CustomText } from '../../components/common';
+import { CustomModal, CustomText } from '../../components/common';
 import { Linking } from 'react-native';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import useModal from '../../hooks/useModal';
+import { deleteUser } from '../../apis/user';
+import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import useAuthStore from '../../store/useAuthStore';
 
 const Settings = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { t } = useTranslation();
+  const { clearTokens } = useAuthStore();
+
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const user = useUserStore((state) => state.user);
+
+  const handleUserDelete = () => {
+    activateModal('USER_DELETE_CONFIRM', {
+      primaryAction: handleDelete,
+    });
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteUser();
+      await clearTokens();
+    } catch (error) {
+      showBottomToast('error', '탈퇴에 실패했습니다.');
+    }
+  };
 
   return (
     <Container>
@@ -62,12 +90,19 @@ const Settings = () => {
           </CustomText>
         </CustomListItem>
 
-        <CustomListItem>
+        <CustomListItem onPress={handleUserDelete}>
           <CustomText size={14} lineHeight="sm">
             {t('settings.deleteAccount')}
           </CustomText>
         </CustomListItem>
       </ListWrapper>
+
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}
+      />
     </Container>
   );
 };

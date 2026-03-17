@@ -11,6 +11,15 @@ export const getUser = async () => {
   }
 };
 
+export const deleteUser = async () => {
+  try {
+    const response = await apiClient.delete('/api/user');
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const updateUserNickname = async (nickname: string) => {
   try {
     const response = await apiClient.patch('/api/user/nickname', { nickname });
