@@ -9,7 +9,7 @@ import {
   SearchWrapper,
 } from './index.styles';
 import InfiniteScrollList, { ApiCallParams } from '../../components/common/InfiniteScrollList';
-import { CommunityPuzzle } from '../../types';
+import { CommunityPuzzle, DEPTH } from '../../types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
@@ -25,7 +25,7 @@ const DEFAULT_FILTER: FilterState = {
   sort: 'LATEST',
   stone: { black: false, white: false },
   auth: { verified: false, unverified: false },
-  depthRange: [1, 10],
+  depthRange: [DEPTH.MIN, DEPTH.MAX],
   solveStatus: { solved: false, unsolved: false },
 };
 
@@ -74,8 +74,8 @@ const CommunityPuzzles = () => {
   };
 
   const apiParams = useMemo<Partial<ApiCallParams>>(() => {
-    const depthMin = Math.max(1, appliedFilter.depthRange[0]);
-    const depthMax = Math.min(appliedFilter.depthRange[1], 255);
+    const depthMin = Math.max(DEPTH.MIN, appliedFilter.depthRange[0]);
+    const depthMax = Math.min(appliedFilter.depthRange[1], DEPTH.MAX);
 
     const params: Record<string, any> = {
       sort: appliedFilter.sort,
@@ -122,7 +122,7 @@ const CommunityPuzzles = () => {
             value={inputText}
             onChangeText={setInputText}
             onSubmitEditing={handleSearchSubmit}
-            placeholder="출제자 또는 문제번호 검색"
+            placeholder={t('placeholder.communitySearch')}
             rightElement={
               <SearchButtonWrapper onPress={handleSearchSubmit}>
                 <Icon name="SearchIcon" color="gray/gray400" />

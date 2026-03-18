@@ -111,9 +111,9 @@ export const MODAL_TEXTS = {
     FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
   },
   COMMUNITY_FILTER: {
-    TITLE: 'modal.rankingPuzzleOutro.title',
+    TITLE: 'modal.communityFilter.title',
     BODY: '',
-    FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
+    FOOTER: ['modal.communityFilter.cancel', 'modal.communityFilter.confirm'],
   },
   TRAINING_PACK_PURCHASE: {
     TITLE: 'modal.trainingPackPurchase.title',

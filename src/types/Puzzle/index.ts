@@ -69,3 +69,10 @@ export enum WinColor {
   'BLACK' = '흑',
   'WHITE' = '백',
 }
+
+export const DEPTH = {
+  MIN: 1,
+  MAX: 225,
+} as const;
+
+export type Depth = number;
