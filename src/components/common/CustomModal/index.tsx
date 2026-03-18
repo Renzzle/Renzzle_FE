@@ -28,6 +28,7 @@ export type ModalCategoryType =
   | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_PUZZLE_OUTRO'
+  | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
   | 'FEATURE_IN_PROGRESS'
@@ -109,6 +110,11 @@ export const MODAL_TEXTS = {
     BODY: 'modal.rankingPuzzleOutro.message',
     FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
   },
+  COMMUNITY_FILTER: {
+    TITLE: 'modal.rankingPuzzleOutro.title',
+    BODY: '',
+    FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
+  },
   TRAINING_PACK_PURCHASE: {
     TITLE: 'modal.trainingPackPurchase.title',
     BODY: 'modal.trainingPackPurchase.message',
@@ -177,8 +183,8 @@ export const ModalCard = ({
           price: gameOutcome?.price,
           puzzleCount: gameOutcome?.puzzleCount,
         })}
-        {children}
       </CustomText>
+      {children}
     </ModalBodyContainer>
   );
 

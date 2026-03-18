@@ -1,4 +1,4 @@
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
 
@@ -27,4 +27,16 @@ export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
 
   background-color: ${({ isDisabled }) =>
     isDisabled ? theme.color['gray/gray100'] : theme.color['gray/white']};
+`;
+
+export const InputContainer = styled(View)`
+  position: relative;
+`;
+
+export const RightElementWrapper = styled(View)`
+  position: absolute;
+  right: 0;
+  height: 100%;
+  justify-content: center;
+  overflow: hidden;
 `;

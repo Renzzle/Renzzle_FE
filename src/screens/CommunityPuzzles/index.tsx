@@ -1,34 +1,145 @@
-import React, { useMemo } from 'react';
-import { ButtonWrapper, Container, EmptyContainer } from './index.styles';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ButtonWrapper,
+  Container,
+  EmptyContainer,
+  FilterButtonWrapper,
+  SearchBarWrapper,
+  SearchButtonWrapper,
+  SearchWrapper,
+} from './index.styles';
 import InfiniteScrollList, { ApiCallParams } from '../../components/common/InfiniteScrollList';
 import { CommunityPuzzle } from '../../types';
 import { getCommunityPuzzles } from '../../apis/community';
 import CommunityCard from '../../components/features/CommunityCard';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CustomText, Icon } from '../../components/common';
+import { CustomModal, CustomText, CustomTextInput, Icon } from '../../components/common';
 import { useTranslation } from 'react-i18next';
 import CircleButton from '../../components/features/CircleButton';
 import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
+import useModal from '../../hooks/useModal';
+import CommunityFilter, { FilterState } from '../../components/features/CommunityFilter';
+
+const DEFAULT_FILTER: FilterState = {
+  sort: 'LATEST',
+  stone: { black: false, white: false },
+  auth: { verified: false, unverified: false },
+  depthRange: [1, 10],
+  solveStatus: { solved: false, unsolved: false },
+};
 
 const CommunityPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { t } = useTranslation();
+  const {
+    isModalVisible,
+    activateModal,
+    closePrimarily,
+    closeSecondarily,
+    category: modalCategory,
+  } = useModal();
   const listRef = useOptimisticCommunityUpdate();
 
-  // TODO: 검색 기능 추가 시 변수화 필요
-  const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
+  const [filter, setFilter] = useState<FilterState>(DEFAULT_FILTER);
+  const [appliedFilter, setAppliedFilter] = useState<FilterState>(DEFAULT_FILTER);
+
+  const filterRef = useRef<FilterState>(filter);
+  useEffect(() => {
+    filterRef.current = filter;
+  }, [filter]);
+
+  const [inputText, setInputText] = useState('');
+  const [appliedQuery, setAppliedQuery] = useState('');
+
+  const handleFilterChange = (updated: Partial<FilterState>) => {
+    setFilter((prev) => ({ ...prev, ...updated }));
+  };
+
+  const handleApplyFilter = () => {
+    setAppliedFilter(filterRef.current);
+  };
+
+  const handleFilter = () => {
+    setFilter(appliedFilter);
+    activateModal('COMMUNITY_FILTER', { primaryAction: handleApplyFilter });
+  };
+
+  const handleSearchSubmit = () => {
+    setAppliedQuery(inputText);
+  };
 
   const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
     navigation.navigate('CommunityPuzzleSolve', { puzzle, fromScreen: 'CommunityPuzzles' });
   };
 
+  const apiParams = useMemo<Partial<ApiCallParams>>(() => {
+    const depthMin = Math.max(1, appliedFilter.depthRange[0]);
+    const depthMax = Math.min(appliedFilter.depthRange[1], 255);
+
+    const params: Record<string, any> = {
+      sort: appliedFilter.sort,
+      depthMin: depthMin,
+      depthMax: depthMax,
+    };
+
+    // 검색어 추가
+    if (appliedQuery) {
+      params.query = appliedQuery;
+    }
+
+    // 흑/백
+    if (appliedFilter.stone.black && !appliedFilter.stone.white) {
+      params.stone = 'BLACK';
+    }
+    if (!appliedFilter.stone.black && appliedFilter.stone.white) {
+      params.stone = 'WHITE';
+    }
+
+    // 인증 여부
+    if (appliedFilter.auth.verified && !appliedFilter.auth.unverified) {
+      params.auth = true;
+    }
+    if (!appliedFilter.auth.verified && appliedFilter.auth.unverified) {
+      params.auth = false;
+    }
+
+    // 풀이 여부
+    if (appliedFilter.solveStatus.solved && !appliedFilter.solveStatus.unsolved) {
+      params.solved = true;
+    }
+    if (!appliedFilter.solveStatus.solved && appliedFilter.solveStatus.unsolved) {
+      params.solved = false;
+    }
+    return params;
+  }, [appliedFilter, appliedQuery]);
+
   return (
     <Container>
+      <SearchWrapper>
+        <SearchBarWrapper>
+          <CustomTextInput
+            value={inputText}
+            onChangeText={setInputText}
+            onSubmitEditing={handleSearchSubmit}
+            placeholder="출제자 또는 문제번호 검색"
+            rightElement={
+              <SearchButtonWrapper onPress={handleSearchSubmit}>
+                <Icon name="SearchIcon" color="gray/gray400" />
+              </SearchButtonWrapper>
+            }
+          />
+        </SearchBarWrapper>
+        <FilterButtonWrapper onPress={handleFilter}>
+          <Icon name="FilterIcon" color="gray/gray500" />
+        </FilterButtonWrapper>
+      </SearchWrapper>
+
       <InfiniteScrollList<CommunityPuzzle>
         ref={listRef}
         apiCall={getCommunityPuzzles}
         defaultParams={apiParams}
+        keyboardDismissMode="on-drag"
         renderItem={({ item }) => (
           <CommunityCard
             title={item.authorName}
@@ -60,6 +171,14 @@ const CommunityPuzzles = () => {
           <Icon name="PlusIcon" color="gray/white" />
         </CircleButton>
       </ButtonWrapper>
+
+      <CustomModal
+        isVisible={isModalVisible}
+        category={modalCategory}
+        onPrimaryAction={closePrimarily}
+        onSecondaryAction={closeSecondarily}>
+        <CommunityFilter filter={filter} onChangeFilter={handleFilterChange} />
+      </CustomModal>
     </Container>
   );
 };
