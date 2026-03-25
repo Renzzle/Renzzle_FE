@@ -25,7 +25,7 @@ const DEFAULT_FILTER: FilterState = {
   sort: 'LATEST',
   stone: { black: false, white: false },
   auth: { verified: false, unverified: false },
-  depthRange: [DEPTH.MIN, DEPTH.MAX],
+  depthRange: [DEPTH.MIN, DEPTH.SEARCH_MAX],
   solveStatus: { solved: false, unsolved: false },
 };
 
@@ -75,7 +75,10 @@ const CommunityPuzzles = () => {
 
   const apiParams = useMemo<Partial<ApiCallParams>>(() => {
     const depthMin = Math.max(DEPTH.MIN, appliedFilter.depthRange[0]);
-    const depthMax = Math.min(appliedFilter.depthRange[1], DEPTH.MAX);
+    let depthMax = Math.min(appliedFilter.depthRange[1], DEPTH.SEARCH_MAX);
+    if (depthMax === DEPTH.SEARCH_MAX) {
+      depthMax = DEPTH.MAX;
+    }
 
     const params: Record<string, any> = {
       sort: appliedFilter.sort,

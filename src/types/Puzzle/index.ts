@@ -73,6 +73,7 @@ export enum WinColor {
 export const DEPTH = {
   MIN: 1,
   MAX: 225,
+  SEARCH_MAX: 31,
 } as const;
 
 export type Depth = number;

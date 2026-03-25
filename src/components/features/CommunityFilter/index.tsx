@@ -108,14 +108,15 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
         {t('puzzle.depth')}
       </CustomText>
       <CustomText size={14} lineHeight="sm" color="gray/gray500">
-        {depthValues[0]} ~ {depthValues[1]}
+        {depthValues[0]}-{depthValues[1]}
+        {depthValues[1] === DEPTH.SEARCH_MAX && '+'}
       </CustomText>
       <SliderWrapper onLayout={(e) => setSliderWidth(e.nativeEvent.layout.width)}>
         <MultiSlider
           values={depthValues}
           min={DEPTH.MIN}
-          max={DEPTH.MAX}
-          step={1}
+          max={DEPTH.SEARCH_MAX}
+          step={2}
           sliderLength={sliderWidth}
           selectedStyle={selectedStyle}
           unselectedStyle={unselectedStyle}
