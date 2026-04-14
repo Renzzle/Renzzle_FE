@@ -33,6 +33,7 @@ import theme from '../../styles/theme';
 import useModal from '../../hooks/useModal';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore } from '../../store/useUserStore';
+import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 
 const CommunityPuzzleSolve = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -50,6 +51,8 @@ const CommunityPuzzleSolve = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
+
+  const { showAdIfReady } = usePuzzleAd();
 
   const markSolved = () => {
     setPuzzleDetail((prev) => {
@@ -71,7 +74,9 @@ const CommunityPuzzleSolve = () => {
 
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
         primaryAction: () => {
-          navigation.goBack();
+          showAdIfReady(() => {
+            navigation.goBack();
+          });
         },
       });
     } else {

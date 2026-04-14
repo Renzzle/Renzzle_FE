@@ -1,4 +1,8 @@
 {
   "name": "Renzzle_FE",
-  "displayName": "Renzzle_FE"
+  "displayName": "Renzzle_FE",
+
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8517144519151386~7296776987"
+  }
 }
