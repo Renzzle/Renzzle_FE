@@ -71,13 +71,19 @@ const Settings = () => {
           </CustomText>
         </CustomListItem>
 
-        <CustomListItem>
+        <CustomListItem
+          onPress={() =>
+            Linking.openURL('https://renzzle.github.io/Renzzle_Policy/privacy-policy.html')
+          }>
           <CustomText size={14} lineHeight="sm">
             {t('settings.privacyPolicy')}
           </CustomText>
         </CustomListItem>
 
-        <CustomListItem>
+        <CustomListItem
+          onPress={() =>
+            Linking.openURL('https://renzzle.github.io/Renzzle_Policy/terms-of-use.html')
+          }>
           <CustomText size={14} lineHeight="sm">
             {t('settings.termsOfService')}
           </CustomText>
