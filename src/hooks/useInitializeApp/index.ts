@@ -4,17 +4,33 @@ import useAuthStore from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { initI18n } from '../../locales/i18n';
+import { getAppData } from '../../apis/config';
+import useConfigStore from '../../store/useConfigStore';
 
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
   const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
   const { setUser } = useUserStore(); // Get setters from the user store
+  const { setFeedbackUrl } = useConfigStore();
 
   useEffect(() => {
+    const loadAppData = async () => {
+      try {
+        const config = await getAppData();
+        const feedbackUrl = config.response.find(
+          (i: { tag: string }) => i.tag === 'feedback_url',
+        )?.value;
+        if (feedbackUrl) {
+          setFeedbackUrl(feedbackUrl);
+        }
+      } catch (e) {
+        console.log('설정 로드 실패:', e);
+      }
+    };
+
     const initApp = async () => {
       try {
-        await initI18n();
-
+        await Promise.all([initI18n(), loadAppData()]);
         const credentials = await restoreCredentials();
         const { accessToken, refreshToken } = credentials;
 
@@ -37,7 +53,7 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [restoreCredentials, setTokens, clearTokens, setUser]);
+  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl]);
 
   return isLoading;
 };

@@ -11,12 +11,14 @@ import useModal from '../../hooks/useModal';
 import { deleteUser } from '../../apis/user';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import useAuthStore from '../../store/useAuthStore';
+import useConfigStore from '../../store/useConfigStore';
 
 const Settings = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { t } = useTranslation();
+  const DEFAULT_FEEDBACK_URL = 'https://forms.gle/NTVoFDAxy498yTv17';
+  const { feedbackUrl } = useConfigStore();
   const { clearTokens } = useAuthStore();
-
   const {
     isModalVisible,
     activateModal,
@@ -25,6 +27,21 @@ const Settings = () => {
     category: modalCategory,
   } = useModal();
   const user = useUserStore((state) => state.user);
+
+  const handleFeedback = async () => {
+    const url = feedbackUrl ?? DEFAULT_FEEDBACK_URL;
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (!canOpen) {
+        throw new Error('Invalid URL');
+      }
+
+      await Linking.openURL(url);
+    } catch (e) {
+      console.log('피드백 열기 실패:', e);
+      showBottomToast('error', '페이지를 열 수 없습니다.'); // TODO: locales 추가
+    }
+  };
 
   const handleUserDelete = () => {
     activateModal('USER_DELETE_CONFIRM', {
@@ -89,8 +106,7 @@ const Settings = () => {
           </CustomText>
         </CustomListItem>
 
-        <CustomListItem onPress={() => Linking.openURL('https://google.com')}>
-          {/* TODO: 실제 피드백 구글폼 주소로 변경 필요 */}
+        <CustomListItem onPress={handleFeedback}>
           <CustomText size={14} lineHeight="sm">
             {t('settings.feedback')}
           </CustomText>
