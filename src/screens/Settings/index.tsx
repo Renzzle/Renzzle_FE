@@ -13,10 +13,16 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import useAuthStore from '../../store/useAuthStore';
 import useConfigStore from '../../store/useConfigStore';
 
+const EXTERNAL_URLS = {
+  DEFAULT_FEEDBACK: 'https://forms.gle/NTVoFDAxy498yTv17',
+  PRIVACY_POLICY: 'https://renzzle.github.io/Renzzle_Policy/privacy-policy.html',
+  TERMS_OF_USE: 'https://renzzle.github.io/Renzzle_Policy/terms-of-use.html',
+};
+
 const Settings = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { t } = useTranslation();
-  const DEFAULT_FEEDBACK_URL = 'https://forms.gle/NTVoFDAxy498yTv17';
+  const user = useUserStore((state) => state.user);
   const { feedbackUrl } = useConfigStore();
   const { clearTokens } = useAuthStore();
   const {
@@ -26,10 +32,11 @@ const Settings = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
-  const user = useUserStore((state) => state.user);
+
+  const handleRemoveAds = () => {};
 
   const handleFeedback = async () => {
-    const url = feedbackUrl ?? DEFAULT_FEEDBACK_URL;
+    const url = feedbackUrl ?? EXTERNAL_URLS.DEFAULT_FEEDBACK;
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (!canOpen) {
@@ -43,20 +50,36 @@ const Settings = () => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteUser();
+      await clearTokens();
+    } catch (error) {
+      showBottomToast('error', '탈퇴에 실패했습니다.'); // TODO: locales
+    }
+  };
+
   const handleUserDelete = () => {
     activateModal('USER_DELETE_CONFIRM', {
       primaryAction: handleDelete,
     });
   };
 
-  const handleDelete = async () => {
-    try {
-      await deleteUser();
-      await clearTokens();
-    } catch (error) {
-      showBottomToast('error', '탈퇴에 실패했습니다.');
-    }
-  };
+  const menuItems = [
+    { label: t('settings.language'), onPress: () => navigation.navigate('Language') },
+    { label: t('settings.changeNickname'), onPress: () => navigation.navigate('ChangeNickname') },
+    { label: t('settings.removeAds'), onPress: () => handleRemoveAds },
+    {
+      label: t('settings.privacyPolicy'),
+      onPress: () => Linking.openURL(EXTERNAL_URLS.PRIVACY_POLICY),
+    },
+    {
+      label: t('settings.termsOfService'),
+      onPress: () => Linking.openURL(EXTERNAL_URLS.TERMS_OF_USE),
+    },
+    { label: t('settings.feedback'), onPress: handleFeedback },
+    { label: t('settings.deleteAccount'), onPress: handleUserDelete },
+  ];
 
   return (
     <Container>
@@ -70,53 +93,13 @@ const Settings = () => {
       </UserInfoWrapper>
 
       <ListWrapper>
-        <CustomListItem onPress={() => navigation.navigate('Language')}>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.language')}
-          </CustomText>
-        </CustomListItem>
-
-        <CustomListItem onPress={() => navigation.navigate('ChangeNickname')}>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.changeNickname')}
-          </CustomText>
-        </CustomListItem>
-
-        <CustomListItem>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.removeAds')}
-          </CustomText>
-        </CustomListItem>
-
-        <CustomListItem
-          onPress={() =>
-            Linking.openURL('https://renzzle.github.io/Renzzle_Policy/privacy-policy.html')
-          }>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.privacyPolicy')}
-          </CustomText>
-        </CustomListItem>
-
-        <CustomListItem
-          onPress={() =>
-            Linking.openURL('https://renzzle.github.io/Renzzle_Policy/terms-of-use.html')
-          }>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.termsOfService')}
-          </CustomText>
-        </CustomListItem>
-
-        <CustomListItem onPress={handleFeedback}>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.feedback')}
-          </CustomText>
-        </CustomListItem>
-
-        <CustomListItem onPress={handleUserDelete}>
-          <CustomText size={14} lineHeight="sm">
-            {t('settings.deleteAccount')}
-          </CustomText>
-        </CustomListItem>
+        {menuItems.map((item, index) => (
+          <CustomListItem key={index} onPress={item.onPress}>
+            <CustomText size={14} lineHeight="sm">
+              {item.label}
+            </CustomText>
+          </CustomListItem>
+        ))}
       </ListWrapper>
 
       <CustomModal
