@@ -3,7 +3,7 @@ import { Container, ListWrapper } from '../index.styles';
 import CustomListItem from '../../../components/common/CustomListItem';
 import CustomRadioButton from '../../../components/common/CustomRadioButton/CustomCheckbox';
 import { useTranslation } from 'react-i18next';
-import { changeLanguage } from 'i18next';
+import { changeLanguage } from '../../../locales/i18n';
 import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 
 const LANGUAGE_OPTIONS = [
