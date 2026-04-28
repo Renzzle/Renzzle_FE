@@ -1,11 +1,17 @@
 import styled from 'styled-components';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import theme from '../../../styles/theme';
 import { TextPropsType } from './index.types';
 
 export type StyledTextType = Required<TextPropsType>;
 export const StyledText = styled(Text)<StyledTextType>`
-  font-family: ${(props) => (props.weight === 'bold' ? 'NanumSquareNeoOTF-Eb' : 'NanumSquareNeoOTF-Bd')};
+  font-family: ${(props) => {
+    if (Platform.OS === 'ios') {
+      return props.weight === 'bold' ? 'NanumSquareNeo-dEb' : 'NanumSquareNeo-cBd';
+    } else {
+      return props.weight === 'bold' ? 'NanumSquareNeoOTF-Eb' : 'NanumSquareNeoOTF-Bd';
+    }
+  }};
   color: ${(props) => theme.color[props.color]};
   font-size: ${(props) => `${props.size}px`};
   /* TODO: NanumSquareNeo font weight broken issue */
