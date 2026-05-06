@@ -70,7 +70,7 @@ const AnswerCommunityPuzzle = () => {
 
   const transition = [
     {
-      text: '검증', // TODO: locales로 빼기
+      text: t('button.verify'),
       onAction: async () => {
         await verifySequence();
       },
@@ -78,7 +78,7 @@ const AnswerCommunityPuzzle = () => {
       loading: isVerifyLoading,
     },
     {
-      text: isVerified ? '인증 업로드' : '미인증 업로드', // TODO: locales로 빼기
+      text: isVerified ? t('button.certifiedUpload') : t('button.uncertifiedUpload'),
       onAction: async () => {
         await handleUpload();
       },
@@ -110,7 +110,7 @@ const AnswerCommunityPuzzle = () => {
           primaryAction: () => {},
         });
       } catch (error) {
-        showBottomToast('error', '검증 중 오류가 발생했습니다.');
+        showBottomToast('error', t('toast.verificationError'));
       } finally {
         setIsVerifyDisabled(false);
         setIsVerifyLoading(false);
@@ -163,7 +163,7 @@ const AnswerCommunityPuzzle = () => {
         showBottomToast('error', t('modal.puzzleUploadFailed.title'));
       }
     } catch (error) {
-      showBottomToast('error', '이미 있는 퍼즐이에요. 새로 만들어 주세요.'); // TODO: locales로 빼기
+      showBottomToast('error', t('toast.duplicatePuzzle'));
     } finally {
       setIsVerifyDisabled(false);
       setIsUploadDisabled(false);

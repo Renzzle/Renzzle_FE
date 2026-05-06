@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { checkNicknameDuplicate } from '../../../apis/auth';
 import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 import NicknameInputStep from '../../../components/features/NicknameInputStep';
+import { useTranslation } from 'react-i18next';
 
 interface SignupNicknameStepProps {
   nickname: string;
@@ -10,6 +11,7 @@ interface SignupNicknameStepProps {
 }
 
 const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknameStepProps) => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleConfirm = async () => {
@@ -20,7 +22,7 @@ const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknam
       if (!response?.response) {
         onComplete();
       } else {
-        showBottomToast('error', '이미 사용된 닉네임입니다.'); // TODO: locales
+        showBottomToast('error', t('toast.nicknameAlreadyInUse'));
       }
     } catch (error) {
       showBottomToast('error', error as string);

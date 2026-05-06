@@ -14,8 +14,10 @@ import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
+import { useTranslation } from 'react-i18next';
 
 const TrainingPuzzleSolve = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPuzzleSolve'>>();
   const {
@@ -114,7 +116,7 @@ const TrainingPuzzleSolve = () => {
         const mainSequence = problemSequence + data.answer;
 
         await updateUser();
-        showBottomToast('success', '구매가 완료되었습니다.');
+        showBottomToast('success', t('toast.purchaseComplete'));
         navigation.navigate('TrainingPuzzleReview', {
           problemSequence,
           mainSequence,

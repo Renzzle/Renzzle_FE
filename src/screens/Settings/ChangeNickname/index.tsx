@@ -9,8 +9,10 @@ import { updateUserNickname } from '../../../apis/user';
 import { useUserStore } from '../../../store/useUserStore';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
 
 const ChangeNickname = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {
     isModalVisible,
@@ -34,7 +36,7 @@ const ChangeNickname = () => {
           primaryAction: handleNicknameChange,
         });
       } else {
-        showBottomToast('error', '이미 사용된 닉네임입니다.'); // TODO: locales
+        showBottomToast('error', t('toast.nicknameAlreadyInUse'));
       }
     } finally {
       setIsLoading(false);
@@ -47,9 +49,9 @@ const ChangeNickname = () => {
 
       await updateUserNickname(nickname);
       navigation.goBack();
-      showBottomToast('success', '닉네임이 변경되었습니다.');
+      showBottomToast('success', t('toast.nicknameChanged'));
     } catch (error) {
-      showBottomToast('error', '닉네임 변경에 실패했습니다.');
+      showBottomToast('error', t('toast.nicknameChangeFailed'));
     } finally {
       setIsLoading(false);
       await updateUser();

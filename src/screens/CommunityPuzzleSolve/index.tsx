@@ -34,8 +34,10 @@ import useModal from '../../hooks/useModal';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore } from '../../store/useUserStore';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
+import { useTranslation } from 'react-i18next';
 
 const CommunityPuzzleSolve = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>>();
   const {
@@ -154,7 +156,7 @@ const CommunityPuzzleSolve = () => {
         const mainSequence = problemSequence + data.answer;
 
         await updateUser();
-        showBottomToast('success', '구매가 완료되었습니다.');
+        showBottomToast('success', t('toast.purchaseComplete'));
         navigation.navigate('CommunityPuzzleReview', {
           problemSequence,
           mainSequence,

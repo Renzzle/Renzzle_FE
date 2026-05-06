@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, FlatListProps, View } from 'react-native';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../Toast/toastMessage';
 import { RefreshControl } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 
 export interface ApiCallParams {
   id?: number | null;
@@ -49,6 +50,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
     },
     ref,
   ) => {
+    const { t } = useTranslation();
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -92,11 +94,11 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           setCursorId(lastItem.id ?? null);
         }
       } catch (err) {
-        showBottomToast('error', '리스트 불러오기 오류'); // TODO: locales
+        showBottomToast('error', t('toast.listLoadError'));
       } finally {
         setLoading(false);
       }
-    }, [apiCall, loading, hasMore, refreshing, cursorId, defaultParams, pageSize]);
+    }, [apiCall, loading, hasMore, refreshing, cursorId, defaultParams, pageSize, t]);
 
     const onRefresh = useCallback(async () => {
       setRefreshing(true);
@@ -122,11 +124,11 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           setHasMore(false);
         }
       } catch (error) {
-        showBottomToast('error', '새로고침 오류'); // TODO: locales
+        showBottomToast('error', t('toast.refreshError'));
       } finally {
         setRefreshing(false);
       }
-    }, [apiCall, defaultParams, pageSize]);
+    }, [apiCall, defaultParams, pageSize, t]);
 
     /** [중요] defaultParams가 바뀌었을 때만 초기화 (페이지 진입 시 자동실행)
      * 부모 컴포넌트에서 defaultParams를 useMemo로 감싸야

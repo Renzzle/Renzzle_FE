@@ -34,6 +34,9 @@ export const initI18n = async () => {
     interpolation: {
       escapeValue: false,
     },
+    react: {
+      useSuspense: false,
+    },
   });
 };
 

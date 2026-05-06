@@ -10,8 +10,10 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
+import { useTranslation } from 'react-i18next';
 
 const MyPuzzles = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const listRef = useOptimisticCommunityUpdate();
   const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
@@ -37,7 +39,7 @@ const MyPuzzles = () => {
           await deleteMyPuzzle(id);
           listRef.current?.removeItem(id);
 
-          showBottomToast('success', '퍼즐이 삭제되었습니다.');
+          showBottomToast('success', t('toast.puzzleDeleted'));
         } catch (error) {
           showBottomToast('error', error as string);
         }

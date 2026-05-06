@@ -19,7 +19,7 @@ const Language = () => {
       return;
     }
     await changeLanguage(lang);
-    showBottomToast('success', t('alert.languageChanged'));
+    showBottomToast('success', t('toast.languageChanged'));
   };
 
   return (

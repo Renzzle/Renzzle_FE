@@ -3,7 +3,7 @@ import SplashScreen from 'react-native-splash-screen';
 import useAuthStore from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
-import { initI18n } from '../../locales/i18n';
+import i18n, { initI18n } from '../../locales/i18n';
 import { getAppData } from '../../apis/config';
 import useConfigStore from '../../store/useConfigStore';
 
@@ -43,7 +43,7 @@ const useInitializeApp = (): boolean => {
           }
         }
       } catch (error) {
-        showBottomToast('error', '어플리케이션 시작 오류 발생'); // TODO: locales
+        showBottomToast('error', i18n.t('toast.appStartError'));
         await clearTokens();
       } finally {
         SplashScreen.hide();

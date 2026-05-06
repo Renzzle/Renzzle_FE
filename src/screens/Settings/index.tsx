@@ -46,7 +46,7 @@ const Settings = () => {
       await Linking.openURL(url);
     } catch (e) {
       console.log('피드백 열기 실패:', e);
-      showBottomToast('error', '페이지를 열 수 없습니다.'); // TODO: locales 추가
+      showBottomToast('error', t('toast.cannotOpenPage'));
     }
   };
 
@@ -55,7 +55,7 @@ const Settings = () => {
       await deleteUser();
       await clearTokens();
     } catch (error) {
-      showBottomToast('error', '탈퇴에 실패했습니다.'); // TODO: locales
+      showBottomToast('error', t('toast.withdrawFailed'));
     }
   };
 
