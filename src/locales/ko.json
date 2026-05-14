@@ -488,6 +488,11 @@
 
     "purchaseComplete": "구매가 완료되었습니다.",
     "priceInfoUnavailable": "가격 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "removeAdsRestored": "광고 제거가 복원되었습니다.",
+    "purchaseFailed": "구매에 실패했습니다.",
+    "adsAlreadyRemoved": "이미 광고 제거가 적용되어 있습니다.",
+    "storeNotConnected": "스토어에 연결할 수 없습니다.",
+    "productUnavailable": "구매 상품을 불러올 수 없습니다.",
 
     "verificationError": "검증 중 오류가 발생했습니다.",
     "duplicatePuzzle": "이미 있는 퍼즐이에요. 새로 만들어 주세요.",

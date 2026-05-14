@@ -488,6 +488,11 @@
 
     "purchaseComplete": "Purchase completed.",
     "priceInfoUnavailable": "Price information could not be loaded. Please try again later.",
+    "removeAdsRestored": "Ad removal has been restored.",
+    "purchaseFailed": "Purchase failed.",
+    "adsAlreadyRemoved": "Ads have already been removed.",
+    "storeNotConnected": "Unable to connect to the store.",
+    "productUnavailable": "Unable to load the product.",
 
     "verificationError": "An error occurred during verification.",
     "duplicatePuzzle": "This puzzle already exists. Create a new one.",

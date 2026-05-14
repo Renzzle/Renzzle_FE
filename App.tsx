@@ -50,6 +50,7 @@ import { getPersonalNotice } from './src/apis/notice.ts';
 import { NoticeLanguage, PersonalNoticeItem } from './src/types/index.ts';
 import { useUserStore } from './src/store/useUserStore.ts';
 import useConfigStore from './src/store/useConfigStore.ts';
+import { withIAPContext } from 'react-native-iap';
 
 const Stack = createNativeStackNavigator();
 const IOS_APP_STORE_ID = '6793042991';
@@ -225,9 +226,7 @@ function App(): React.JSX.Element | null {
         `\n${i18n.t('modal.forceUpdate.latestVersion')}: ${personalNoticeModal.version}`
       : undefined;
   const personalNoticePrimaryButtonText =
-    personalNoticeModal?.category === 'FORCE_UPDATE'
-      ? 'modal.forceUpdate.update'
-      : undefined;
+    personalNoticeModal?.category === 'FORCE_UPDATE' ? 'modal.forceUpdate.update' : undefined;
   const shouldHidePersonalNoticeFooter =
     Platform.OS === 'ios' && personalNoticeModal?.category === 'SYSTEM_CHECK';
 
@@ -420,4 +419,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default withIAPContext(App);

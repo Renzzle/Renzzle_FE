@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import usePurchaseStore from '../../store/usePurchaseStore';
 
 const AD_UNIT_ID = 'ca-app-pub-8517144519151386/4005306762';
 const AD_TRIGGER_COUNT = 3; // Show ad every 3 solves
@@ -44,7 +45,7 @@ const getInterstitial = () => {
 
 export const usePuzzleAd = () => {
   const showAdIfReady = useCallback((onAdFinished: () => void) => {
-    if (__DEV__) {
+    if (__DEV__ || usePurchaseStore.getState().isAdsRemoved) {
       onAdFinished();
       return;
     }
