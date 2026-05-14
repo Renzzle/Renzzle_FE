@@ -112,6 +112,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 21
         versionName "1.0.7"
+        missingDimensionStrategy 'store', 'play'
     }
     signingConfigs {
         release {
@@ -160,4 +161,6 @@ dependencies {
         implementation jscFlavor
     }
 
+    // billing
+    implementation "com.android.billingclient:billing:7.0.0"
 }
