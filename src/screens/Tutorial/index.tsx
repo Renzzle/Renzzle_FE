@@ -38,7 +38,8 @@ import MenuButton from '../../components/features/MenuButton';
 import TutorialBoard, { PlacedStone } from '../../components/features/TutorialBoard';
 import useModal from '../../hooks/useModal';
 import useTutorialStore from '../../store/useTutorialStore';
-import { menuThemeMap, MenuType, RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../types';
+import { menuThemeMap, MenuType } from '../../constants/menuThemeMap';
 
 const MODE_MENUS: MenuType[] = ['trainingPuzzle', 'communityPuzzle', 'rankingPuzzle'];
 const FORBIDDEN_TYPES = ['doubleThree', 'doubleFour', 'overline'] as const;

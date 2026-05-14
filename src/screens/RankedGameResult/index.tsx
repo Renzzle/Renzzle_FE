@@ -22,7 +22,8 @@ import {
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/ParamList';
-import { RankArchive, RankingResultTheme, ResultVariant } from '../../types';
+import { RankArchive, ResultVariant } from '../../types';
+import { RankingResultTheme } from '../../constants/rankingResultTheme';
 import { getRankGameArchive } from '../../apis/rank';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { BottomButtonBar, CustomModal, CustomText, Icon } from '../../components/common';

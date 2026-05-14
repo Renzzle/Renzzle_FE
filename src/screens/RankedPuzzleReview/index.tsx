@@ -15,7 +15,8 @@ import Board, { BoardRef } from '../../components/features/Board';
 import { BottomButtonBar, CustomText, Icon } from '../../components/common';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/ParamList';
-import { RankingResultTheme, ResultVariant } from '../../types';
+import { ResultVariant } from '../../types';
+import { RankingResultTheme } from '../../constants/rankingResultTheme';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useTranslation } from 'react-i18next';
 

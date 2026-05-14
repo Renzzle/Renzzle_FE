@@ -14,7 +14,8 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MenuButton from '../../components/features/MenuButton';
 import { CustomModal, CustomText, Icon } from '../../components/common';
-import { CommunityPuzzle, menuThemeMap, MenuType, TrainingPack } from '../../types';
+import { CommunityPuzzle, TrainingPack } from '../../types';
+import { menuThemeMap, MenuType } from '../../constants/menuThemeMap';
 import { useTranslation } from 'react-i18next';
 import theme, { ColorType } from '../../styles/theme';
 import { getRecommendPack, getTrendPuzzles } from '../../apis/content';

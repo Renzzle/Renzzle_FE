@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container } from './index.styles';
-import { RankingResultTheme, ResultVariant } from '../../../types';
+import { ResultVariant } from '../../../types';
+import { RankingResultTheme } from '../../../constants/rankingResultTheme';
 import { CustomText, Icon } from '../../common';
 
 interface Props {

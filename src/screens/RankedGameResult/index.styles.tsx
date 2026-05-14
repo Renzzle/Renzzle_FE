@@ -1,7 +1,8 @@
 import { TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
-import { RankingResultTheme, ResultVariant } from '../../types';
+import { ResultVariant } from '../../types';
+import { RankingResultTheme } from '../../constants/rankingResultTheme';
 
 export const Container = styled(View)`
   flex: 1;

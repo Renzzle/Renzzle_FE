@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import styled from 'styled-components';
-import { RankingResultTheme, ResultVariant } from '../../../types';
+import { ResultVariant } from '../../../types';
+import { RankingResultTheme } from '../../../constants/rankingResultTheme';
 import theme from '../../../styles/theme';
 
 export const Container = styled(View)<{ variant: ResultVariant }>`
