@@ -2,14 +2,22 @@
 
 #include <iostream>
 #include <chrono>
+#include <thread>
 #include <cassert>
 #include <vector>
 #include <string>
-#include "../game/board.h"
 
 #ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <Windows.h>
 #endif
+
+#include "../game/board.h"
 
 using namespace std;
 
@@ -116,7 +124,7 @@ void printBoardPattern(Board& board, Piece p) {
         cout << pieceName[p] << " " << directionName[k];
         printPatternCells(cells, p, static_cast<Direction>(k));
         cout << "---------------------------------------" << endl;
-        // Sleep(1000); // Windows 전용 함수, Android에서는 주석 처리
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 

@@ -20,7 +20,6 @@ target_include_directories(native-lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/test
         ${CMAKE_CURRENT_SOURCE_DIR}/game
         ${CMAKE_CURRENT_SOURCE_DIR}/evaluate
-        ${CMAKE_CURRENT_SOURCE_DIR}/tree
         ${CMAKE_CURRENT_SOURCE_DIR}/search
         ${CMAKE_CURRENT_SOURCE_DIR}/engine
 )
