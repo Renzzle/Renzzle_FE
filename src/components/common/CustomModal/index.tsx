@@ -32,6 +32,7 @@ export type ModalCategoryType =
   | 'RANKING_REQUEST_FAILED'
   | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
+  | 'PIECE_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
   | 'NICKNAME_CHANGE_PURCHASE'
   | 'USER_DELETE_CONFIRM'
@@ -134,6 +135,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.trainingPackPurchase.title',
     BODY: 'modal.trainingPackPurchase.message',
     FOOTER: ['modal.trainingPackPurchase.cancel', 'modal.trainingPackPurchase.confirm'],
+  },
+  PIECE_PURCHASE: {
+    TITLE: 'modal.piecePurchase.title',
+    BODY: 'modal.piecePurchase.message',
+    FOOTER: 'modal.piecePurchase.cancel',
   },
   PUZZLE_REVIEW_PURCHASE: {
     TITLE: 'modal.puzzleReviewPurchase.title',

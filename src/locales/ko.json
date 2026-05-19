@@ -192,6 +192,11 @@
       "confirm": "구매하기",
       "cancel": "취소"
     },
+    "piecePurchase": {
+      "title": "조각 구매",
+      "message": "구매할 조각 팩을 선택해주세요.",
+      "cancel": "닫기"
+    },
     "nicknameChangePurchase": {
       "title": "닉네임 변경",
       "message": "닉네임 변경을 진행하시겠습니까?\n필요 재화: {{price}}조각",
