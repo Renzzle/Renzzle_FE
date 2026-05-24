@@ -48,7 +48,8 @@
     "password": "비밀번호",
     "confirmPassword": "비밀번호 확인",
     "nickname": "닉네임",
-    "description": "설명 입력"
+    "description": "설명 입력",
+    "communitySearch": "출제자 또는 문제번호 검색"
   },
   "modal": {
     "filter": {
@@ -133,6 +134,11 @@
       "message": "레이팅: {{rating}}점\n획득 재화: {{reward}}피스",
       "confirm": "확인",
       "cancel": "복습하기"
+    },
+    "communityFilter": {
+      "title": "필터",
+      "confirm": "적용",
+      "cancel": "취소"
     },
     "trainingPackPurchase": {
       "title": "트레이닝 팩 구매",

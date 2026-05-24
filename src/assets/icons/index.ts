@@ -18,6 +18,7 @@ import ConfusedInactiveIcon from './ico-confused-inactive.svg';
 import CorrectIcon from './ico-correct.svg';
 import DepthIcon from './ico-depth.svg';
 import ErrorIcon from './ico-error.svg';
+import FilterIcon from './ico-filter.svg';
 import FlagIcon from './ico-flag.svg';
 import FocusIcon from './ico-focus.svg';
 import HashTagIcon from './ico-hashtag.svg';
@@ -53,6 +54,7 @@ import RankingPuzzleIcon from './ico-ranking-puzzle.svg';
 import RankingRatingIcon from './ico-ranking-rating.svg';
 import RankingIcon from './ico-ranking.svg';
 import RefreshIcon from './ico-refresh.svg';
+import SearchIcon from './ico-search.svg';
 import SettingIcon from './ico-setting.svg';
 import SolvedIcon from './ico-solved.svg';
 import StoneBlackIcon from './ico-stone-black.svg';
@@ -84,6 +86,7 @@ const Icons = {
   CorrectIcon,
   DepthIcon,
   ErrorIcon,
+  FilterIcon,
   FlagIcon,
   FocusIcon,
   HashTagIcon,
@@ -119,6 +122,7 @@ const Icons = {
   RankingRatingIcon,
   RankingIcon,
   RefreshIcon,
+  SearchIcon,
   SettingIcon,
   SolvedIcon,
   StoneBlackIcon,

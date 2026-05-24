@@ -1,8 +1,19 @@
-import React from 'react';
-import { Container, InputsWrapper, InputWrapper } from './index.styles';
+import React, { useState } from 'react';
+import {
+  Container,
+  InputsWrapper,
+  InputWrapper,
+  markerStyle,
+  selectedStyle,
+  SliderWrapper,
+  unselectedStyle,
+} from './index.styles';
 import { CustomText, DividerThin } from '../../common';
 import CustomRadioButton from '../../common/CustomRadioButton/CustomCheckbox';
 import CustomCheckbox from '../../common/CustomCheckbox';
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { useTranslation } from 'react-i18next';
+import { DEPTH } from '../../../types';
 
 export interface FilterState {
   sort: 'LATEST' | 'LIKE';
@@ -17,18 +28,22 @@ interface CommunityFilterProps {
   onChangeFilter: (updated: Partial<FilterState>) => void;
 }
 
-const SORT_OPTIONS = [
-  { label: '최신순', value: 'LATEST' },
-  { label: '인기순', value: 'LIKE' },
-] as const;
-
 const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
+  const { t } = useTranslation();
   const { sort, stone, auth, depthRange, solveStatus } = filter;
+
+  const SORT_OPTIONS = [
+    { label: t('modal.filter.subtitle.sort.options.0'), value: 'LATEST' },
+    { label: t('modal.filter.subtitle.sort.options.1'), value: 'LIKE' },
+  ] as const;
+
+  const [depthValues, setDepthValues] = useState(depthRange);
+  const [sliderWidth, setSliderWidth] = useState(0);
 
   return (
     <Container>
       <CustomText size={14} weight="bold" lineHeight="sm" color="gray/gray500">
-        정렬
+        {t('modal.filter.subtitle.sort.title')}
       </CustomText>
       <InputsWrapper>
         {SORT_OPTIONS.map((option) => (
@@ -46,19 +61,19 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
       <DividerThin />
 
       <CustomText size={14} weight="bold" lineHeight="sm" color="gray/gray500">
-        승리
+        {t('modal.filter.subtitle.win')}
       </CustomText>
       <InputsWrapper>
         <InputWrapper>
           <CustomCheckbox
-            label="흑선승"
+            label={t('puzzle.blackWin')}
             isChecked={stone.black}
             onToggle={() => onChangeFilter({ stone: { ...stone, black: !stone.black } })}
           />
         </InputWrapper>
         <InputWrapper>
           <CustomCheckbox
-            label="백선승"
+            label={t('puzzle.whiteWin')}
             isChecked={stone.white}
             onToggle={() => onChangeFilter({ stone: { ...stone, white: !stone.white } })}
           />
@@ -68,19 +83,19 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
       <DividerThin />
 
       <CustomText size={14} weight="bold" lineHeight="sm" color="gray/gray500">
-        인증여부
+        {t('modal.filter.subtitle.certification')}
       </CustomText>
       <InputsWrapper>
         <InputWrapper>
           <CustomCheckbox
-            label="인증"
+            label={t('puzzle.certified')}
             isChecked={auth.verified}
             onToggle={() => onChangeFilter({ auth: { ...auth, verified: !auth.verified } })}
           />
         </InputWrapper>
         <InputWrapper>
           <CustomCheckbox
-            label="미인증"
+            label={t('puzzle.notCertified')}
             isChecked={auth.unverified}
             onToggle={() => onChangeFilter({ auth: { ...auth, unverified: !auth.unverified } })}
           />
@@ -90,18 +105,39 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
       <DividerThin />
 
       <CustomText size={14} weight="bold" lineHeight="sm" color="gray/gray500">
-        깊이
+        {t('puzzle.depth')}
       </CustomText>
+      <CustomText size={14} lineHeight="sm" color="gray/gray500">
+        {depthValues[0]}-{depthValues[1]}
+        {depthValues[1] === DEPTH.SEARCH_MAX && '+'}
+      </CustomText>
+      <SliderWrapper onLayout={(e) => setSliderWidth(e.nativeEvent.layout.width)}>
+        <MultiSlider
+          values={depthValues}
+          min={DEPTH.MIN}
+          max={DEPTH.SEARCH_MAX}
+          step={2}
+          sliderLength={sliderWidth}
+          selectedStyle={selectedStyle}
+          unselectedStyle={unselectedStyle}
+          markerStyle={markerStyle}
+          onValuesChange={(val) => setDepthValues([val[0], val[1]])}
+          onValuesChangeFinish={(val) => {
+            setDepthValues([val[0], val[1]]);
+            onChangeFilter({ depthRange: [val[0], val[1]] });
+          }}
+        />
+      </SliderWrapper>
 
       <DividerThin />
 
       <CustomText size={14} weight="bold" lineHeight="sm" color="gray/gray500">
-        풀이여부
+        {t('modal.filter.subtitle.solvedStatus')}
       </CustomText>
       <InputsWrapper>
         <InputWrapper>
           <CustomCheckbox
-            label="풀이 완료"
+            label={t('puzzle.solved')}
             isChecked={solveStatus.solved}
             onToggle={() =>
               onChangeFilter({ solveStatus: { ...solveStatus, solved: !solveStatus.solved } })
@@ -110,7 +146,7 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
         </InputWrapper>
         <InputWrapper>
           <CustomCheckbox
-            label="풀이 전"
+            label={t('puzzle.unsolved')}
             isChecked={solveStatus.unsolved}
             onToggle={() =>
               onChangeFilter({ solveStatus: { ...solveStatus, unsolved: !solveStatus.unsolved } })

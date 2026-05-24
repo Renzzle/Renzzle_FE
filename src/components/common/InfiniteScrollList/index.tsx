@@ -128,16 +128,13 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
       }
     }, [apiCall, defaultParams, pageSize]);
 
-    /** [중요] defaultParams가 바뀌었을 때만 초기화 (페이지 진입 시 자동실행)
-     * 부모 컴포넌트에서 defaultParams를 useMemo로 감싸야
-     * 리스트가 깜빡이지 않고 로드됨
+    /** [중요] defaultParams가 바뀌었을 때 목록을 처음부터 다시 불러옵니다.
+     * 부모 컴포넌트에서 defaultParams를 useMemo로 감싸두었으므로,
+     * 실제 검색어나 필터 조건이 변경될 때만 이 useEffect가 실행됩니다.
      */
     useEffect(() => {
-      if (data.length === 0) {
-        fetchData();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultParams]);
+      onRefresh();
+    }, [defaultParams, onRefresh]);
 
     const renderFooter = () =>
       loading ? (
