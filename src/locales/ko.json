@@ -35,12 +35,24 @@
     "notice": "공지",
     "settings": "설정"
   },
+  "settings": {
+    "language": "언어 설정",
+    "changeNickname": "닉네임 변경",
+    "removeAds": "광고 제거",
+    "privacyPolicy": "개인정보 처리방침",
+    "termsOfService": "이용 약관",
+    "feedback": "개발자에게 피드백하기",
+    "deleteAccount": "탈퇴하기"
+  },
   "button": {
     "createPuzzle": "출제",
     "uploadPuzzle": "업로드",
     "sendEmail": "인증메일 전송",
     "resend": "재발송",
-    "confirm": "확인"
+    "confirm": "확인",
+    "verify": "검증",
+    "certifiedUpload": "인증 업로드",
+    "uncertifiedUpload": "미인증 업로드"
   },
   "placeholder": {
     "email": "이메일",
@@ -152,6 +164,18 @@
       "confirm": "구매하기",
       "cancel": "취소"
     },
+    "nicknameChangePurchase": {
+      "title": "닉네임 변경",
+      "message": "닉네임 변경을 진행하시겠습니까?\n필요 재화: {{price}}피스",
+      "confirm": "구매하기",
+      "cancel": "취소"
+    },
+    "userDeleteConfirm": {
+      "title": "회원 탈퇴",
+      "message": "정말로 회원 탈퇴를 진행하시겠습니까?\n탈퇴 후에는 계정을 복구할 수 없습니다.",
+      "confirm": "탈퇴하기",
+      "cancel": "취소"
+    },
     "featureInProgress": {
       "title": "준비 중",
       "message": "해당 기능은 현재 개발 중입니다.\n정식 출시에서 만나요!",
@@ -203,5 +227,38 @@
   },
   "alert": {
     "noData": "데이터가 없습니다."
+  },
+  "toast": {
+    "languageChanged": "언어가 변경되었습니다.",
+
+    "listLoadError": "리스트 불러오기 오류",
+    "refreshError": "새로고침 오류",
+
+    "aiCalculationFailed": "AI 계산 실패!",
+    "numberProcessingError": "수 처리 중 오류가 발생했습니다.",
+    "invalidProblemFormat": "문제 형식이 올바르지 않습니다.",
+
+    "appStartError": "어플리케이션 시작 오류 발생",
+
+    "purchaseComplete": "구매가 완료되었습니다.",
+
+    "verificationError": "검증 중 오류가 발생했습니다.",
+    "duplicatePuzzle": "이미 있는 퍼즐이에요. 새로 만들어 주세요.",
+
+    "puzzleDeleted": "퍼즐이 삭제되었습니다.",
+
+    "cannotOpenPage": "페이지를 열 수 없습니다.",
+    "withdrawFailed": "탈퇴에 실패했습니다.",
+
+    "nicknameAlreadyInUse": "이미 사용된 닉네임입니다.",
+    "nicknameChanged": "닉네임이 변경되었습니다.",
+    "nicknameChangeFailed": "닉네임 변경에 실패했습니다.",
+
+    "enterEmail": "이메일을 입력해주세요.",
+    "enterPassword": "비밀번호를 입력해주세요.",
+
+    "missingRequiredFields": "필수 항목이 누락되었습니다. 처음으로 돌아갑니다.",
+
+    "trainingPackLoadFailed": "문제 팩 불러오기 실패: "
   }
 }

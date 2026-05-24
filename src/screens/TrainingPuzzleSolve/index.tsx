@@ -13,8 +13,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import { usePuzzleAd } from '../../hooks/usePuzzleAd';
+import { useTranslation } from 'react-i18next';
 
 const TrainingPuzzleSolve = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPuzzleSolve'>>();
   const {
@@ -34,6 +37,8 @@ const TrainingPuzzleSolve = () => {
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
   const [boardKey, setBoardKey] = useState(0);
+
+  const { showAdIfReady } = usePuzzleAd();
 
   const updatedItemsRef = useRef<Map<number, TrainingPuzzle>>(new Map());
 
@@ -62,8 +67,10 @@ const TrainingPuzzleSolve = () => {
       if (puzzles.length > currentPuzzleNumber) {
         activateModal('TRAINING_PUZZLE_SUCCESS', {
           primaryAction: async () => {
-            setPuzzleDetail(puzzles[currentPuzzleNumber]);
-            setCurrentPuzzleNumber((prev) => prev + 1);
+            showAdIfReady(() => {
+              setPuzzleDetail(puzzles[currentPuzzleNumber]);
+              setCurrentPuzzleNumber((prev) => prev + 1);
+            });
           },
           secondaryAction: () => {
             navigation.goBack();
@@ -73,7 +80,7 @@ const TrainingPuzzleSolve = () => {
       } else {
         // If this is the final puzzle in the pack
         activateModal('TRAINING_PACK_COMPLETE', {
-          primaryAction: () => navigation.goBack(),
+          primaryAction: () => showAdIfReady(() => navigation.goBack()),
         });
         await updateUser();
       }
@@ -109,7 +116,7 @@ const TrainingPuzzleSolve = () => {
         const mainSequence = problemSequence + data.answer;
 
         await updateUser();
-        showBottomToast('success', '구매가 완료되었습니다.');
+        showBottomToast('success', t('toast.purchaseComplete'));
         navigation.navigate('TrainingPuzzleReview', {
           problemSequence,
           mainSequence,

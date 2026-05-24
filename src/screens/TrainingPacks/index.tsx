@@ -14,8 +14,10 @@ import useModal from '../../hooks/useModal';
 import { GameOutcome, RootStackParamList, TrainingPack } from '../../types';
 import { useUserStore } from '../../store/useUserStore';
 import theme from '../../styles/theme';
+import { useTranslation } from 'react-i18next';
 
 const TrainingPacks = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPacks'>>();
   const {
@@ -42,7 +44,7 @@ const TrainingPacks = () => {
           const isSuccess = await handlePurchase(item.id);
           if (isSuccess) {
             await updateUser();
-            showBottomToast('success', '구매가 완료되었습니다.');
+            showBottomToast('success', t('toast.purchaseComplete'));
             navigation.navigate('TrainingPuzzles', { pack: item });
           } else {
             return;
@@ -66,22 +68,21 @@ const TrainingPacks = () => {
     }
   };
 
-  const fetchPackData = async (difficulty: string) => {
-    setLoading(true);
-    try {
-      const data = await getPack(difficulty, 'KO');
-      setPacks(data);
-    } catch (error) {
-      showBottomToast('error', '문제 팩 불러오기 실패: ' + error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Fetch data on initial mount
   useEffect(() => {
+    const fetchPackData = async (difficulty: string) => {
+      setLoading(true);
+      try {
+        const data = await getPack(difficulty, 'KO');
+        setPacks(data);
+      } catch (error) {
+        showBottomToast('error', t('toast.trainingPackLoadFailed') + error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchPackData(currentTab);
-  }, [currentTab]);
+  }, [currentTab, t]);
 
   // Optimistic update
   useEffect(() => {

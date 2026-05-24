@@ -24,6 +24,7 @@ import Home from './src/screens/Home/index.tsx';
 import MyPuzzles from './src/screens/MyPuzzles/index.tsx';
 import LikedPuzzles from './src/screens/LikedPuzzles/index.tsx';
 import Ranking from './src/screens/Ranking/index.tsx';
+import Settings from './src/screens/Settings/index.tsx';
 import TrainingPacks from './src/screens/TrainingPacks/index.tsx';
 import TrainingPuzzles from './src/screens/TrainingPuzzles/index.tsx';
 import TrainingPuzzleSolve from './src/screens/TrainingPuzzleSolve/index.tsx';
@@ -36,6 +37,8 @@ import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCom
 import theme from './src/styles/theme.ts';
 import useNetworkStore from './src/store/useNetworkStore.ts';
 import { CustomModal } from './src/components/common/index.ts';
+import Language from './src/screens/Settings/Language/index.tsx';
+import ChangeNickname from './src/screens/Settings/ChangeNickname/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -90,6 +93,21 @@ function App(): React.JSX.Element | null {
                     name="Ranking"
                     component={Ranking}
                     options={{ title: 'common.ranking' }}
+                  />
+                  <Stack.Screen
+                    name="Settings"
+                    component={Settings}
+                    options={{ title: 'common.settings' }}
+                  />
+                  <Stack.Screen
+                    name="Language"
+                    component={Language}
+                    options={{ title: 'settings.language' }}
+                  />
+                  <Stack.Screen
+                    name="ChangeNickname"
+                    component={ChangeNickname}
+                    options={{ title: 'settings.changeNickname' }}
                   />
                   <Stack.Screen
                     name="TrainingPacks"

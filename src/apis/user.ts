@@ -11,6 +11,24 @@ export const getUser = async () => {
   }
 };
 
+export const deleteUser = async () => {
+  try {
+    const response = await apiClient.delete('/api/user');
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUserNickname = async (nickname: string) => {
+  try {
+    const response = await apiClient.patch('/api/user/nickname', { nickname });
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getUserPuzzles = async (params: ApiCallParams) => {
   const queryParams: Record<string, any> = {
     size: params.size ?? 10,

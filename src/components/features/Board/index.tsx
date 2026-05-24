@@ -26,6 +26,7 @@ import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
 import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../../common/Toast/toastMessage';
+import { useTranslation } from 'react-i18next';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -78,6 +79,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   },
   ref,
 ) {
+  const { t } = useTranslation();
+
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
@@ -245,7 +248,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         }
         setAiAnswer(result);
       } catch (error) {
-        showBottomToast('error', 'AI 계산 실패!'); // TODO: locales
+        showBottomToast('error', t('toast.aiCalculationFailed'));
       }
     }, 0);
   };
@@ -260,7 +263,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           resolve(check === 1);
         } catch (error) {
           console.log(error);
-          showBottomToast('error', '수 처리 중 오류가 발생했습니다.');
+          showBottomToast('error', t('toast.numberProcessingError'));
           resolve(false);
         }
       }, 0);
@@ -350,7 +353,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       const letter = sequence[i];
       const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/);
       if (!numberMatch) {
-        showBottomToast('error', '문제 형식이 올바르지 않습니다.'); // TODO: locales
+        showBottomToast('error', t('toast.invalidProblemFormat'));
         break;
       }
 

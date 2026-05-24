@@ -10,6 +10,7 @@ import DeviceInfo from 'react-native-device-info';
 import { registerUser } from '../../apis/auth';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { useLogin } from '../../hooks/useLogin';
+import { useTranslation } from 'react-i18next';
 
 enum SignupStep {
   Email,
@@ -19,6 +20,7 @@ enum SignupStep {
 }
 
 const Signup = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { login } = useLogin();
   const [step, setStep] = useState<SignupStep>(SignupStep.Email);
@@ -31,7 +33,7 @@ const Signup = () => {
 
   const handleSignupComplete = async () => {
     if (!email || !code || !password || !nickname || !authVerityToken || !deviceId) {
-      showBottomToast('error', '필수 항목이 누락되었습니다. 처음으로 돌아갑니다.');
+      showBottomToast('error', t('toast.missingRequiredFields'));
       fetchDeviceId();
       setStep(SignupStep.Email);
       return;
