@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../game/board.h"
-#include "../tree/tree_manager.h"
 #include "../test/test.h"
 #include <chrono>
 #include <functional>
@@ -10,7 +9,7 @@ using Timestamp = chrono::time_point<chrono::high_resolution_clock>;
 
 class SearchMonitor {
 
-private:
+PRIVATE
     Timestamp startTime;
     double elapsedTime;
     MoveList bestPath; // final best path determined after one complete search iteration
@@ -23,7 +22,7 @@ private:
     function<MoveList(int)> bestLineProvider;
     function<Value()> bestValueProvider;
 
-public:
+PUBLIC
     SearchMonitor();
 
     void initStartTime() { startTime = chrono::high_resolution_clock::now(); };
@@ -34,10 +33,13 @@ public:
     void setBestValueProvider(std::function<Value()> provider) { bestValueProvider = provider; }
     
     // update data function, executeTrigger function execute
+    void updateElapsedTimeQuiet();
     void updateElapsedTime();
     void incDepth(int val) { depth += val; executeTrigger(); };
     void decDepth(int val) { depth -= val; executeTrigger(); };
     void incVisitCnt() { visitCnt++; executeTrigger(); };
+    void incVisitCntQuiet() { visitCnt++; };
+    void addVisitCnt(size_t delta) { visitCnt += delta; executeTrigger(); };
     void setBestPath(MoveList path) { bestPath = path; executeTrigger(); };
 
     // getter
@@ -54,19 +56,24 @@ SearchMonitor::SearchMonitor() {
     elapsedTime = 0.0;
     depth = 0;
     visitCnt = 0;
-
-    trigger = [](SearchMonitor monitor) { return false; };
-    searchListener = [](SearchMonitor monitor) { return; };
 }
 
-void SearchMonitor::updateElapsedTime() {
+void SearchMonitor::updateElapsedTimeQuiet() {
     Timestamp now = chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(now - startTime);
     elapsedTime = duration.count() / 1e9;
+}
+
+void SearchMonitor::updateElapsedTime() {
+    updateElapsedTimeQuiet();
     executeTrigger();
 }
 
 void SearchMonitor::executeTrigger() {
+    if (!trigger || !searchListener) {
+        return;
+    }
+
     if(trigger(*this)) {
         searchListener(*this);
     }

@@ -2,14 +2,22 @@
 
 #include <iostream>
 #include <chrono>
+#include <thread>
 #include <cassert>
 #include <vector>
 #include <string>
-#include "../game/board.h"
 
 #ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <Windows.h>
 #endif
+
+#include "../game/board.h"
 
 using namespace std;
 
@@ -20,7 +28,7 @@ vector<pair<int, int>> processString(const string& input) {
         int number;
         if (isdigit(input[i + 1]) && isdigit(input[i + 2])) {
             number = (input[i + 1] - '0') * 10 + (input[i + 2] - '0');
-            i++; 
+            i++;
         } else {
             number = input[i + 1] - '0';
         }
@@ -68,7 +76,7 @@ void printBoard(Board& board) {
                 default:
                     // Handle unexpected cases
                     break;
-            }  
+            }
         }
         cout << endl;
     }
@@ -86,13 +94,13 @@ void printPatternCells(CellArray& cells, Piece p, Direction k) {
         for (int j = 0; j < BOARD_SIZE + 2; j++) {
             if (cells[i][j].getPiece() != EMPTY) {
                 if (cells[i][j].getPiece() == BLACK) {
-                    cout << "⚫"; 
+                    cout << "⚫";
                 } else if (cells[i][j].getPiece() == WHITE) {
-                    cout << "⚪"; 
+                    cout << "⚪";
                 } else {
-                    if (i == 0 && j < BOARD_SIZE) 
+                    if (i == 0 && j < BOARD_SIZE)
                         printf("%2c", j + 65);
-                    else if (i != 0 && i != BOARD_SIZE + 1 && j != 0) 
+                    else if (i != 0 && i != BOARD_SIZE + 1 && j != 0)
                         printf(" %02d", i);
                     continue;
                 }
@@ -116,7 +124,7 @@ void printBoardPattern(Board& board, Piece p) {
         cout << pieceName[p] << " " << directionName[k];
         printPatternCells(cells, p, static_cast<Direction>(k));
         cout << "---------------------------------------" << endl;
-        // Sleep(1000); // Windows 전용 함수, Android에서는 주석 처리
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 

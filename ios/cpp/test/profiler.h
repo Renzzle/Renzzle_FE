@@ -42,7 +42,7 @@ void printResults() {
         std::cout << "Function: " << funcName
                   << " | Total Time: " << totalTime << " s"
                   << " | Call Count: " << count
-                  << " | Avg Time: " << std::fixed << std::setprecision(3) << avgTimeMicroseconds << " us"  
+                  << " | Avg Time: " << std::fixed << std::setprecision(3) << avgTimeMicroseconds << " us"
                   << std::endl;                                            // us(microSec) = 1 / 1,000,000 s
     }
     std::cout << "-------------------------" << std::endl;

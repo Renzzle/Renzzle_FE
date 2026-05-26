@@ -1,116 +1,82 @@
-#include "../search/search.h"
-#include <thread>
-#include <future>
-#include <atomic>
-#include <condition_variable>
-#include <optional>
+#pragma once
 
-#define MAX_THINKING_TIME 10.0 // second
+#include "../search/search.h"
+#include "../search/search_win.h"
+#include "../test/util.h"
+
+#define MAX_THINKING_TIME 10.0    // validatePuzzle soft timeout
+#define HARD_THINKING_TIME 20.0   // validatePuzzle hard timeout (grace for QVCF win → EXACT)
+#define FIND_NEXT_MOVE_TIME 10.0   // findNextMove timeout
 
 string validatePuzzle(string boardStr) {
     Board board = getBoard(boardStr);
-    Evaluator evaluator(board);
 
-    // if game is already over
-    Result status = board.getResult();
-    if (status != ONGOING) return "";
+    if (board.getResult() != ONGOING) return "";
 
-    SearchMonitor vcfMonitor;
-    SearchWin vcfSearcher(board, vcfMonitor);
+    SearchMonitor monitor;
+    Search searcher(board, monitor);
 
-    double lastTriggerTime = 0.0;
-    vcfMonitor.setTrigger([&lastTriggerTime](SearchMonitor& monitor) {
-        if (monitor.getElapsedTime() >= MAX_THINKING_TIME) {
-            lastTriggerTime = monitor.getElapsedTime();
-            return true;
-        }
+    monitor.setTrigger([](SearchMonitor& m) {
+        const double t = m.getElapsedTime();
+        if (t >= HARD_THINKING_TIME) return true;
+        if (t >= MAX_THINKING_TIME) return !m.getBestValue().isWin();
         return false;
     });
-    vcfMonitor.setSearchListener([&vcfSearcher](SearchMonitor& monitor) {
-        vcfSearcher.stop();
+    monitor.setSearchListener([&searcher](SearchMonitor&) {
+        searcher.stop();
     });
 
-    bool result = vcfSearcher.findVCF();
-    if (result) return convertPath2String(vcfMonitor.getBestPath());
-    
-    SearchMonitor vctMonitor;
-    Search vctSearcher(board, vctMonitor);
-
-    lastTriggerTime = 0.0;
-    vctMonitor.setTrigger([&lastTriggerTime](SearchMonitor& monitor) {
-        if (monitor.getElapsedTime() >= MAX_THINKING_TIME) {
-            lastTriggerTime = monitor.getElapsedTime();
-            return true;
-        }
-        return false;
-    });
-    vctMonitor.setSearchListener([&vctSearcher](SearchMonitor& monitor) {
-        vctSearcher.stop();
-    });
-
-    vctSearcher.ids();
-    if (vctMonitor.getBestValue().isWin())
-        return convertPath2String(vctMonitor.getBestPath());
+    searcher.ids();
+    if (monitor.getBestValue().isWin())
+        return convertPath2String(monitor.getBestPath());
 
     return "";
 }
 
 int convertMoveToInt(Pos& move) {
     if (move.isDefault()) return -1;
-    int result = (move.getY() - 1) * 15 + move.getX() - 1;
+    int result = (move.getY() - 1) * BOARD_SIZE + move.getX() - 1;
     return result;
 }
 
 int findNextMove(string boardStr) {
     Board board = getBoard(boardStr);
+    if (board.getResult() != ONGOING) return -1;
+
     Evaluator evaluator(board);
+    Pos sureMove = evaluator.getSureMove();
+    if (!sureMove.isDefault()) return convertMoveToInt(sureMove);
 
-    // if game is already over
-    Result status = board.getResult();
-    if (status != ONGOING) return -1;
+    SearchMonitor monitor;
+    Search searcher(board, monitor);
+    searcher.setMode(Search::Mode::DEFENSIVE);
 
-    // if there is sure move
-    Pos nextMove = evaluator.getSureMove();
-    if (!nextMove.isDefault()) return convertMoveToInt(nextMove);
-
-    SearchMonitor vcfMonitor;
-    SearchWin vcfSearcher(board, vcfMonitor);
-
-    vcfMonitor.setTrigger([](SearchMonitor& monitor) {
-        if (monitor.getElapsedTime() >= MAX_THINKING_TIME) {
+    monitor.setTrigger([](SearchMonitor& m) {
+        Value bv = m.getBestValue();
+        if (bv.isWin()) return true;
+        // LOSE in DEFENSIVE is now genuine (threatBrokenLeaf is VCT-only, defender
+        // candidates aren't shallow-truncated), so longest-delay LOSE is confirmed
+        // once ABP reports it — no need to keep deepening.
+        if (bv.isLose() && !bv.isQVCFDerived()
+            && (bv.getType() == Value::Type::EXACT || bv.getType() == Value::Type::UPPER_BOUND)) {
             return true;
         }
-        return false;
+        return m.getElapsedTime() >= FIND_NEXT_MOVE_TIME;
     });
-    vcfMonitor.setSearchListener([&vcfSearcher](SearchMonitor& monitor) {
-        vcfSearcher.stop();
-    });
-
-    bool result = vcfSearcher.findVCF();
-    if (result) return convertMoveToInt(vcfMonitor.getBestPath()[0]);
-    
-    SearchMonitor searchMonitor;
-    Search searcher(board, searchMonitor);
-
-    searchMonitor.setTrigger([](SearchMonitor& monitor) {
-        if (monitor.getElapsedTime() >= 3) {
-            return true;
-        }
-        return false;
-    });
-    searchMonitor.setSearchListener([&searcher](SearchMonitor& monitor) {
+    monitor.setSearchListener([&searcher](SearchMonitor&) {
         searcher.stop();
     });
 
     searcher.ids();
-    
-    if (!searchMonitor.getBestPath().empty())
-        nextMove = searchMonitor.getBestPath()[0];
-    
-    if (nextMove.isDefault()) {
-        MoveList moves = evaluator.getCandidates();
-        if (!moves.empty()) nextMove = moves[0];
-    }
 
-    return convertMoveToInt(nextMove);
+    MoveList path = monitor.getBestPath();
+    if (!path.empty()) return convertMoveToInt(path[0]);
+
+    // safety net: no completed iteration → pick any reasonable candidate
+    MoveList moves = evaluator.getCandidates();
+    if (!moves.empty()) {
+        Pos fallback = moves[0];
+        return convertMoveToInt(fallback);
+    }
+    return -1;
 }

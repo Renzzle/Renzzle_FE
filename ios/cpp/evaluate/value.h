@@ -6,7 +6,7 @@
 
 class Value {
 
-PRIVATE    
+PRIVATE
     enum class Type {
         EXACT, LOWER_BOUND, UPPER_BOUND, UNKNOWN
     };
@@ -17,6 +17,7 @@ PRIVATE
     Type type;
     Result result;
     int resultDepth;
+    bool qvcfDerived;
 
 PUBLIC
     Value() : Value(INITIAL_VALUE, Type::UNKNOWN, Result::ONGOING, INITIAL_VALUE) {}
@@ -42,6 +43,7 @@ PUBLIC
         this->type = type;
         this->result = result;
         this->resultDepth = resultDepth;
+        this->qvcfDerived = false;
     }
 
     Value(int val, Type type, Result result, int resultDepth) {
@@ -49,6 +51,7 @@ PUBLIC
         this->type = type;
         this->result = result;
         this->resultDepth = resultDepth;
+        this->qvcfDerived = false;
     }
 
     bool isWin() {
@@ -79,6 +82,14 @@ PUBLIC
 
     bool isOnGoing() {
         return result == Result::ONGOING;
+    }
+
+    bool isQVCFDerived() {
+        return qvcfDerived;
+    }
+
+    void markQVCFDerived() {
+        qvcfDerived = true;
     }
 
     void setType(Type type) {
@@ -142,7 +153,7 @@ PUBLIC
     }
 
     bool operator==(const Value& other) const {
-        if ((value != MAX_VALUE && value != MIN_VALUE) || 
+        if ((value != MAX_VALUE && value != MIN_VALUE) ||
             (other.value != MAX_VALUE && other.value != MIN_VALUE))
             return (value == other.value);
         if (resultDepth == INITIAL_VALUE || other.resultDepth == INITIAL_VALUE)
@@ -173,6 +184,7 @@ PUBLIC
         type = other.type;
         result = other.result;
         resultDepth = other.resultDepth;
+        qvcfDerived = other.qvcfDerived;
         return *this;
     }
 
@@ -189,6 +201,7 @@ PUBLIC
             result = Result::ONGOING;
             resultDepth = INITIAL_VALUE;
         }
+        qvcfDerived = false;
         return *this;
     }
 
