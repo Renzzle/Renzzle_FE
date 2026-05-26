@@ -16,6 +16,9 @@ export interface CommunityPuzzle {
   myDislike?: boolean;
 }
 
+export type CommunityPuzzlePatch = Pick<CommunityPuzzle, 'id'> &
+  Partial<Omit<CommunityPuzzle, 'id'>>;
+
 export interface TrainingPack {
   id: number;
   title: string;
@@ -66,3 +69,11 @@ export enum WinColor {
   'BLACK' = '흑',
   'WHITE' = '백',
 }
+
+export const DEPTH = {
+  MIN: 1,
+  MAX: 225,
+  SEARCH_MAX: 31,
+} as const;
+
+export type Depth = number;

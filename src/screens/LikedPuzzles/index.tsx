@@ -1,28 +1,32 @@
-import React, { useCallback, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Container } from './index.styles';
-import InfiniteScrollList from '../../components/common/InfiniteScrollList';
+import InfiniteScrollList, { ApiCallParams } from '../../components/common/InfiniteScrollList';
 import { CommunityPuzzle } from '../../types';
 import { getLikedPuzzles } from '../../apis/user';
 import CommunityCard from '../../components/features/CommunityCard';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
 
 const LikedPuzzles = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const [refreshKey, setRefreshKey] = useState(0);
+  const listRef = useOptimisticCommunityUpdate();
 
-  useFocusEffect(
-    useCallback(() => {
-      // list refresh
-      setRefreshKey((prev) => prev + 1);
-    }, []),
-  );
+  const apiParams = useMemo<Partial<ApiCallParams>>(() => ({}), []);
+
+  const navigateToCommunityDetail = (puzzle: CommunityPuzzle) => {
+    navigation.navigate('CommunityPuzzleSolve', {
+      puzzle: puzzle,
+      fromScreen: 'LikedPuzzles',
+    });
+  };
 
   return (
     <Container>
       <InfiniteScrollList<CommunityPuzzle>
-        key={refreshKey}
+        ref={listRef}
         apiCall={({ id, size }) => getLikedPuzzles(id, size)}
+        defaultParams={apiParams}
         renderItem={({ item }) => (
           <CommunityCard
             title={item.authorName}
@@ -36,7 +40,7 @@ const LikedPuzzles = () => {
             solvedCount={item.solvedCount}
             likeCount={item.likeCount}
             isSolved={item.isSolved}
-            onPress={() => navigation.navigate('CommunityPuzzleSolve', { puzzle: item })}
+            onPress={() => navigateToCommunityDetail(item)}
           />
         )}
         keyExtractor={(item) => item && item.id.toString()}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View } from 'react-native';
+import { Modal, TouchableWithoutFeedback, View } from 'react-native';
 import {
   CenteredView,
   ModalBodyContainer,
@@ -28,9 +28,23 @@ export type ModalCategoryType =
   | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_PUZZLE_OUTRO'
+  | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
-  | 'FEATURE_IN_PROGRESS';
+  | 'NICKNAME_CHANGE_PURCHASE'
+  | 'USER_DELETE_CONFIRM'
+  | 'FEATURE_IN_PROGRESS'
+  | 'NETWORK_ERROR';
+
+const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
+  'NETWORK_ERROR',
+  'RANKING_PUZZLE_OUTRO',
+  'TRAINING_PUZZLE_SUCCESS',
+  'COMMUNITY_PUZZLE_SUCCESS',
+  'RANKING_PUZZLE_SUCCESS',
+  'TRAINING_PUZZLE_FAILURE',
+  'COMMUNITY_PUZZLE_FAILURE',
+];
 
 export const MODAL_TEXTS = {
   TRAINING_PUZZLE_SUCCESS: {
@@ -61,7 +75,7 @@ export const MODAL_TEXTS = {
   COMMUNITY_PUZZLE_FAILURE: {
     TITLE: 'modal.communityPuzzleFailure.title',
     BODY: 'modal.communityPuzzleFailure.message',
-    FOOTER: 'modal.communityPuzzleFailure.confirm',
+    FOOTER: ['modal.communityPuzzleFailure.cancel', 'modal.communityPuzzleFailure.confirm'],
   },
   VALIDATION_COMPLETE: {
     TITLE: 'modal.validationComplete.title',
@@ -98,6 +112,11 @@ export const MODAL_TEXTS = {
     BODY: 'modal.rankingPuzzleOutro.message',
     FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
   },
+  COMMUNITY_FILTER: {
+    TITLE: 'modal.communityFilter.title',
+    BODY: '',
+    FOOTER: ['modal.communityFilter.cancel', 'modal.communityFilter.confirm'],
+  },
   TRAINING_PACK_PURCHASE: {
     TITLE: 'modal.trainingPackPurchase.title',
     BODY: 'modal.trainingPackPurchase.message',
@@ -108,10 +127,25 @@ export const MODAL_TEXTS = {
     BODY: 'modal.puzzleReviewPurchase.message',
     FOOTER: ['modal.puzzleReviewPurchase.cancel', 'modal.puzzleReviewPurchase.confirm'],
   },
+  NICKNAME_CHANGE_PURCHASE: {
+    TITLE: 'modal.nicknameChangePurchase.title',
+    BODY: 'modal.nicknameChangePurchase.message',
+    FOOTER: ['modal.nicknameChangePurchase.cancel', 'modal.nicknameChangePurchase.confirm'],
+  },
+  USER_DELETE_CONFIRM: {
+    TITLE: 'modal.userDeleteConfirm.title',
+    BODY: 'modal.userDeleteConfirm.message',
+    FOOTER: ['modal.userDeleteConfirm.cancel', 'modal.userDeleteConfirm.confirm'],
+  },
   FEATURE_IN_PROGRESS: {
     TITLE: 'modal.featureInProgress.title',
     BODY: 'modal.featureInProgress.message',
     FOOTER: 'modal.featureInProgress.confirm',
+  },
+  NETWORK_ERROR: {
+    TITLE: 'modal.networkError.title',
+    BODY: 'modal.networkError.message',
+    FOOTER: 'modal.networkError.confirm',
   },
 };
 
@@ -161,8 +195,8 @@ export const ModalCard = ({
           price: gameOutcome?.price,
           puzzleCount: gameOutcome?.puzzleCount,
         })}
-        {children}
       </CustomText>
+      {children}
     </ModalBodyContainer>
   );
 
@@ -185,20 +219,55 @@ export const ModalCard = ({
     );
 
   return (
-    <CenteredView>
-      <ModalContainer screenWidth={width}>
-        {title}
-        {body}
-        {footer}
-      </ModalContainer>
-    </CenteredView>
+    <ModalContainer screenWidth={width}>
+      {title}
+      {body}
+      {footer}
+    </ModalContainer>
   );
 };
 
-const CustomModal = ({ isVisible, children, ...props }: CustomModalProps) => {
+const CustomModal = ({
+  isVisible,
+  onPrimaryAction,
+  onSecondaryAction,
+  category,
+  children,
+  ...props
+}: CustomModalProps) => {
+  const handleDismiss = () => {
+    if (category && NON_DISMISSIBLE_CATEGORIES.includes(category)) {
+      return;
+    }
+
+    if (onSecondaryAction) {
+      onSecondaryAction();
+    } else {
+      onPrimaryAction();
+    }
+  };
+
   return (
-    <Modal visible={isVisible} transparent={true} animationType="fade">
-      {isVisible && <ModalCard {...props}>{children}</ModalCard>}
+    <Modal
+      visible={isVisible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={handleDismiss}>
+      {isVisible && (
+        <CenteredView onPress={handleDismiss}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View>
+              <ModalCard
+                category={category}
+                onPrimaryAction={onPrimaryAction}
+                onSecondaryAction={onSecondaryAction}
+                {...props}>
+                {children}
+              </ModalCard>
+            </View>
+          </TouchableWithoutFeedback>
+        </CenteredView>
+      )}
     </Modal>
   );
 };

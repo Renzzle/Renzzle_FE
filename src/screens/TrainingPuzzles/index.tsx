@@ -1,15 +1,9 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 
-import {
-  ParamListBase,
-  RouteProp,
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
-import React, { useCallback, useMemo, useState } from 'react';
-import { RootStackParamList, TrainingPuzzle } from '../../types';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RootStackParamList, TrainingPack, TrainingPuzzle } from '../../types';
 import { Container } from './index.styles';
 import TrainingCard from '../../components/features/TrainingCard';
 import { getTrainingPuzzles } from '../../apis/training';
@@ -24,16 +18,20 @@ const TrainingPuzzles = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPuzzles'>>();
   const { pack } = route.params;
 
-  const [puzzles, setPuzzless] = useState<TrainingPuzzle[]>([]);
+  const [puzzles, setPuzzles] = useState<TrainingPuzzle[]>([]);
   const [loading, setLoading] = useState(true);
 
   const solvedCount = useMemo(() => puzzles.filter((puzzle) => puzzle.isSolved).length, [puzzles]);
+  const solvedCountRef = useRef(solvedCount);
+  useEffect(() => {
+    solvedCountRef.current = solvedCount;
+  }, [solvedCount]);
 
   const fetchPuzzleData = useCallback(async (packId: number) => {
     setLoading(true);
     try {
       const data = await getTrainingPuzzles(packId);
-      setPuzzless(data);
+      setPuzzles(data);
     } catch (error) {
       showBottomToast('error', error as string);
     } finally {
@@ -41,23 +39,53 @@ const TrainingPuzzles = () => {
     }
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (pack && pack.id) {
-        fetchPuzzleData(pack.id);
+  // Fetch data on initial mount
+  useEffect(() => {
+    if (pack && pack.id) {
+      fetchPuzzleData(pack.id);
+    }
+  }, [fetchPuzzleData, pack, pack.id]);
+
+  // Optimistic update
+  useEffect(() => {
+    const updatedItems = route.params?.updatedItems;
+
+    if (updatedItems && updatedItems.length > 0) {
+      setPuzzles((prevPuzzles) =>
+        prevPuzzles.map((prevPuzzle) => {
+          const updatedTarget = updatedItems.find((item) => item.id === prevPuzzle.id);
+          return updatedTarget ? { ...prevPuzzle, ...updatedTarget } : prevPuzzle;
+        }),
+      );
+
+      navigation.setParams({ updatedItems: undefined });
+    }
+  }, [route.params?.updatedItems, navigation]);
+
+  useEffect(() => {
+    return () => {
+      if (solvedCountRef.current !== pack.solvedPuzzleCount) {
+        const updatedPack: TrainingPack = {
+          ...pack,
+          solvedPuzzleCount: solvedCountRef.current,
+        };
+
+        navigation.navigate('TrainingPacks', {
+          updatedPack,
+        });
       }
-    }, [pack, fetchPuzzleData]),
-  );
+    };
+  }, [pack, navigation]);
 
   const navigateToTrainingDetail = useCallback(
     (puzzleNumber: number) => {
       navigation.navigate('TrainingPuzzleSolve', {
         puzzles: puzzles,
-        title: pack.title,
+        pack: pack,
         puzzleNumber: puzzleNumber,
       });
     },
-    [navigation, pack.title, puzzles],
+    [navigation, pack, puzzles],
   );
 
   const renderItem = useCallback(

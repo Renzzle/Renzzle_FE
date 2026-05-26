@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useRef, useState } from 'react';
 import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 import Board from '../../components/features/Board';
@@ -12,8 +13,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
+import { usePuzzleAd } from '../../hooks/usePuzzleAd';
+import { useTranslation } from 'react-i18next';
 
 const TrainingPuzzleSolve = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPuzzleSolve'>>();
   const {
@@ -23,15 +27,26 @@ const TrainingPuzzleSolve = () => {
     closeSecondarily,
     category: modalCategory,
   } = useModal();
-  const puzzles = route.params.puzzles;
-  const puzzleIndex = route.params.puzzleNumber - 1;
-  const puzzleParam = useMemo(() => puzzles[puzzleIndex], [puzzles, puzzleIndex]);
-  const [currentPuzzleNumber, setCurrentPuzzleNumber] = useState(puzzleIndex + 1);
-  const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(null);
+  const { pack, puzzles, puzzleNumber } = route.params;
+  const [currentPuzzleNumber, setCurrentPuzzleNumber] = useState(puzzleNumber);
+  const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(
+    puzzles[puzzleNumber - 1],
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
   const [boardKey, setBoardKey] = useState(0);
+
+  const { showAdIfReady } = usePuzzleAd();
+
+  const updatedItemsRef = useRef<Map<number, TrainingPuzzle>>(new Map());
+
+  const markSolved = (targetPuzzle: TrainingPuzzle) => {
+    const solvedPuzzle = { ...targetPuzzle, isSolved: true };
+    updatedItemsRef.current.set(solvedPuzzle.id, solvedPuzzle);
+    setPuzzleDetail(solvedPuzzle);
+  };
 
   const handleResult = async (result: boolean | null) => {
     if (result === null || !puzzleDetail) {
@@ -39,17 +54,23 @@ const TrainingPuzzleSolve = () => {
     }
     if (result) {
       const data = await solveTrainingPuzzle(puzzleDetail.id);
+
+      markSolved(puzzleDetail);
+
       if (data.reward) {
         setOutcome({ reward: data.reward });
       } else {
         setOutcome({ reward: 0 });
       }
 
+      // If there are more puzzles left in the pack
       if (puzzles.length > currentPuzzleNumber) {
         activateModal('TRAINING_PUZZLE_SUCCESS', {
           primaryAction: async () => {
-            setPuzzleDetail(puzzles[currentPuzzleNumber]);
-            setCurrentPuzzleNumber(currentPuzzleNumber + 1);
+            showAdIfReady(() => {
+              setPuzzleDetail(puzzles[currentPuzzleNumber]);
+              setCurrentPuzzleNumber((prev) => prev + 1);
+            });
           },
           secondaryAction: () => {
             navigation.goBack();
@@ -57,8 +78,9 @@ const TrainingPuzzleSolve = () => {
         });
         await updateUser();
       } else {
+        // If this is the final puzzle in the pack
         activateModal('TRAINING_PACK_COMPLETE', {
-          primaryAction: () => navigation.goBack(),
+          primaryAction: () => showAdIfReady(() => navigation.goBack()),
         });
         await updateUser();
       }
@@ -87,17 +109,20 @@ const TrainingPuzzleSolve = () => {
       setIsLoading(true);
       try {
         const data = await openTrainingAnswer(puzzleDetail.id);
+
+        markSolved(puzzleDetail);
+
         const problemSequence = puzzleDetail.boardStatus;
         const mainSequence = problemSequence + data.answer;
 
         await updateUser();
-        showBottomToast('success', '구매가 완료되었습니다.');
+        showBottomToast('success', t('toast.purchaseComplete'));
         navigation.navigate('TrainingPuzzleReview', {
           problemSequence,
           mainSequence,
           puzzle: puzzleDetail,
           isCommunityPuzzle: false,
-          title: route.params.title,
+          title: pack.title,
           puzzleNumber: currentPuzzleNumber,
         });
       } catch (error) {
@@ -114,10 +139,16 @@ const TrainingPuzzleSolve = () => {
   };
 
   useEffect(() => {
-    if (puzzleParam) {
-      setPuzzleDetail(puzzleParam);
-    }
-  }, [puzzleParam]);
+    return () => {
+      const updatedItems =
+        updatedItemsRef.current.size > 0 ? Array.from(updatedItemsRef.current.values()) : undefined;
+
+      navigation.navigate('TrainingPuzzles', {
+        pack: pack,
+        updatedItems: updatedItems,
+      });
+    };
+  }, []);
 
   if (!puzzleDetail) {
     return (
@@ -131,7 +162,7 @@ const TrainingPuzzleSolve = () => {
     <Container>
       <HeaderWrapper>
         <PuzzleHeader
-          title={route.params.title ?? puzzleDetail.id.toString()}
+          title={pack.title ?? puzzleDetail.id.toString()}
           depth={puzzleDetail.depth}
           winColor={puzzleDetail.winColor}
           displayNumber={currentPuzzleNumber}

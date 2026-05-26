@@ -9,11 +9,9 @@ import { BestRankingResponse, RatingRankingResponse } from '../../types';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import RankingListItem from '../../components/features/RankingListItem';
 import { useTranslation } from 'react-i18next';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import theme from '../../styles/theme';
 
 const Ranking = () => {
-  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const [currentTab, setCurrentTab] = useState('RATING');
   const [loading, setLoading] = useState(true);
@@ -70,8 +68,8 @@ const Ranking = () => {
   };
 
   const tabs = [
-    { key: 'RATING', title: '레이팅', component: () => null },
-    { key: 'BEST', title: '베스트 퍼즐러', component: () => null },
+    { key: 'RATING', title: t('ranking.rating'), component: () => null },
+    { key: 'BEST', title: t('ranking.best'), component: () => null },
   ];
 
   const description = () => {
@@ -134,7 +132,7 @@ const Ranking = () => {
             showsVerticalScrollIndicator={false}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+            contentContainerStyle={{ paddingBottom: 80 }}
           />
         ) : (
           <FlatList
@@ -152,11 +150,11 @@ const Ranking = () => {
             showsVerticalScrollIndicator={false}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+            contentContainerStyle={{ paddingBottom: 80 }}
           />
         )}
       </ActiveTabContainer>
-      <MyRankingContainer insetsBottom={insets.bottom}>{myRanking()}</MyRankingContainer>
+      <MyRankingContainer>{myRanking()}</MyRankingContainer>
     </Container>
   );
 };

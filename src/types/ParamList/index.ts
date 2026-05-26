@@ -3,14 +3,22 @@ import { CommunityPuzzle, TrainingPack, TrainingPuzzle } from '../Puzzle';
 export type RootStackParamList = {
   CommunityPuzzleSolve: {
     puzzle: CommunityPuzzle;
+    fromScreen?: 'CommunityPuzzles' | 'MyPuzzles' | 'LikedPuzzles';
+  };
+  CommunityPuzzles: {
+    updatedItem?: CommunityPuzzle;
   };
   TrainingPuzzleSolve: {
     puzzles: TrainingPuzzle[];
-    title: string;
+    pack: TrainingPack;
     puzzleNumber: number;
   };
   TrainingPuzzles: {
     pack: TrainingPack;
+    updatedItems?: TrainingPuzzle[];
+  };
+  TrainingPacks: {
+    updatedPack?: TrainingPack;
   };
   PuzzleReview: {
     problemSequence: string;

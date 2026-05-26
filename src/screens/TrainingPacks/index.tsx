@@ -1,22 +1,25 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TabBar from '../../components/common/TabBar';
 import { ActiveTabContainer, Container } from './index.styles';
 import { getPack, purchaseTrainingPack } from '../../apis/training';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import PackCard from '../../components/features/PackCard';
-import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomModal } from '../../components/common';
 import useModal from '../../hooks/useModal';
-import { GameOutcome, TrainingPack } from '../../types';
+import { GameOutcome, RootStackParamList, TrainingPack } from '../../types';
 import { useUserStore } from '../../store/useUserStore';
 import theme from '../../styles/theme';
+import { useTranslation } from 'react-i18next';
 
 const TrainingPacks = () => {
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'TrainingPacks'>>();
   const {
     isModalVisible,
     activateModal,
@@ -41,7 +44,7 @@ const TrainingPacks = () => {
           const isSuccess = await handlePurchase(item.id);
           if (isSuccess) {
             await updateUser();
-            showBottomToast('success', '구매가 완료되었습니다.');
+            showBottomToast('success', t('toast.purchaseComplete'));
             navigation.navigate('TrainingPuzzles', { pack: item });
           } else {
             return;
@@ -65,28 +68,40 @@ const TrainingPacks = () => {
     }
   };
 
-  const fetchPackData = async (difficulty: string) => {
-    setLoading(true);
-    try {
-      const data = await getPack(difficulty, 'KO');
-      setPacks(data);
-    } catch (error) {
-      showBottomToast('error', '문제 팩 불러오기 실패: ' + error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch data on initial mount
+  useEffect(() => {
+    const fetchPackData = async (difficulty: string) => {
+      setLoading(true);
+      try {
+        const language = i18n.language.split('-')[0].toUpperCase();
+        const data = await getPack(difficulty, language);
+        setPacks(data);
+      } catch (error) {
+        showBottomToast('error', t('toast.trainingPackLoadFailed') + error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPackData(currentTab);
+  }, [currentTab, i18n.language, t]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchPackData(currentTab);
-    }, [currentTab]),
-  );
+  // Optimistic update
+  useEffect(() => {
+    const updatedPack = route.params?.updatedPack;
+
+    if (updatedPack) {
+      setPacks((prevPacks) =>
+        prevPacks.map((prevPack) => (prevPack.id === updatedPack.id ? updatedPack : prevPack)),
+      );
+
+      navigation.setParams({ updatedPack: undefined });
+    }
+  }, [route.params?.updatedPack, navigation]);
 
   const tabs = [
-    { key: 'LOW', title: '초급', component: () => null },
-    { key: 'MIDDLE', title: '중급', component: () => null },
-    { key: 'HIGH', title: '고급', component: () => null },
+    { key: 'LOW', title: t('puzzle.level.easy'), component: () => null },
+    { key: 'MIDDLE', title: t('puzzle.level.standard'), component: () => null },
+    { key: 'HIGH', title: t('puzzle.level.hard'), component: () => null },
   ];
 
   return (

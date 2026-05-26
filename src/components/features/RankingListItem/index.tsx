@@ -60,7 +60,7 @@ const RankingListItem = ({
     <CardContainer category={category} isCurrentUser={isCurrentUser}>
       <Icon name={iconName} color={iconColor} />
       <RankText size={rankSize} lineHeight="sm" weight="bold">
-        {rank}
+        {rank < 1 ? '-' : rank}
       </RankText>
 
       <NameText size={14} lineHeight="sm" numberOfLines={1} ellipsizeMode="tail">

@@ -27,7 +27,7 @@ const BoardPreview = ({ sequence = '', isSolved = false, size = 90 }: BoardPrevi
 
   return (
     <Preview size={size}>
-      <InnerBorder size={size * 0.95}>
+      <InnerBorder size={size * 0.95} pointerEvents="none">
         {moves.map(({ x, y, stone }, index) => (
           <Cell
             key={index}
@@ -36,6 +36,7 @@ const BoardPreview = ({ sequence = '', isSolved = false, size = 90 }: BoardPrevi
             cellWidth={cellWidth} // Assume a fixed width
             stoneX={x}
             stoneY={y}
+            sequence={null}
             onPress={() => {}}
             showHighlights={false}
             style={{

@@ -1,6 +1,6 @@
 import apiClient from './interceptor';
 
-export const getRecommendPack = async (langCode: 'KO' | 'EN' | 'JP') => {
+export const getRecommendPack = async (langCode: string) => {
   try {
     const response = await apiClient.get('/api/content/recommend', { params: { langCode } });
 

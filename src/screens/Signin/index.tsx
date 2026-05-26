@@ -28,11 +28,11 @@ const Signin = () => {
 
   const handleLogin = async () => {
     if (!email) {
-      showBottomToast('error', '이메일을 입력해주세요.');
+      showBottomToast('error', t('toast.enterEmail'));
       return;
     }
     if (!password) {
-      showBottomToast('error', '비밀번호를 입력해주세요.');
+      showBottomToast('error', t('toast.enterPassword'));
       return;
     }
 

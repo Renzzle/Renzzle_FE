@@ -1,4 +1,4 @@
-import { TouchableOpacity, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
 import { StoneType } from '.';
@@ -54,7 +54,7 @@ export const StoneRow = styled(View)`
   flex-direction: row;
 `;
 
-export const CellContainer = styled(TouchableOpacity)<{ cellWidth: number }>`
+export const CellContainer = styled(Pressable)<{ cellWidth: number }>`
   width: ${({ cellWidth }) => cellWidth}px;
   height: ${({ cellWidth }) => cellWidth}px;
   justify-content: center;

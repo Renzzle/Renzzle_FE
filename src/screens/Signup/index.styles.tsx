@@ -1,8 +1,9 @@
 import { View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import DismissKeyboardView from '../../components/common/DismissKeyboadView';
 
-export const SignupContainer = styled(View)`
+export const SignupContainer = styled(DismissKeyboardView)`
   flex: 1;
   background-color: ${theme.color['gray/grayBG']};
 `;

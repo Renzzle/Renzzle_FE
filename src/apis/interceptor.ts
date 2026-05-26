@@ -2,6 +2,7 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 import { HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
 import useAuthStore from '../store/useAuthStore';
 import { reissueToken } from './auth';
+import useNetworkStore from '../store/useNetworkStore';
 
 export const apiClient = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -40,6 +41,14 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
+      console.log('네트워크 연결 끊김 감지');
+
+      useNetworkStore.getState().setNetworkError(true);
+
+      return Promise.reject(error);
+    }
+
     if (axios.isAxiosError(error)) {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 

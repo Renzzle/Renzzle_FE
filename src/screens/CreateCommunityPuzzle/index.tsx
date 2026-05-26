@@ -43,7 +43,7 @@ const CreateCommunityPuzzle = () => {
 
   const transition = [
     {
-      text: '정답 입력',
+      text: t('button.enterAnswer'),
       onAction: () =>
         navigation.navigate('AnswerCommunityPuzzle', {
           problemSequence: currentSequence,

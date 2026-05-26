@@ -30,6 +30,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
     'CommunityPuzzleSolve',
     'CreateCommunityPuzzle',
     'RankedPuzzleSolve',
+    'ChangeNickname',
   ];
   const backgroundColor = grayBGRoutes.includes(route.name)
     ? theme.color['gray/grayBG']

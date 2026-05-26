@@ -3,6 +3,27 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 
+Properties localProps = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProps.load(it) }
+}
+
+// 우선순위: 1. local.properties -> 2. gradle.properties (System property)
+def getProp = { propName ->
+    return localProps.getProperty(propName) ?: (project.findProperty(propName) ?: "")
+}
+
+def uploadStoreFile = getProp("MYAPP_UPLOAD_STORE_FILE")
+def uploadStorePassword = getProp("MYAPP_UPLOAD_STORE_PASSWORD")
+def uploadKeyAlias = getProp("MYAPP_UPLOAD_KEY_ALIAS")
+def uploadKeyPassword = getProp("MYAPP_UPLOAD_KEY_PASSWORD")
+
+def hasReleaseSigning = !uploadStoreFile.isEmpty() && 
+                        !uploadStorePassword.isEmpty() && 
+                        !uploadKeyAlias.isEmpty() && 
+                        !uploadKeyPassword.isEmpty()
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -74,6 +95,11 @@ def enableSeparateBuildPerCPUArchitecture = true
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+// Jetifier 비활성화 시 일부 라이브러리가 구 support를 가져와 AndroidX와 중복 이슈 해결
+configurations.all {
+    exclude group: 'com.android.support'
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -84,16 +110,16 @@ android {
         applicationId "com.renzzle_fe"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
+        versionCode 15
         versionName "1.0.1"
     }
     signingConfigs {
         release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file(MYAPP_UPLOAD_STORE_FILE)
-                storePassword MYAPP_UPLOAD_STORE_PASSWORD
-                keyAlias MYAPP_UPLOAD_KEY_ALIAS
-                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            if (hasReleaseSigning) {
+                storeFile file(uploadStoreFile.startsWith("/") ? uploadStoreFile : uploadStoreFile)
+                storePassword uploadStorePassword
+                keyAlias uploadKeyAlias
+                keyPassword uploadKeyPassword
             }
         }
         debug {
@@ -108,9 +134,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
 
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

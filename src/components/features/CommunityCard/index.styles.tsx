@@ -24,3 +24,7 @@ export const TitleWrapper = styled(View)<{ showDeleteIcon: boolean }>`
   justify-content: ${({ showDeleteIcon }) => (showDeleteIcon ? 'space-between' : 'flex-start')};
   align-items: center;
 `;
+
+export const DeleteButton = styled(TouchableOpacity)`
+  padding: 5px;
+`;

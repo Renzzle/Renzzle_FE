@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   BoardReactionWrapper,
   BoardStatsWrapper,
@@ -22,14 +22,22 @@ import {
   updateLike,
 } from '../../apis/community';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { CommunityPuzzle, ReactionType, RootStackParamList } from '../../types';
+import {
+  CommunityPuzzle,
+  CommunityPuzzlePatch,
+  ReactionType,
+  RootStackParamList,
+} from '../../types';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import useModal from '../../hooks/useModal';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore } from '../../store/useUserStore';
+import { usePuzzleAd } from '../../hooks/usePuzzleAd';
+import { useTranslation } from 'react-i18next';
 
 const CommunityPuzzleSolve = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'CommunityPuzzleSolve'>>();
   const {
@@ -40,9 +48,22 @@ const CommunityPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const { fromScreen = 'CommunityPuzzles' } = route.params;
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
+  const puzzleDetailRef = useRef(puzzleDetail);
+
+  const { showAdIfReady } = usePuzzleAd();
+
+  const markSolved = () => {
+    setPuzzleDetail((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      return { ...prev, isSolved: true };
+    });
+  };
 
   const handleResult = async (result: boolean | null) => {
     if (result === null || !puzzleDetail) {
@@ -51,15 +72,22 @@ const CommunityPuzzleSolve = () => {
     if (result) {
       await solveCommunityPuzzle(puzzleDetail.id);
 
+      markSolved();
+
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
         primaryAction: () => {
-          navigation.goBack();
+          showAdIfReady(() => {
+            navigation.goBack();
+          });
         },
       });
     } else {
       activateModal('COMMUNITY_PUZZLE_FAILURE', {
         primaryAction: async () => {
           navigation.goBack();
+        },
+        secondaryAction: () => {
+          handleRetry();
         },
       });
     }
@@ -121,11 +149,14 @@ const CommunityPuzzleSolve = () => {
       setIsLoading(true);
       try {
         const data = await openCommunityAnswer(puzzleDetail.id);
+
+        markSolved();
+
         const problemSequence = puzzleDetail.boardStatus;
         const mainSequence = problemSequence + data.answer;
 
         await updateUser();
-        showBottomToast('success', '구매가 완료되었습니다.');
+        showBottomToast('success', t('toast.purchaseComplete'));
         navigation.navigate('CommunityPuzzleReview', {
           problemSequence,
           mainSequence,
@@ -143,6 +174,29 @@ const CommunityPuzzleSolve = () => {
       primaryAction: openAnswer,
     });
   };
+
+  useEffect(() => {
+    puzzleDetailRef.current = puzzleDetail;
+  }, [puzzleDetail]);
+
+  useEffect(() => {
+    return () => {
+      const lastDetail = puzzleDetailRef.current;
+
+      if (!lastDetail) {
+        return;
+      }
+
+      navigation.navigate(fromScreen, {
+        updatedItem: {
+          id: lastDetail.id,
+          likeCount: lastDetail.likeCount,
+          views: lastDetail.views,
+          isSolved: lastDetail.isSolved,
+        } satisfies CommunityPuzzlePatch,
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const getDetail = async () => {
