@@ -3,11 +3,11 @@ package com.renzzle_fe;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableMap;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,6 +45,8 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
 
         executor.execute(() -> {
             try {
+                android.os.Trace.beginSection("JNI:calculateSomethingWrapper");
+
                 if (cancelledRequestIds.remove(requestId)) {
                     promise.resolve(createCancelledResponse());
                     return;
@@ -64,6 +66,7 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
                 promise.reject("ERROR", "Failed to react user move", e);
             } finally {
                 cancelledRequestIds.remove(requestId);
+                android.os.Trace.endSection();
             }
         });
     }
@@ -85,5 +88,4 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
         response.putString("status", "cancelled");
         return response;
     }
-
 }
