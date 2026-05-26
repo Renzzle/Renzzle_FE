@@ -68,8 +68,8 @@ const Ranking = () => {
   };
 
   const tabs = [
-    { key: 'RATING', title: '레이팅', component: () => null },
-    { key: 'BEST', title: '베스트 퍼즐러', component: () => null },
+    { key: 'RATING', title: t('ranking.rating'), component: () => null },
+    { key: 'BEST', title: t('ranking.best'), component: () => null },
   ];
 
   const description = () => {

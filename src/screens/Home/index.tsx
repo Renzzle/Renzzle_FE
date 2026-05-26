@@ -23,6 +23,7 @@ import PackCard from '../../components/features/PackCard';
 import CommunityCard from '../../components/features/CommunityCard';
 import useModal from '../../hooks/useModal';
 import { BackHandler, Platform, ToastAndroid } from 'react-native';
+import i18n from '../../locales/i18n';
 
 const Home = () => {
   const backHandlerPressedOnce = useRef(false);
@@ -46,7 +47,8 @@ const Home = () => {
 
   const fetchRecommendPack = async () => {
     try {
-      const data = await getRecommendPack('KO'); // TODO: 팩 언어 설정
+      const language = i18n.language.split('-')[0].toUpperCase();
+      const data = await getRecommendPack(language);
       setRecommendPack(data);
     } catch (error) {
       showBottomToast('error', error as string);

@@ -10,6 +10,7 @@ import {
 import PuzzleAttributes from '../PuzzleAttributes';
 import { CustomTag } from '../../common';
 import PuzzleActionButton from '../PuzzleActionButton';
+import { useTranslation } from 'react-i18next';
 
 interface PuzzleHeaderProps {
   title: string;
@@ -34,6 +35,7 @@ const PuzzleHeader = ({
   handleRetry,
   handleShowAnswer,
 }: PuzzleHeaderProps) => {
+  const { t } = useTranslation();
   return (
     <HeaderContainer>
       <LeftInfoWrapper>
@@ -43,11 +45,11 @@ const PuzzleHeader = ({
           </TitleText>
           {isCommunityPuzzle && (
             <AutorText size={10} color="gray/gray500" weight="bold" lineHeight="lg">
-              님 출제
+              {t('puzzle.author')}
             </AutorText>
           )}
           {!isCommunityPuzzle && displayNumber != null && <CustomTag>#{displayNumber}</CustomTag>}
-          {isSolved && <CustomTag variant="highlight">풀이 완료</CustomTag>}
+          {isSolved && <CustomTag variant="highlight">{t('puzzle.solved')}</CustomTag>}
         </TitleWrapper>
 
         <PuzzleAttributes depth={depth} winColor={winColor} isVerified={isVerified} />

@@ -17,7 +17,7 @@ import theme from '../../styles/theme';
 import { useTranslation } from 'react-i18next';
 
 const TrainingPacks = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'TrainingPacks'>>();
   const {
@@ -73,7 +73,8 @@ const TrainingPacks = () => {
     const fetchPackData = async (difficulty: string) => {
       setLoading(true);
       try {
-        const data = await getPack(difficulty, 'KO');
+        const language = i18n.language.split('-')[0].toUpperCase();
+        const data = await getPack(difficulty, language);
         setPacks(data);
       } catch (error) {
         showBottomToast('error', t('toast.trainingPackLoadFailed') + error);
@@ -82,7 +83,7 @@ const TrainingPacks = () => {
       }
     };
     fetchPackData(currentTab);
-  }, [currentTab, t]);
+  }, [currentTab, i18n.language, t]);
 
   // Optimistic update
   useEffect(() => {
@@ -98,9 +99,9 @@ const TrainingPacks = () => {
   }, [route.params?.updatedPack, navigation]);
 
   const tabs = [
-    { key: 'LOW', title: '초급', component: () => null },
-    { key: 'MIDDLE', title: '중급', component: () => null },
-    { key: 'HIGH', title: '고급', component: () => null },
+    { key: 'LOW', title: t('puzzle.level.easy'), component: () => null },
+    { key: 'MIDDLE', title: t('puzzle.level.standard'), component: () => null },
+    { key: 'HIGH', title: t('puzzle.level.hard'), component: () => null },
   ];
 
   return (

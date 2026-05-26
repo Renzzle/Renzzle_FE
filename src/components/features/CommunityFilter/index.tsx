@@ -53,6 +53,7 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
               value={option.value}
               selectedValue={sort}
               onSelect={() => onChangeFilter({ sort: option.value })}
+              variant="light"
             />
           </InputWrapper>
         ))}

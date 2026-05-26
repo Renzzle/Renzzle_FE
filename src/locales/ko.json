@@ -52,7 +52,8 @@
     "confirm": "확인",
     "verify": "검증",
     "certifiedUpload": "인증 업로드",
-    "uncertifiedUpload": "미인증 업로드"
+    "uncertifiedUpload": "미인증 업로드",
+    "enterAnswer": "정답 입력"
   },
   "placeholder": {
     "email": "이메일",
@@ -79,7 +80,7 @@
     },
     "trainingPuzzleSuccess": {
       "title": "퍼즐 풀기 성공",
-      "message": "오목을 완성하였습니다!",
+      "message": "오목을 완성하였습니다!\n획득 재화: {{reward}}조각",
       "confirm": "다음문제",
       "cancel": "나가기"
     },
@@ -143,7 +144,7 @@
     },
     "rankingPuzzleOutro": {
       "title": "랭킹 퍼즐 종료",
-      "message": "레이팅: {{rating}}점\n획득 재화: {{reward}}피스",
+      "message": "레이팅: {{rating}}점\n획득 재화: {{reward}}조각",
       "confirm": "확인",
       "cancel": "복습하기"
     },
@@ -154,19 +155,19 @@
     },
     "trainingPackPurchase": {
       "title": "트레이닝 팩 구매",
-      "message": "이 팩을 구매하시겠습니까? ({{puzzleCount}}개 퍼즐)\n필요 재화: {{price}}피스",
+      "message": "이 팩을 구매하시겠습니까? ({{puzzleCount}}개 퍼즐)\n필요 재화: {{price}}조각",
       "confirm": "구매하기",
       "cancel": "취소"
     },
     "puzzleReviewPurchase": {
       "title": "정답 보기 구매",
-      "message": "정답을 열람하시겠습니까?\n필요 재화: {{price}}피스",
+      "message": "정답을 열람하시겠습니까?\n필요 재화: {{price}}조각",
       "confirm": "구매하기",
       "cancel": "취소"
     },
     "nicknameChangePurchase": {
       "title": "닉네임 변경",
-      "message": "닉네임 변경을 진행하시겠습니까?\n필요 재화: {{price}}피스",
+      "message": "닉네임 변경을 진행하시겠습니까?\n필요 재화: {{price}}조각",
       "confirm": "구매하기",
       "cancel": "취소"
     },
@@ -210,8 +211,15 @@
     "unsolved": "풀이 전",
     "viewAnswer": "정답보기",
     "retry": "새로하기",
+    "resign": "포기하기",
     "solvedCount": "풀이",
     "views": "조회",
+    "level": {
+      "easy": "초급",
+      "standard": "중급",
+      "hard": "고급"
+    },
+    "author": "님 출제",
     "createDescription": "보드를 클릭하여 문제를 만들어 보세요. 흑돌과 백돌 순서에 주의하세요.",
     "verifyDescription": "검증 버튼으로 AI 인증을 받으세요. 인증되지 않아도 출제 가능해요."
   },

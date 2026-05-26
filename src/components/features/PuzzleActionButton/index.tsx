@@ -2,6 +2,7 @@ import React from 'react';
 import { ActionButtonWrapper } from './index.styles';
 import { CustomText, Icon } from '../../common';
 import { IconName } from '../../../assets/icons';
+import { useTranslation } from 'react-i18next';
 
 type PuzzleActionMode = 'showAnswer' | 'retry' | 'giveUp';
 
@@ -12,10 +13,12 @@ interface PuzzleActionButtonProps {
 }
 
 const PuzzleActionButton = ({ mode, disabled = false, onPress }: PuzzleActionButtonProps) => {
+  const { t } = useTranslation();
+
   const modeLabel: Record<PuzzleActionMode, string> = {
-    showAnswer: '정답열기',
-    retry: '새로하기',
-    giveUp: '포기하기',
+    showAnswer: t('puzzle.viewAnswer'),
+    retry: t('puzzle.retry'),
+    giveUp: t('puzzle.resign'),
   };
 
   const modeIcon: Record<PuzzleActionMode, IconName> = {
