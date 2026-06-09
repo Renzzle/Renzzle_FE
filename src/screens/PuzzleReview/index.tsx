@@ -1,18 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Container, HeaderWrapper, RedoButton, UndoButton, UndoRedoWrapper } from './index.styles';
 import Board, { BoardRef } from '../../components/features/Board';
 import { Icon } from '../../components/common';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { CommunityPuzzle, RootStackParamList, TrainingPuzzle } from '../../types';
+import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/ParamList';
+import { CommunityPuzzle, TrainingPuzzle } from '../../types/Puzzle';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 
 const PuzzleReview = () => {
-  const route = useRoute<RouteProp<RootStackParamList, 'PuzzleReview'>>();
+  const route =
+    useRoute<RouteProp<RootStackParamList, 'PuzzleReview' | 'TrainingPuzzleReview' | 'CommunityPuzzleReview'>>();
+  const navigation = useNavigation();
+  const isHandlingBackRef = useRef(false);
 
   const boardRef = useRef<BoardRef>(null);
 
   const [currentSequence, setCurrentSequence] = useState(route.params.problemSequence);
-  const { problemSequence, mainSequence, puzzle, isCommunityPuzzle, title, puzzleNumber } =
+  const { problemSequence, mainSequence, puzzle, isCommunityPuzzle, title, puzzleNumber, backBehavior } =
     route.params;
 
   const [canUndo, setCanUndo] = useState(false);
@@ -33,6 +37,24 @@ const PuzzleReview = () => {
       return 'gray/gray200';
     }
   };
+
+  useEffect(() => {
+    if (backBehavior !== 'popTwo') {
+      return;
+    }
+
+    const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+      if (isHandlingBackRef.current) {
+        return;
+      }
+
+      event.preventDefault();
+      isHandlingBackRef.current = true;
+      navigation.dispatch(StackActions.pop(2));
+    });
+
+    return unsubscribe;
+  }, [backBehavior, navigation]);
 
   return (
     <Container>

@@ -143,7 +143,10 @@ const TrainingPuzzleSolve = () => {
     });
   };
 
-  const handleReviewPress = (answer = currentSequence.slice(puzzleDetail?.boardStatus.length)) => {
+  const handleReviewPress = (
+    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
+    backBehavior?: 'popTwo',
+  ) => {
     if (!puzzleDetail || !answer) {
       return;
     }
@@ -153,6 +156,7 @@ const TrainingPuzzleSolve = () => {
       answer,
       title: pack.title,
       puzzleNumber: currentPuzzleNumber,
+      backBehavior,
     });
   };
 
@@ -214,7 +218,9 @@ const TrainingPuzzleSolve = () => {
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
         titleRight={
-          shouldShowReviewButton ? <ReviewButton onPress={() => handleReviewPress()} /> : undefined
+          shouldShowReviewButton ? (
+            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo')} />
+          ) : undefined
         }
         gameOutcome={outcome}
         isLoading={isLoading}

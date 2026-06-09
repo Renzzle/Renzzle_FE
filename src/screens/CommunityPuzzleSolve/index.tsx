@@ -182,7 +182,10 @@ const CommunityPuzzleSolve = () => {
     });
   };
 
-  const handleReviewPress = (answer = currentSequence.slice(puzzleDetail?.boardStatus.length)) => {
+  const handleReviewPress = (
+    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
+    backBehavior?: 'popTwo',
+  ) => {
     if (!puzzleDetail || !answer) {
       return;
     }
@@ -190,6 +193,7 @@ const CommunityPuzzleSolve = () => {
     navigateToCommunityPuzzleReview({
       puzzle: puzzleDetail,
       answer,
+      backBehavior,
     });
   };
 
@@ -309,7 +313,9 @@ const CommunityPuzzleSolve = () => {
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
         titleRight={
-          shouldShowReviewButton ? <ReviewButton onPress={() => handleReviewPress()} /> : undefined
+          shouldShowReviewButton ? (
+            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo')} />
+          ) : undefined
         }
         gameOutcome={{ price: 100 }}
         isLoading={isLoading}

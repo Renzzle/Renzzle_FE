@@ -1,10 +1,12 @@
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback } from 'react';
-import { CommunityPuzzle, TrainingPuzzle } from '../../types';
+import { PuzzleReviewBackBehavior } from '../../types/ParamList';
+import { CommunityPuzzle, TrainingPuzzle } from '../../types/Puzzle';
 
 interface BasePuzzleReviewParams {
   answer: string;
+  backBehavior?: PuzzleReviewBackBehavior;
 }
 
 interface CommunityPuzzleReviewParams extends BasePuzzleReviewParams {
@@ -26,24 +28,26 @@ const usePuzzleReviewNavigation = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const navigateToCommunityPuzzleReview = useCallback(
-    ({ puzzle, answer }: CommunityPuzzleReviewParams) => {
+    ({ puzzle, answer, backBehavior }: CommunityPuzzleReviewParams) => {
       navigation.navigate('CommunityPuzzleReview', {
         ...createPuzzleReviewSequences(puzzle.boardStatus, answer),
         puzzle,
         isCommunityPuzzle: true,
+        backBehavior,
       });
     },
     [navigation],
   );
 
   const navigateToTrainingPuzzleReview = useCallback(
-    ({ puzzle, answer, title, puzzleNumber }: TrainingPuzzleReviewParams) => {
+    ({ puzzle, answer, title, puzzleNumber, backBehavior }: TrainingPuzzleReviewParams) => {
       navigation.navigate('TrainingPuzzleReview', {
         ...createPuzzleReviewSequences(puzzle.boardStatus, answer),
         puzzle,
         isCommunityPuzzle: false,
         title,
         puzzleNumber,
+        backBehavior,
       });
     },
     [navigation],
