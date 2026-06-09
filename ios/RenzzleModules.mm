@@ -8,6 +8,16 @@
 #include "cpp/engine/engine.h"
 #include <string>
 
+static dispatch_queue_t RenzzleJNIQueue()
+{
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("com.renzzle_fe.jni", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
+}
+
 // ==========================================
 // 1. SearchJNI 모듈
 // ==========================================
@@ -16,6 +26,11 @@
 
 @implementation SearchModule
 RCT_EXPORT_MODULE(SearchJNI);
+
+- (dispatch_queue_t)methodQueue
+{
+    return RenzzleJNIQueue();
+}
 
 RCT_EXPORT_METHOD(findWinWrapper:(NSString *)boardData
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -39,6 +54,11 @@ RCT_EXPORT_METHOD(findWinWrapper:(NSString *)boardData
 @implementation UserAgainstActionModule
 RCT_EXPORT_MODULE(UserAgainstActionJNI);
 
+- (dispatch_queue_t)methodQueue
+{
+    return RenzzleJNIQueue();
+}
+
 RCT_EXPORT_METHOD(calculateSomethingWrapper:(NSString *)boardData
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
@@ -60,6 +80,11 @@ RCT_EXPORT_METHOD(calculateSomethingWrapper:(NSString *)boardData
 
 @implementation CheckWinModule
 RCT_EXPORT_MODULE(CheckWinJNI);
+
+- (dispatch_queue_t)methodQueue
+{
+    return RenzzleJNIQueue();
+}
 
 RCT_EXPORT_METHOD(checkWinWrapper:(NSString *)boardData
                   resolver:(RCTPromiseResolveBlock)resolve
