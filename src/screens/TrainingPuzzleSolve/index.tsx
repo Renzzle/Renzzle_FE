@@ -15,6 +15,8 @@ import theme from '../../styles/theme';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
+import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
+import ReviewButton from '../../components/features/ReviewButton';
 
 const TrainingPuzzleSolve = () => {
   const { t } = useTranslation();
@@ -28,15 +30,25 @@ const TrainingPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { pack, puzzles, puzzleNumber } = route.params;
+  const { navigateToTrainingPuzzleReview } = usePuzzleReviewNavigation();
   const [currentPuzzleNumber, setCurrentPuzzleNumber] = useState(puzzleNumber);
   const [puzzleDetail, setPuzzleDetail] = useState<TrainingPuzzle | null>(
     puzzles[puzzleNumber - 1],
   );
+  const [currentSequence, setCurrentSequence] = useState(puzzleDetail?.boardStatus ?? '');
 
   const [isLoading, setIsLoading] = useState(false);
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
   const [boardKey, setBoardKey] = useState(0);
+
+  const isPuzzleResultModal =
+    modalCategory === 'TRAINING_PUZZLE_SUCCESS' || modalCategory === 'TRAINING_PUZZLE_FAILURE';
+
+  const shouldShowReviewButton =
+    isPuzzleResultModal &&
+    !!puzzleDetail &&
+    currentSequence.length > puzzleDetail.boardStatus.length;
 
   const { showAdIfReady } = usePuzzleAd();
 
@@ -97,6 +109,9 @@ const TrainingPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    if (puzzleDetail) {
+      setCurrentSequence(puzzleDetail.boardStatus);
+    }
     setBoardKey((prevKey) => prevKey + 1);
   };
 
@@ -112,19 +127,9 @@ const TrainingPuzzleSolve = () => {
 
         markSolved(puzzleDetail);
 
-        const problemSequence = puzzleDetail.boardStatus;
-        const mainSequence = problemSequence + data.answer;
-
         await updateUser();
         showBottomToast('success', t('toast.purchaseComplete'));
-        navigation.navigate('TrainingPuzzleReview', {
-          problemSequence,
-          mainSequence,
-          puzzle: puzzleDetail,
-          isCommunityPuzzle: false,
-          title: pack.title,
-          puzzleNumber: currentPuzzleNumber,
-        });
+        handleReviewPress(data.answer);
       } catch (error) {
         showBottomToast('error', error as string);
       } finally {
@@ -137,6 +142,25 @@ const TrainingPuzzleSolve = () => {
       primaryAction: openAnswer,
     });
   };
+
+  const handleReviewPress = (answer = currentSequence.slice(puzzleDetail?.boardStatus.length)) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToTrainingPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      title: pack.title,
+      puzzleNumber: currentPuzzleNumber,
+    });
+  };
+
+  useEffect(() => {
+    if (puzzleDetail?.boardStatus) {
+      setCurrentSequence(puzzleDetail.boardStatus);
+    }
+  }, [puzzleDetail?.boardStatus]);
 
   useEffect(() => {
     return () => {
@@ -178,7 +202,7 @@ const TrainingPuzzleSolve = () => {
           key={boardKey}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
-          setSequence={() => {}}
+          setSequence={setCurrentSequence}
           setIsWin={handleResult}
           setIsLoading={() => {}}
         />
@@ -189,6 +213,9 @@ const TrainingPuzzleSolve = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
+        titleRight={
+          shouldShowReviewButton ? <ReviewButton onPress={() => handleReviewPress()} /> : undefined
+        }
         gameOutcome={outcome}
         isLoading={isLoading}
       />

@@ -183,9 +183,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       setSequence(updatedSequence);
     } else {
       setLocalSequence(updatedSequence);
-      if (mode === 'make') {
-        setSequence(updatedSequence);
-      }
+      setSequence(updatedSequence);
     }
 
     return updatedSequence;

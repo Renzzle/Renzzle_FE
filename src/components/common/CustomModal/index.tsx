@@ -156,6 +156,7 @@ interface CustomModalProps {
   onSecondaryAction?: () => void;
   gameOutcome?: GameOutcome;
   bodyText?: string;
+  titleRight?: React.ReactNode;
   isLoading?: boolean;
   children?: React.ReactNode;
 }
@@ -164,6 +165,7 @@ export const ModalCard = ({
   category,
   onPrimaryAction: onPrimaryClose,
   onSecondaryAction: onSecondaryClose = () => {},
+  titleRight,
   isLoading,
   gameOutcome,
   children,
@@ -183,6 +185,7 @@ export const ModalCard = ({
           {t(titleText)}
         </CustomText>
       </ModalTitleContainer>
+      {titleRight}
     </ModalTopContainer>
   );
 

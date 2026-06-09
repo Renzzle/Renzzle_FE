@@ -12,29 +12,30 @@ const useModal = () => {
 
   const { primaryAction, secondaryAction } = closeActions;
 
-  const onToggle = () => {
-    setIsModalVisible((currentIsModalOpen) => !currentIsModalOpen);
+  const openModal = () => {
+    setIsModalVisible(true);
   };
 
-  const activateModal = (
-    newCategory: ModalCategoryType,
-    newCloseActions: CloseActionsType,
-  ) => {
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const activateModal = (newCategory: ModalCategoryType, newCloseActions: CloseActionsType) => {
     setCategory(newCategory);
     setCloseActions(newCloseActions);
-    onToggle();
+    openModal();
   };
 
   const closePrimarily = async () => {
     await primaryAction();
-    onToggle();
+    closeModal();
   };
 
-  const closeSecondarily = () => {
+  const closeSecondarily = async () => {
     if (secondaryAction) {
-      secondaryAction();
+      await secondaryAction();
     }
-    onToggle();
+    closeModal();
   };
 
   return {

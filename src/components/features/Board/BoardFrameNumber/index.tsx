@@ -30,6 +30,8 @@ const BoardFrameNumber = ({ direction }: BoardFrameNumberProps) => {
       </HorizontalNum>
     );
   }
+
+  return null;
 };
 
 export default BoardFrameNumber;

@@ -35,6 +35,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore } from '../../store/useUserStore';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
+import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
+import ReviewButton from '../../components/features/ReviewButton';
 
 const CommunityPuzzleSolve = () => {
   const { t } = useTranslation();
@@ -49,10 +51,20 @@ const CommunityPuzzleSolve = () => {
   } = useModal();
   const { updateUser } = useUserStore();
   const { fromScreen = 'CommunityPuzzles' } = route.params;
+  const { navigateToCommunityPuzzleReview } = usePuzzleReviewNavigation();
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
+  const [currentSequence, setCurrentSequence] = useState(puzzleDetail?.boardStatus ?? '');
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
+
+  const isPuzzleResultModal =
+    modalCategory === 'COMMUNITY_PUZZLE_SUCCESS' || modalCategory === 'COMMUNITY_PUZZLE_FAILURE';
+
+  const shouldShowReviewButton =
+    isPuzzleResultModal &&
+    !!puzzleDetail &&
+    currentSequence.length > puzzleDetail.boardStatus.length;
 
   const { showAdIfReady } = usePuzzleAd();
 
@@ -137,6 +149,9 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    if (puzzleDetail) {
+      setCurrentSequence(puzzleDetail.boardStatus);
+    }
     setBoardKey((prevKey) => prevKey + 1);
   };
 
@@ -152,17 +167,9 @@ const CommunityPuzzleSolve = () => {
 
         markSolved();
 
-        const problemSequence = puzzleDetail.boardStatus;
-        const mainSequence = problemSequence + data.answer;
-
         await updateUser();
         showBottomToast('success', t('toast.purchaseComplete'));
-        navigation.navigate('CommunityPuzzleReview', {
-          problemSequence,
-          mainSequence,
-          puzzle: puzzleDetail,
-          isCommunityPuzzle: true,
-        });
+        handleReviewPress(data.answer);
       } catch (error) {
         showBottomToast('error', error as string);
       } finally {
@@ -175,9 +182,26 @@ const CommunityPuzzleSolve = () => {
     });
   };
 
+  const handleReviewPress = (answer = currentSequence.slice(puzzleDetail?.boardStatus.length)) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToCommunityPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+    });
+  };
+
   useEffect(() => {
     puzzleDetailRef.current = puzzleDetail;
   }, [puzzleDetail]);
+
+  useEffect(() => {
+    if (puzzleDetail?.boardStatus) {
+      setCurrentSequence(puzzleDetail.boardStatus);
+    }
+  }, [puzzleDetail?.boardStatus]);
 
   useEffect(() => {
     return () => {
@@ -266,7 +290,7 @@ const CommunityPuzzleSolve = () => {
           key={boardKey}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
-          setSequence={() => {}}
+          setSequence={setCurrentSequence}
           setIsWin={handleResult}
           setIsLoading={setIsLoading}
         />
@@ -284,6 +308,9 @@ const CommunityPuzzleSolve = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
+        titleRight={
+          shouldShowReviewButton ? <ReviewButton onPress={() => handleReviewPress()} /> : undefined
+        }
         gameOutcome={{ price: 100 }}
         isLoading={isLoading}
       />
