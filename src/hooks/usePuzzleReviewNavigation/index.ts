@@ -4,9 +4,12 @@ import { useCallback } from 'react';
 import { PuzzleReviewBackBehavior } from '../../types/ParamList';
 import { CommunityPuzzle, TrainingPuzzle } from '../../types/Puzzle';
 
+type PuzzleReviewDestination = 'review' | 'viewAnswer';
+
 interface BasePuzzleReviewParams {
   answer: string;
   backBehavior?: PuzzleReviewBackBehavior;
+  destination?: PuzzleReviewDestination;
 }
 
 interface CommunityPuzzleReviewParams extends BasePuzzleReviewParams {
@@ -28,8 +31,11 @@ const usePuzzleReviewNavigation = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const navigateToCommunityPuzzleReview = useCallback(
-    ({ puzzle, answer, backBehavior }: CommunityPuzzleReviewParams) => {
-      navigation.navigate('CommunityPuzzleReview', {
+    ({ puzzle, answer, backBehavior, destination = 'review' }: CommunityPuzzleReviewParams) => {
+      const routeName =
+        destination === 'viewAnswer' ? 'CommunityPuzzleViewAnswer' : 'CommunityPuzzleReview';
+
+      navigation.navigate(routeName, {
         ...createPuzzleReviewSequences(puzzle.boardStatus, answer),
         puzzle,
         isCommunityPuzzle: true,
@@ -40,8 +46,18 @@ const usePuzzleReviewNavigation = () => {
   );
 
   const navigateToTrainingPuzzleReview = useCallback(
-    ({ puzzle, answer, title, puzzleNumber, backBehavior }: TrainingPuzzleReviewParams) => {
-      navigation.navigate('TrainingPuzzleReview', {
+    ({
+      puzzle,
+      answer,
+      title,
+      puzzleNumber,
+      backBehavior,
+      destination = 'review',
+    }: TrainingPuzzleReviewParams) => {
+      const routeName =
+        destination === 'viewAnswer' ? 'TrainingPuzzleViewAnswer' : 'TrainingPuzzleReview';
+
+      navigation.navigate(routeName, {
         ...createPuzzleReviewSequences(puzzle.boardStatus, answer),
         puzzle,
         isCommunityPuzzle: false,

@@ -20,6 +20,34 @@ export const menuThemeMap = {
     iconName: 'LightningIcon',
     route: 'RankedPuzzleSolve',
   },
+  trainingPuzzleReview: {
+    titleKey: 'puzzle.review',
+    background: 'sub_color/indigo/bg',
+    iconColor: 'main_color/blue_p',
+    iconName: 'TrainingIcon',
+    route: 'TrainingPuzzleReview',
+  },
+  communityPuzzleReview: {
+    titleKey: 'puzzle.review',
+    background: 'sub_color/orange/bg',
+    iconColor: 'main_color/yellow_s',
+    iconName: 'CommunityIcon',
+    route: 'CommunityPuzzleReview',
+  },
+  trainingPuzzleViewAnswer: {
+    titleKey: 'puzzle.viewAnswer',
+    background: 'sub_color/indigo/bg',
+    iconColor: 'main_color/blue_p',
+    iconName: 'TrainingIcon',
+    route: 'TrainingPuzzleReview',
+  },
+  communityPuzzleViewAnswer: {
+    titleKey: 'puzzle.viewAnswer',
+    background: 'sub_color/orange/bg',
+    iconColor: 'main_color/yellow_s',
+    iconName: 'CommunityIcon',
+    route: 'CommunityPuzzleReview',
+  },
   ranking: {
     titleKey: 'common.ranking',
     background: 'sub_color/green/bg',
@@ -86,3 +114,29 @@ export const menuThemeMap = {
 } as const;
 
 export type MenuType = keyof typeof menuThemeMap;
+
+export const headerMenuTypeMap = {
+  Home: 'home',
+  Signup: 'signup',
+  MyPuzzles: 'myPuzzle',
+  LikedPuzzles: 'likes',
+  Ranking: 'ranking',
+  Settings: 'settings',
+  Language: 'language',
+  ChangeNickname: 'changeNickname',
+  TrainingPacks: 'trainingPuzzle',
+  TrainingPuzzles: 'trainingPuzzle',
+  TrainingPuzzleSolve: 'trainingPuzzle',
+  TrainingPuzzleReview: 'trainingPuzzleReview',
+  TrainingPuzzleViewAnswer: 'trainingPuzzleViewAnswer',
+  CommunityPuzzles: 'communityPuzzle',
+  CommunityPuzzleSolve: 'communityPuzzle',
+  CommunityPuzzleReview: 'communityPuzzleReview',
+  CommunityPuzzleViewAnswer: 'communityPuzzleViewAnswer',
+  CreateCommunityPuzzle: 'communityPuzzle',
+  AnswerCommunityPuzzle: 'communityPuzzle',
+  RankedPuzzleSolve: 'rankingPuzzle',
+} as const satisfies Record<string, MenuType>;
+
+export const getMenuTypeByRouteName = (routeName: string): MenuType | undefined =>
+  headerMenuTypeMap[routeName as keyof typeof headerMenuTypeMap];

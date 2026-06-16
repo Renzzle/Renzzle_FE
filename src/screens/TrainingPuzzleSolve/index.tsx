@@ -115,34 +115,6 @@ const TrainingPuzzleSolve = () => {
     setBoardKey((prevKey) => prevKey + 1);
   };
 
-  const handleShowAnswer = () => {
-    if (isLoading || !puzzleDetail?.id) {
-      return;
-    }
-
-    const openAnswer = async () => {
-      setIsLoading(true);
-      try {
-        const data = await openTrainingAnswer(puzzleDetail.id);
-
-        markSolved(puzzleDetail);
-
-        await updateUser();
-        showBottomToast('success', t('toast.purchaseComplete'));
-        handleReviewPress(data.answer);
-      } catch (error) {
-        showBottomToast('error', error as string);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    setOutcome({ ...outcome, price: 100 });
-    activateModal('PUZZLE_REVIEW_PURCHASE', {
-      primaryAction: openAnswer,
-    });
-  };
-
   const handleReviewPress = (
     answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
     backBehavior?: 'popTwo',
@@ -157,6 +129,48 @@ const TrainingPuzzleSolve = () => {
       title: pack.title,
       puzzleNumber: currentPuzzleNumber,
       backBehavior,
+    });
+  };
+
+  const handleViewAnswerPress = (answer: string) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToTrainingPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      title: pack.title,
+      puzzleNumber: currentPuzzleNumber,
+      destination: 'viewAnswer',
+    });
+  };
+
+  const handleShowAnswer = () => {
+    if (isLoading || !puzzleDetail?.id) {
+      return;
+    }
+
+    const openAnswer = async () => {
+      setIsLoading(true);
+      try {
+        const data = await openTrainingAnswer(puzzleDetail.id);
+
+        markSolved(puzzleDetail);
+
+        await updateUser();
+        showBottomToast('success', t('toast.purchaseComplete'));
+        handleViewAnswerPress(data.answer);
+      } catch (error) {
+        showBottomToast('error', error as string);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    setOutcome({ ...outcome, price: 100 });
+    activateModal('PUZZLE_REVIEW_PURCHASE', {
+      primaryAction: openAnswer,
     });
   };
 

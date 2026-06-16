@@ -155,6 +155,33 @@ const CommunityPuzzleSolve = () => {
     setBoardKey((prevKey) => prevKey + 1);
   };
 
+  const handleReviewPress = (
+    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
+    backBehavior?: 'popTwo',
+  ) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToCommunityPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      backBehavior,
+    });
+  };
+
+  const handleViewAnswerPress = (answer: string) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToCommunityPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      destination: 'viewAnswer',
+    });
+  };
+
   const handleShowAnswer = () => {
     if (isLoading || !puzzleDetail?.id) {
       return;
@@ -169,7 +196,7 @@ const CommunityPuzzleSolve = () => {
 
         await updateUser();
         showBottomToast('success', t('toast.purchaseComplete'));
-        handleReviewPress(data.answer);
+        handleViewAnswerPress(data.answer);
       } catch (error) {
         showBottomToast('error', error as string);
       } finally {
@@ -179,21 +206,6 @@ const CommunityPuzzleSolve = () => {
 
     activateModal('PUZZLE_REVIEW_PURCHASE', {
       primaryAction: openAnswer,
-    });
-  };
-
-  const handleReviewPress = (
-    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
-    backBehavior?: 'popTwo',
-  ) => {
-    if (!puzzleDetail || !answer) {
-      return;
-    }
-
-    navigateToCommunityPuzzleReview({
-      puzzle: puzzleDetail,
-      answer,
-      backBehavior,
     });
   };
 

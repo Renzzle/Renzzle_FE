@@ -9,15 +9,31 @@ import PuzzleHeader from '../../components/features/PuzzleHeader';
 
 const PuzzleReview = () => {
   const route =
-    useRoute<RouteProp<RootStackParamList, 'PuzzleReview' | 'TrainingPuzzleReview' | 'CommunityPuzzleReview'>>();
+    useRoute<
+      RouteProp<
+        RootStackParamList,
+        | 'PuzzleReview'
+        | 'TrainingPuzzleReview'
+        | 'TrainingPuzzleViewAnswer'
+        | 'CommunityPuzzleReview'
+        | 'CommunityPuzzleViewAnswer'
+      >
+    >();
   const navigation = useNavigation();
   const isHandlingBackRef = useRef(false);
 
   const boardRef = useRef<BoardRef>(null);
 
   const [currentSequence, setCurrentSequence] = useState(route.params.problemSequence);
-  const { problemSequence, mainSequence, puzzle, isCommunityPuzzle, title, puzzleNumber, backBehavior } =
-    route.params;
+  const {
+    problemSequence,
+    mainSequence,
+    puzzle,
+    isCommunityPuzzle,
+    title,
+    puzzleNumber,
+    backBehavior,
+  } = route.params;
 
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);

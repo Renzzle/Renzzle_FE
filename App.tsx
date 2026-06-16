@@ -127,7 +127,12 @@ function App(): React.JSX.Element | null {
                   <Stack.Screen
                     name="TrainingPuzzleReview"
                     component={PuzzleReview}
-                    options={{ title: 'home.trainingPuzzle' }}
+                    options={{ title: 'puzzle.review' }}
+                  />
+                  <Stack.Screen
+                    name="TrainingPuzzleViewAnswer"
+                    component={PuzzleReview}
+                    options={{ title: 'puzzle.viewAnswer' }}
                   />
                   <Stack.Screen
                     name="CommunityPuzzles"
@@ -142,7 +147,12 @@ function App(): React.JSX.Element | null {
                   <Stack.Screen
                     name="CommunityPuzzleReview"
                     component={PuzzleReview}
-                    options={{ title: 'home.communityPuzzle' }}
+                    options={{ title: 'puzzle.review' }}
+                  />
+                  <Stack.Screen
+                    name="CommunityPuzzleViewAnswer"
+                    component={PuzzleReview}
+                    options={{ title: 'puzzle.viewAnswer' }}
                   />
                   <Stack.Screen
                     name="CreateCommunityPuzzle"

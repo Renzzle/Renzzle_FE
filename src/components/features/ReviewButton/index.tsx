@@ -1,5 +1,5 @@
 import React from 'react';
-import { CustomText } from '../../common';
+import { CustomText, Icon } from '../../common';
 import { ButtonContainer } from './index.styles';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,7 @@ const ReviewButton = ({ onPress }: ReviewButtonProps) => {
       <CustomText weight="bold" lineHeight="sm" color="main_color/blue_p">
         {t('puzzle.review')}
       </CustomText>
+      <Icon name="ChevronRightIcon" size={22} color="main_color/blue_p" />
     </ButtonContainer>
   );
 };

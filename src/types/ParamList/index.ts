@@ -34,7 +34,9 @@ export type RootStackParamList = {
   };
   PuzzleReview: PuzzleReviewParams;
   TrainingPuzzleReview: PuzzleReviewParams;
+  TrainingPuzzleViewAnswer: PuzzleReviewParams;
   CommunityPuzzleReview: PuzzleReviewParams;
+  CommunityPuzzleViewAnswer: PuzzleReviewParams;
   AnswerCommunityPuzzle: {
     problemSequence: string;
     description: string;
