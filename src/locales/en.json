@@ -212,6 +212,7 @@
     "viewAnswer": "answer",
     "retry": "retry",
     "resign": "resign",
+    "review": "review",
     "solvedCount": "solved",
     "views": "views",
     "level": {
