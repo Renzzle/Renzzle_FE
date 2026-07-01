@@ -42,6 +42,7 @@ const useModal = () => {
     isModalVisible,
     category,
     activateModal,
+    closeModal,
     closePrimarily,
     closeSecondarily,
   };

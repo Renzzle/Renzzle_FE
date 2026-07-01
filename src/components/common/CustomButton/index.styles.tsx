@@ -10,6 +10,7 @@ export const StyledButton = styled(TouchableOpacity)`
   border-radius: 6px;
   border-width: 0;
   flex: 1;
+  align-items: center;
 `;
 
 export const StyledPrimaryButton = styled(StyledButton)<{ disabled: boolean }>`

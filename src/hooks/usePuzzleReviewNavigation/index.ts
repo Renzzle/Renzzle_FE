@@ -1,7 +1,7 @@
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback } from 'react';
-import { PuzzleReviewBackBehavior } from '../../types/ParamList';
+import { PuzzleReviewBackBehavior, TrainingPuzzleReviewAction } from '../../types/ParamList';
 import { CommunityPuzzle, TrainingPuzzle } from '../../types/Puzzle';
 
 type PuzzleReviewDestination = 'review' | 'viewAnswer';
@@ -20,6 +20,7 @@ interface TrainingPuzzleReviewParams extends BasePuzzleReviewParams {
   puzzle: TrainingPuzzle;
   title?: string;
   puzzleNumber?: number;
+  reviewAction?: TrainingPuzzleReviewAction;
 }
 
 const createPuzzleReviewSequences = (problemSequence: string, answer: string) => ({
@@ -52,6 +53,7 @@ const usePuzzleReviewNavigation = () => {
       title,
       puzzleNumber,
       backBehavior,
+      reviewAction,
       destination = 'review',
     }: TrainingPuzzleReviewParams) => {
       const routeName =
@@ -64,6 +66,7 @@ const usePuzzleReviewNavigation = () => {
         title,
         puzzleNumber,
         backBehavior,
+        reviewAction,
       });
     },
     [navigation],

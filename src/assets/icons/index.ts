@@ -11,6 +11,7 @@ import ChevronDoubleLeftIcon from './ico-chevron-double-left.svg';
 import ChevronDoubleRightIcon from './ico-chevron-double-right.svg';
 import ChevronLeftIcon from './ico-chevron-left.svg';
 import ChevronRightIcon from './ico-chevron-right.svg';
+import ChevronRightCompactIcon from './ico-chevron-right-compact.svg';
 import CloseIcon from './ico-close.svg';
 import CommunityIcon from './ico-community.svg';
 import ConfusedActiveIcon from './ico-confused-active.svg';
@@ -79,6 +80,7 @@ const Icons = {
   ChevronDoubleRightIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronRightCompactIcon,
   CloseIcon,
   CommunityIcon,
   ConfusedActiveIcon,

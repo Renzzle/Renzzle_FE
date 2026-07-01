@@ -1,13 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Container, HeaderWrapper, RedoButton, UndoButton, UndoRedoWrapper } from './index.styles';
+import {
+  ButtonWrapper,
+  Container,
+  HeaderWrapper,
+  RedoButton,
+  UndoButton,
+  UndoRedoWrapper,
+} from './index.styles';
 import Board, { BoardRef } from '../../components/features/Board';
 import { Icon } from '../../components/common';
-import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  CommonActions,
+  RouteProp,
+  StackActions,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/ParamList';
 import { CommunityPuzzle, TrainingPuzzle } from '../../types/Puzzle';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
+import ReviewButton from '../../components/features/ReviewButton';
+import { useTranslation } from 'react-i18next';
 
 const PuzzleReview = () => {
+  const { t } = useTranslation();
+
+  const REVIEW_ACTION_LABELS = {
+    next: t('modal.trainingPuzzleSuccess.confirm'),
+    retry: t('modal.trainingPuzzleFailure.cancel'),
+    complete: t('button.complete'),
+  };
+
   const route =
     useRoute<
       RouteProp<
@@ -19,7 +43,7 @@ const PuzzleReview = () => {
         | 'CommunityPuzzleViewAnswer'
       >
     >();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const isHandlingBackRef = useRef(false);
 
   const boardRef = useRef<BoardRef>(null);
@@ -33,6 +57,7 @@ const PuzzleReview = () => {
     title,
     puzzleNumber,
     backBehavior,
+    reviewAction,
   } = route.params;
 
   const [canUndo, setCanUndo] = useState(false);
@@ -52,6 +77,21 @@ const PuzzleReview = () => {
     } else {
       return 'gray/gray200';
     }
+  };
+
+  const handleReviewActionPress = () => {
+    if (!reviewAction) {
+      return;
+    }
+
+    isHandlingBackRef.current = true;
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'TrainingPuzzleSolve',
+        params: { reviewAction },
+        merge: true,
+      }),
+    );
   };
 
   useEffect(() => {
@@ -88,6 +128,13 @@ const PuzzleReview = () => {
           isSolved={puzzle.isSolved}
           isCommunityPuzzle={isCommunityPuzzle}
         />
+        {!isCommunityPuzzle && reviewAction ? (
+          <ButtonWrapper>
+            <ReviewButton onPress={handleReviewActionPress}>
+              {REVIEW_ACTION_LABELS[reviewAction]}
+            </ReviewButton>
+          </ButtonWrapper>
+        ) : null}
       </HeaderWrapper>
 
       <Board

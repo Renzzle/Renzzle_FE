@@ -1,20 +1,19 @@
 import React from 'react';
 import { CustomText, Icon } from '../../common';
 import { ButtonContainer } from './index.styles';
-import { useTranslation } from 'react-i18next';
 
 interface ReviewButtonProps {
   onPress: () => void;
+  children: React.ReactNode;
 }
 
-const ReviewButton = ({ onPress }: ReviewButtonProps) => {
-  const { t } = useTranslation();
+const ReviewButton = ({ onPress, children }: ReviewButtonProps) => {
   return (
     <ButtonContainer onPress={onPress}>
       <CustomText weight="bold" lineHeight="sm" color="main_color/blue_p">
-        {t('puzzle.review')}
+        {children}
       </CustomText>
-      <Icon name="ChevronRightIcon" size={22} color="main_color/blue_p" />
+      <Icon name="ChevronRightCompactIcon" size={18} color="main_color/blue_p" />
     </ButtonContainer>
   );
 };

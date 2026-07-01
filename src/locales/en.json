@@ -53,7 +53,8 @@
     "verify": "Verify",
     "certifiedUpload": "Verified Upload",
     "uncertifiedUpload": "Unverified Upload",
-    "enterAnswer": "Enter Answer"
+    "enterAnswer": "Enter Answer",
+    "complete": "Done"
   },
   "placeholder": {
     "email": "Email",

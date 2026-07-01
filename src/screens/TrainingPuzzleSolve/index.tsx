@@ -4,7 +4,12 @@ import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 import Board from '../../components/features/Board';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { GameOutcome, RootStackParamList, TrainingPuzzle } from '../../types';
+import {
+  GameOutcome,
+  RootStackParamList,
+  TrainingPuzzle,
+  TrainingPuzzleReviewAction,
+} from '../../types';
 import { CustomModal } from '../../components/common';
 import { openTrainingAnswer, solveTrainingPuzzle } from '../../apis/training';
 import { useUserStore } from '../../store/useUserStore';
@@ -25,6 +30,7 @@ const TrainingPuzzleSolve = () => {
   const {
     isModalVisible,
     activateModal,
+    closeModal,
     closePrimarily,
     closeSecondarily,
     category: modalCategory,
@@ -43,16 +49,38 @@ const TrainingPuzzleSolve = () => {
   const [boardKey, setBoardKey] = useState(0);
 
   const isPuzzleResultModal =
-    modalCategory === 'TRAINING_PUZZLE_SUCCESS' || modalCategory === 'TRAINING_PUZZLE_FAILURE';
+    modalCategory === 'TRAINING_PUZZLE_SUCCESS' ||
+    modalCategory === 'TRAINING_PACK_COMPLETE' ||
+    modalCategory === 'TRAINING_PUZZLE_FAILURE';
 
   const shouldShowReviewButton =
     isPuzzleResultModal &&
     !!puzzleDetail &&
     currentSequence.length > puzzleDetail.boardStatus.length;
 
+  const reviewAction: TrainingPuzzleReviewAction | undefined =
+    modalCategory === 'TRAINING_PUZZLE_SUCCESS'
+      ? 'next'
+      : modalCategory === 'TRAINING_PACK_COMPLETE'
+      ? 'complete'
+      : modalCategory === 'TRAINING_PUZZLE_FAILURE'
+      ? 'retry'
+      : undefined;
+
   const { showAdIfReady } = usePuzzleAd();
 
   const updatedItemsRef = useRef<Map<number, TrainingPuzzle>>(new Map());
+
+  const handleNextPuzzle = () => {
+    if (puzzles.length <= currentPuzzleNumber) {
+      return;
+    }
+
+    showAdIfReady(() => {
+      setPuzzleDetail(puzzles[currentPuzzleNumber]);
+      setCurrentPuzzleNumber((prev) => prev + 1);
+    });
+  };
 
   const markSolved = (targetPuzzle: TrainingPuzzle) => {
     const solvedPuzzle = { ...targetPuzzle, isSolved: true };
@@ -79,10 +107,7 @@ const TrainingPuzzleSolve = () => {
       if (puzzles.length > currentPuzzleNumber) {
         activateModal('TRAINING_PUZZLE_SUCCESS', {
           primaryAction: async () => {
-            showAdIfReady(() => {
-              setPuzzleDetail(puzzles[currentPuzzleNumber]);
-              setCurrentPuzzleNumber((prev) => prev + 1);
-            });
+            handleNextPuzzle();
           },
           secondaryAction: () => {
             navigation.goBack();
@@ -115,37 +140,6 @@ const TrainingPuzzleSolve = () => {
     setBoardKey((prevKey) => prevKey + 1);
   };
 
-  const handleReviewPress = (
-    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
-    backBehavior?: 'popTwo',
-  ) => {
-    if (!puzzleDetail || !answer) {
-      return;
-    }
-
-    navigateToTrainingPuzzleReview({
-      puzzle: puzzleDetail,
-      answer,
-      title: pack.title,
-      puzzleNumber: currentPuzzleNumber,
-      backBehavior,
-    });
-  };
-
-  const handleViewAnswerPress = (answer: string) => {
-    if (!puzzleDetail || !answer) {
-      return;
-    }
-
-    navigateToTrainingPuzzleReview({
-      puzzle: puzzleDetail,
-      answer,
-      title: pack.title,
-      puzzleNumber: currentPuzzleNumber,
-      destination: 'viewAnswer',
-    });
-  };
-
   const handleShowAnswer = () => {
     if (isLoading || !puzzleDetail?.id) {
       return;
@@ -174,11 +168,68 @@ const TrainingPuzzleSolve = () => {
     });
   };
 
+  const handleReviewPress = (
+    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
+    backBehavior?: 'popTwo',
+    nextReviewAction?: TrainingPuzzleReviewAction,
+  ) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    closeModal();
+
+    navigateToTrainingPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      title: pack.title,
+      puzzleNumber: currentPuzzleNumber,
+      backBehavior,
+      reviewAction: nextReviewAction,
+    });
+  };
+
+  const handleViewAnswerPress = (answer: string) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToTrainingPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      title: pack.title,
+      puzzleNumber: currentPuzzleNumber,
+      destination: 'viewAnswer',
+    });
+  };
+
   useEffect(() => {
     if (puzzleDetail?.boardStatus) {
       setCurrentSequence(puzzleDetail.boardStatus);
     }
   }, [puzzleDetail?.boardStatus]);
+
+  useEffect(() => {
+    const currentReviewAction = route.params.reviewAction;
+
+    if (!currentReviewAction) {
+      return;
+    }
+
+    navigation.setParams({ reviewAction: undefined });
+
+    if (currentReviewAction === 'next') {
+      handleNextPuzzle();
+      return;
+    }
+
+    if (currentReviewAction === 'complete') {
+      navigation.goBack();
+      return;
+    }
+
+    handleRetry();
+  }, [route.params.reviewAction]);
 
   useEffect(() => {
     return () => {
@@ -232,8 +283,10 @@ const TrainingPuzzleSolve = () => {
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
         titleRight={
-          shouldShowReviewButton ? (
-            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo')} />
+          shouldShowReviewButton && reviewAction ? (
+            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo', reviewAction)}>
+              {t('puzzle.review')}
+            </ReviewButton>
           ) : undefined
         }
         gameOutcome={outcome}

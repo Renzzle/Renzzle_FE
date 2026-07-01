@@ -326,7 +326,9 @@ const CommunityPuzzleSolve = () => {
         onSecondaryAction={closeSecondarily}
         titleRight={
           shouldShowReviewButton ? (
-            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo')} />
+            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo')}>
+              {t('puzzle.review')}
+            </ReviewButton>
           ) : undefined
         }
         gameOutcome={{ price: 100 }}

@@ -15,6 +15,14 @@ export const HeaderWrapper = styled(View)`
   position: absolute;
   top: 0;
   left: 0;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+`;
+
+export const ButtonWrapper = styled(View)`
+  margin-top: 20px;
+  margin-right: 5px;
 `;
 
 export const BoardWrapper = styled(View)`

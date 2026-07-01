@@ -1,6 +1,7 @@
 import { CommunityPuzzle, TrainingPack, TrainingPuzzle } from '../Puzzle';
 
 export type PuzzleReviewBackBehavior = 'popTwo';
+export type TrainingPuzzleReviewAction = 'next' | 'retry' | 'complete';
 
 export interface PuzzleReviewParams {
   problemSequence: string;
@@ -10,6 +11,7 @@ export interface PuzzleReviewParams {
   title?: string;
   puzzleNumber?: number;
   backBehavior?: PuzzleReviewBackBehavior;
+  reviewAction?: TrainingPuzzleReviewAction;
 }
 
 export type RootStackParamList = {
@@ -24,6 +26,7 @@ export type RootStackParamList = {
     puzzles: TrainingPuzzle[];
     pack: TrainingPack;
     puzzleNumber: number;
+    reviewAction?: TrainingPuzzleReviewAction;
   };
   TrainingPuzzles: {
     pack: TrainingPack;

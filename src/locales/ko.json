@@ -53,7 +53,8 @@
     "verify": "검증",
     "certifiedUpload": "인증 업로드",
     "uncertifiedUpload": "미인증 업로드",
-    "enterAnswer": "정답 입력"
+    "enterAnswer": "정답 입력",
+    "complete": "완료"
   },
   "placeholder": {
     "email": "이메일",
