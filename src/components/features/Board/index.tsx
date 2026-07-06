@@ -69,6 +69,7 @@ interface CellType {
 export interface BoardRef {
   undo: () => void;
   redo: () => void;
+  cancelAiTurn: () => void;
 }
 
 const createEmptyBoard = (): CellType[][] => {
@@ -79,6 +80,15 @@ const createEmptyBoard = (): CellType[][] => {
     })),
   );
 };
+
+type AiMoveResponse =
+  | {
+      status: 'ok';
+      move: number;
+    }
+  | {
+      status: 'cancelled';
+    };
 
 interface BoardProps {
   mode: 'make' | 'solve';
@@ -137,6 +147,9 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const aiBenchmarkRef = useRef<AiBenchmarkResult | null>(null);
 
   useImperativeHandle(ref, () => ({
+    cancelAiTurn: () => {
+      cancelActiveAiTurn(true);
+    },
     undo: () => {
       if (mode !== 'make') {
         return;
@@ -185,6 +198,12 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       }
     },
   }));
+
+  useEffect(() => {
+    return () => {
+      cancelActiveAiTurn(false);
+    };
+  }, []);
 
   const updateBoard = (x: number, y: number) => {
     // copy board
@@ -360,6 +379,10 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   };
 
   const handleAiTurn = async (userSequence: string) => {
+    cancelActiveAiTurn(false);
+    const requestId = createAiRequestId();
+    activeAiRequestIdRef.current = requestId;
+
     setTimeout(async () => {
       try {
         const aiMode = getPuzzleAiMode();
@@ -380,6 +403,10 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
               position: undefined,
             };
 
+        if (activeAiRequestIdRef.current !== requestId) {
+          return;
+        }
+
         if (cachedAnswer !== null) {
           if (IS_AI_BENCHMARK_ENABLED) {
             aiBenchmarkRef.current = {
@@ -395,6 +422,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
               position,
             };
           }
+          activeAiRequestIdRef.current = null;
           setAiAnswer(cachedAnswer);
           return;
         }
@@ -403,7 +431,26 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           aiMode === 'LOCAL_ONLY' ? 'local-only' : shouldSave ? 'cache-miss' : 'cache-fallback';
 
         const localAiStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
-        const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
+
+        const response = (await UserAgainstActionJNI.calculateSomethingWrapper(
+          requestId,
+          userSequence,
+        )) as AiMoveResponse | number;
+
+        if (activeAiRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        if (typeof response !== 'number' && response.status === 'cancelled') {
+          activeAiRequestIdRef.current = null;
+          setIsDisabled(false);
+          setIsLoading?.(false);
+          return;
+        }
+
+        const result = typeof response === 'number' ? response : response.move;
+        activeAiRequestIdRef.current = null;
+
         if (IS_AI_BENCHMARK_ENABLED) {
           aiBenchmarkRef.current = {
             mode: aiMode,
@@ -437,9 +484,12 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         }
         setAiAnswer(result);
       } catch (error) {
-        showBottomToast('error', t('toast.aiCalculationFailed'));
-        setIsLoading?.(false);
-        setIsDisabled(false);
+        if (activeAiRequestIdRef.current === requestId) {
+          activeAiRequestIdRef.current = null;
+          showBottomToast('error', t('toast.aiCalculationFailed'));
+          setIsLoading?.(false);
+          setIsDisabled(false);
+        }
       }
     }, 0);
   };

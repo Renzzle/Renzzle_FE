@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BoardHeaderWrapper,
   Container,
@@ -19,6 +19,15 @@ import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 import { getSequenceDepth } from '../../../utils/utils';
 import { uploadPuzzle } from '../../../apis/community';
 import HelperText from '../../../components/common/HelperText';
+
+type ValidationResponse =
+  | {
+      status: 'ok';
+      result: string;
+    }
+  | {
+      status: 'cancelled';
+    };
 
 const AnswerCommunityPuzzle = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -51,6 +60,23 @@ const AnswerCommunityPuzzle = () => {
   }, [problemSequence]);
 
   const boardRef = useRef<BoardRef>(null);
+  const verifyRequestIdRef = useRef(0);
+  const activeVerifyRequestIdRef = useRef<number | null>(null);
+
+  const createVerifyRequestId = () => {
+    verifyRequestIdRef.current += 1;
+    return verifyRequestIdRef.current;
+  };
+
+  const cancelActiveVerification = useCallback(() => {
+    const activeRequestId = activeVerifyRequestIdRef.current;
+    if (activeRequestId === null) {
+      return;
+    }
+
+    activeVerifyRequestIdRef.current = null;
+    SearchJNI.cancelFindWin?.(activeRequestId);
+  }, [SearchJNI]);
 
   const handleUndo = () => {
     boardRef.current?.undo();
@@ -87,13 +113,33 @@ const AnswerCommunityPuzzle = () => {
   ];
 
   const verifySequence = async () => {
+    cancelActiveVerification();
+    const requestId = createVerifyRequestId();
+    activeVerifyRequestIdRef.current = requestId;
+
     setIsVerifyDisabled(true);
     setIsUploadDisabled(true);
     setIsVerifyLoading(true);
 
     setTimeout(async () => {
       try {
-        const result = await SearchJNI.findWinWrapper(problemSequence);
+        const response = (await SearchJNI.findWinWrapper(requestId, problemSequence)) as
+          | ValidationResponse
+          | string;
+
+        if (activeVerifyRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        if (typeof response !== 'string' && response.status === 'cancelled') {
+          activeVerifyRequestIdRef.current = null;
+          setIsVerifyDisabled(false);
+          setIsVerifyLoading(false);
+          setIsUploadDisabled(currentSequence.length <= problemSequence.length);
+          return;
+        }
+
+        const result = typeof response === 'string' ? response : response.result;
         console.log('VCF Wrapper Result: ', result);
 
         if (result.length === 0) {
@@ -110,13 +156,24 @@ const AnswerCommunityPuzzle = () => {
           primaryAction: () => {},
         });
       } catch (error) {
-        showBottomToast('error', t('toast.verificationError'));
+        if (activeVerifyRequestIdRef.current === requestId) {
+          showBottomToast('error', t('toast.verificationError'));
+        }
       } finally {
-        setIsVerifyDisabled(false);
-        setIsVerifyLoading(false);
+        if (activeVerifyRequestIdRef.current === requestId) {
+          activeVerifyRequestIdRef.current = null;
+          setIsVerifyDisabled(false);
+          setIsVerifyLoading(false);
+        }
       }
     }, 0);
   };
+
+  useEffect(() => {
+    return () => {
+      cancelActiveVerification();
+    };
+  }, [cancelActiveVerification]);
 
   const handleVerificationSuccess = (result: string) => {
     console.log('Verification successful with sequence: ' + result);
