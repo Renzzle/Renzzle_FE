@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import {
   BoardBackground,
   CellContainer,
@@ -16,10 +16,12 @@ import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import BoardFrameNumber from './BoardFrameNumber';
 import {
   BOARD_SIZE,
+  coordinatesToPosition,
   convertLowercaseAlphabetToNumber,
   convertToLowercaseAlphabet,
   convertToReverseNumber,
   getSequenceDepth,
+  positionToValue,
   valueToCoordinates,
 } from '../../../utils/utils';
 import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
@@ -27,8 +29,37 @@ import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 import { useTranslation } from 'react-i18next';
+import {
+  getPuzzleCacheAiResponse,
+  PuzzleCacheType,
+  savePuzzleCache,
+} from '../../../apis/puzzleCache';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
+
+type PuzzleAiBenchmarkMode = 'LOCAL_ONLY' | 'CACHE';
+type PuzzleAiAnswerSource = 'local-only' | 'cache-hit' | 'cache-miss' | 'cache-fallback';
+
+const PUZZLE_AI_BENCHMARK_MODE = 'CACHE' as PuzzleAiBenchmarkMode;
+const IS_AI_BENCHMARK_ENABLED = __DEV__;
+
+const getPuzzleAiMode = (): PuzzleAiBenchmarkMode => {
+  return __DEV__ ? PUZZLE_AI_BENCHMARK_MODE : 'CACHE';
+};
+
+interface AiBenchmarkResult {
+  mode: PuzzleAiBenchmarkMode;
+  source: PuzzleAiAnswerSource;
+  turnStartedAt: number;
+  boardDepth: number;
+  puzzleType?: PuzzleCacheType;
+  puzzleId?: number;
+  cacheLookupMs?: number;
+  localAiMs?: number;
+  answerReadyMs: number;
+  aiAnswer: number;
+  position?: string | null;
+}
 
 interface CellType {
   stone: StoneType;
@@ -63,6 +94,11 @@ interface BoardProps {
 
   // undo/redo 가능 여부를 부모에게 알리는 콜백
   onUndoRedoStateChange?: (canUndo: boolean, canRedo: boolean) => void;
+
+  puzzleCache?: {
+    puzzleType: PuzzleCacheType;
+    puzzleId: number;
+  };
 }
 
 const Board = forwardRef<BoardRef, BoardProps>(function Board(
@@ -76,6 +112,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     mainSequence = '',
     problemSequence = '',
     onUndoRedoStateChange,
+    puzzleCache,
   },
   ref,
 ) {
@@ -97,6 +134,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const [history, setHistory] = useState<string[]>([sequence]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const aiBenchmarkRef = useRef<AiBenchmarkResult | null>(null);
 
   useImperativeHandle(ref, () => ({
     undo: () => {
@@ -204,7 +242,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       setStoneY(null);
 
       if (mode === 'solve') {
-        if (await checkWin(newSequence, 'user')) {
+        if (await checkWin(newSequence)) {
           setIsWin?.(true);
           setIsLoading?.(false);
           setIsDisabled(false);
@@ -230,36 +268,189 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     }
   };
 
+  const getCachedAiAnswer = async (
+    userSequence: string,
+  ): Promise<{
+    answer: number | null;
+    shouldSave: boolean;
+    cacheLookupMs?: number;
+    position?: string | null;
+  }> => {
+    if (!puzzleCache) {
+      return { answer: null, shouldSave: false };
+    }
+
+    try {
+      const cacheStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+      const cache = await getPuzzleCacheAiResponse({
+        ...puzzleCache,
+        currentBoardState: userSequence,
+      });
+      const cacheLookupMs = IS_AI_BENCHMARK_ENABLED ? Date.now() - cacheStartedAt : undefined;
+
+      if (!cache.position) {
+        return { answer: null, shouldSave: true, cacheLookupMs, position: null };
+      }
+
+      const cachedAnswer = positionToValue(cache.position);
+
+      return { answer: cachedAnswer, shouldSave: false, cacheLookupMs, position: cache.position };
+    } catch (error) {
+      console.log('AI cache request failed:', error);
+      return { answer: null, shouldSave: false };
+    }
+  };
+
+  const saveAiAnswerCache = (userSequence: string, aiResult: number) => {
+    if (!puzzleCache) {
+      return;
+    }
+
+    const coordinates = valueToCoordinates(aiResult);
+    if (!coordinates) {
+      return;
+    }
+
+    const answerPuzzle = coordinatesToPosition(coordinates.x, coordinates.y);
+    if (!answerPuzzle) {
+      return;
+    }
+
+    const saveStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+    savePuzzleCache({
+      ...puzzleCache,
+      currentBoardState: userSequence,
+      answerPuzzle,
+    })
+      .then((response) => {
+        if (IS_AI_BENCHMARK_ENABLED) {
+          console.log('[AiBenchmark] cache save:', {
+            puzzleType: puzzleCache.puzzleType,
+            puzzleId: puzzleCache.puzzleId,
+            boardDepth: getSequenceDepth(userSequence),
+            isSuccess: response.isSuccess,
+            ms: Date.now() - saveStartedAt,
+            answerPuzzle,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log('AI cache save failed:', error);
+      });
+  };
+
+  const logAiBenchmark = (result: 'move-applied' | 'ai-win' | 'terminal') => {
+    if (!IS_AI_BENCHMARK_ENABLED) {
+      return;
+    }
+
+    const benchmark = aiBenchmarkRef.current;
+
+    if (!benchmark) {
+      return;
+    }
+
+    const { turnStartedAt, ...payload } = benchmark;
+
+    console.log(`[AiBenchmark] ${benchmark.source}:`, {
+      ...payload,
+      turnCompleteMs: Date.now() - turnStartedAt,
+      result,
+    });
+
+    aiBenchmarkRef.current = null;
+  };
+
   const handleAiTurn = async (userSequence: string) => {
     setTimeout(async () => {
       try {
+        const aiMode = getPuzzleAiMode();
+        const turnStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+        aiBenchmarkRef.current = null;
+
+        const {
+          answer: cachedAnswer,
+          shouldSave,
+          cacheLookupMs,
+          position,
+        } = aiMode === 'CACHE'
+          ? await getCachedAiAnswer(userSequence)
+          : {
+              answer: null,
+              shouldSave: false,
+              cacheLookupMs: undefined,
+              position: undefined,
+            };
+
+        if (cachedAnswer !== null) {
+          if (IS_AI_BENCHMARK_ENABLED) {
+            aiBenchmarkRef.current = {
+              mode: aiMode,
+              source: 'cache-hit',
+              turnStartedAt,
+              boardDepth: getSequenceDepth(userSequence),
+              puzzleType: puzzleCache?.puzzleType,
+              puzzleId: puzzleCache?.puzzleId,
+              cacheLookupMs,
+              answerReadyMs: Date.now() - turnStartedAt,
+              aiAnswer: cachedAnswer,
+              position,
+            };
+          }
+          setAiAnswer(cachedAnswer);
+          return;
+        }
+
+        const source =
+          aiMode === 'LOCAL_ONLY' ? 'local-only' : shouldSave ? 'cache-miss' : 'cache-fallback';
+
+        const localAiStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
         const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
+        if (IS_AI_BENCHMARK_ENABLED) {
+          aiBenchmarkRef.current = {
+            mode: aiMode,
+            source,
+            turnStartedAt,
+            boardDepth: getSequenceDepth(userSequence),
+            puzzleType: puzzleCache?.puzzleType,
+            puzzleId: puzzleCache?.puzzleId,
+            cacheLookupMs,
+            localAiMs: Date.now() - localAiStartedAt,
+            answerReadyMs: Date.now() - turnStartedAt,
+            aiAnswer: result,
+            position,
+          };
+        }
+
         if (result === -1) {
-          console.log('졌다!');
+          logAiBenchmark('terminal');
           setIsWin?.(false);
           setIsLoading?.(false);
           setIsDisabled(false);
         }
         if (result === 1000) {
-          console.log('이겼다!');
+          logAiBenchmark('terminal');
           setIsWin?.(true);
           setIsLoading?.(false);
           setIsDisabled(false);
         }
+        if (shouldSave && result !== -1 && result !== 1000) {
+          saveAiAnswerCache(userSequence, result);
+        }
         setAiAnswer(result);
       } catch (error) {
         showBottomToast('error', t('toast.aiCalculationFailed'));
+        setIsLoading?.(false);
+        setIsDisabled(false);
       }
     }, 0);
   };
 
-  const checkWin = (sequenceToCheck: string, turn: string): Promise<boolean> => {
+  const checkWin = (sequenceToCheck: string): Promise<boolean> => {
     return new Promise((resolve) => {
       setTimeout(async () => {
         try {
           const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
-          console.log(turn, ' sequence:', sequenceToCheck);
-          console.log(turn, ' :', check);
           resolve(check === 1);
         } catch (error) {
           console.log(error);
@@ -286,7 +477,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
         const { x, y } = coordinates;
         const newSequence = addToSequence(x, y);
-        if (await checkWin(newSequence, 'ai')) {
+        if (await checkWin(newSequence)) {
+          logAiBenchmark('ai-win');
           setIsWin?.(false);
           setIsLoading?.(false);
           setIsDisabled(false);
@@ -297,6 +489,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         setIsBlackTurn(!isBlackTurn);
         setIsDisabled(false);
         setIsLoading?.(false);
+        logAiBenchmark('move-applied');
       }
     };
 
@@ -342,7 +535,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   ]);
 
   const initializeBoard = () => {
-    console.log('보드 초기화 - 시퀀스: ' + sequence);
     const newBoard = createEmptyBoard();
     let turn = true;
     const problemSequenceLength = problemSequence ? getSequenceDepth(problemSequence) : 0;
