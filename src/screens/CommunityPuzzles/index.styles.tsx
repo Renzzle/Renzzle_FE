@@ -25,6 +25,7 @@ export const SearchWrapper = styled(View)`
   flex-direction: row;
   justify-content: flex-end;
   padding: 0 0 10px;
+  align-items: center;
 `;
 
 export const SearchBarWrapper = styled(View)`
