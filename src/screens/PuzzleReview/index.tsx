@@ -87,7 +87,7 @@ const PuzzleReview = () => {
     isHandlingBackRef.current = true;
     navigation.dispatch(
       CommonActions.navigate({
-        name: 'TrainingPuzzleSolve',
+        name: isCommunityPuzzle ? 'CommunityPuzzleSolve' : 'TrainingPuzzleSolve',
         params: { reviewAction },
         merge: true,
       }),
@@ -128,7 +128,7 @@ const PuzzleReview = () => {
           isSolved={puzzle.isSolved}
           isCommunityPuzzle={isCommunityPuzzle}
         />
-        {!isCommunityPuzzle && reviewAction ? (
+        {reviewAction ? (
           <ButtonWrapper>
             <ReviewButton onPress={handleReviewActionPress}>
               {REVIEW_ACTION_LABELS[reviewAction]}

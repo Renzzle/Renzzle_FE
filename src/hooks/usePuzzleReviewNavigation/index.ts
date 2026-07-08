@@ -14,6 +14,7 @@ interface BasePuzzleReviewParams {
 
 interface CommunityPuzzleReviewParams extends BasePuzzleReviewParams {
   puzzle: CommunityPuzzle;
+  reviewAction?: TrainingPuzzleReviewAction;
 }
 
 interface TrainingPuzzleReviewParams extends BasePuzzleReviewParams {
@@ -32,7 +33,13 @@ const usePuzzleReviewNavigation = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const navigateToCommunityPuzzleReview = useCallback(
-    ({ puzzle, answer, backBehavior, destination = 'review' }: CommunityPuzzleReviewParams) => {
+    ({
+      puzzle,
+      answer,
+      backBehavior,
+      reviewAction,
+      destination = 'review',
+    }: CommunityPuzzleReviewParams) => {
       const routeName =
         destination === 'viewAnswer' ? 'CommunityPuzzleViewAnswer' : 'CommunityPuzzleReview';
 
@@ -41,6 +48,7 @@ const usePuzzleReviewNavigation = () => {
         puzzle,
         isCommunityPuzzle: true,
         backBehavior,
+        reviewAction,
       });
     },
     [navigation],

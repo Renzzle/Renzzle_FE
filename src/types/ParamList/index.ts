@@ -18,6 +18,7 @@ export type RootStackParamList = {
   CommunityPuzzleSolve: {
     puzzle: CommunityPuzzle;
     fromScreen?: 'CommunityPuzzles' | 'MyPuzzles' | 'LikedPuzzles';
+    reviewAction?: TrainingPuzzleReviewAction;
   };
   CommunityPuzzles: {
     updatedItem?: CommunityPuzzle;

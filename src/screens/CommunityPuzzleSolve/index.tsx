@@ -27,6 +27,7 @@ import {
   CommunityPuzzlePatch,
   ReactionType,
   RootStackParamList,
+  TrainingPuzzleReviewAction,
 } from '../../types';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
@@ -45,6 +46,7 @@ const CommunityPuzzleSolve = () => {
   const {
     isModalVisible,
     activateModal,
+    closeModal,
     closePrimarily,
     closeSecondarily,
     category: modalCategory,
@@ -60,6 +62,13 @@ const CommunityPuzzleSolve = () => {
 
   const isPuzzleResultModal =
     modalCategory === 'COMMUNITY_PUZZLE_SUCCESS' || modalCategory === 'COMMUNITY_PUZZLE_FAILURE';
+
+  const reviewAction: TrainingPuzzleReviewAction | undefined =
+    modalCategory === 'COMMUNITY_PUZZLE_SUCCESS'
+      ? 'complete'
+      : modalCategory === 'COMMUNITY_PUZZLE_FAILURE'
+        ? 'retry'
+        : undefined;
 
   const shouldShowReviewButton =
     isPuzzleResultModal &&
@@ -158,15 +167,19 @@ const CommunityPuzzleSolve = () => {
   const handleReviewPress = (
     answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
     backBehavior?: 'popTwo',
+    nextReviewAction?: TrainingPuzzleReviewAction,
   ) => {
     if (!puzzleDetail || !answer) {
       return;
     }
 
+    closeModal();
+
     navigateToCommunityPuzzleReview({
       puzzle: puzzleDetail,
       answer,
       backBehavior,
+      reviewAction: nextReviewAction,
     });
   };
 
@@ -218,6 +231,25 @@ const CommunityPuzzleSolve = () => {
       setCurrentSequence(puzzleDetail.boardStatus);
     }
   }, [puzzleDetail?.boardStatus]);
+
+  useEffect(() => {
+    const currentReviewAction = route.params.reviewAction;
+
+    if (!currentReviewAction) {
+      return;
+    }
+
+    navigation.setParams({ reviewAction: undefined });
+
+    if (currentReviewAction === 'complete') {
+      navigation.goBack();
+      return;
+    }
+
+    if (currentReviewAction === 'retry') {
+      handleRetry();
+    }
+  }, [route.params.reviewAction]);
 
   useEffect(() => {
     return () => {
@@ -325,8 +357,8 @@ const CommunityPuzzleSolve = () => {
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
         titleRight={
-          shouldShowReviewButton ? (
-            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo')}>
+          shouldShowReviewButton && reviewAction ? (
+            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo', reviewAction)}>
               {t('puzzle.review')}
             </ReviewButton>
           ) : undefined
