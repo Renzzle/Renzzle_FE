@@ -61,23 +61,16 @@ const AnswerCommunityPuzzle = () => {
   }, [problemSequence]);
 
   const boardRef = useRef<BoardRef>(null);
-  const verifyRequestIdRef = useRef(0);
-  const activeVerifyRequestIdRef = useRef<number | null>(null);
 
-  const createVerifyRequestId = () => {
-    verifyRequestIdRef.current += 1;
-    return verifyRequestIdRef.current;
-  };
-
-  const cancelActiveVerification = useCallback(() => {
-    const activeRequestId = activeVerifyRequestIdRef.current;
-    if (activeRequestId === null) {
-      return;
-    }
-
-    activeVerifyRequestIdRef.current = null;
+  const cancelFindWin = useCallback((activeRequestId: number) => {
     SearchJNI.cancelFindWin?.(activeRequestId);
   }, [SearchJNI]);
+  const {
+    cancelActiveRequest: cancelActiveVerification,
+    finishRequest: finishVerification,
+    isActiveRequest: isActiveVerification,
+    scheduleRequest: scheduleVerification,
+  } = useCancellableNativeRequest({ cancelRequest: cancelFindWin });
 
   const cancelFindWin = useCallback(
     (activeRequestId: number) => {
@@ -127,10 +120,6 @@ const AnswerCommunityPuzzle = () => {
   ];
 
   const verifySequence = async () => {
-    cancelActiveVerification();
-    const requestId = createVerifyRequestId();
-    activeVerifyRequestIdRef.current = requestId;
-
     setIsVerifyDisabled(true);
     setIsUploadDisabled(true);
     setIsVerifyLoading(true);
@@ -141,12 +130,12 @@ const AnswerCommunityPuzzle = () => {
           | ValidationResponse
           | string;
 
-        if (activeVerifyRequestIdRef.current !== requestId) {
+        if (!isActiveVerification(requestId)) {
           return;
         }
 
         if (typeof response !== 'string' && response.status === 'cancelled') {
-          activeVerifyRequestIdRef.current = null;
+          finishVerification(requestId);
           setIsVerifyDisabled(false);
           setIsVerifyLoading(false);
           setIsUploadDisabled(currentSequence.length <= problemSequence.length);
@@ -170,24 +159,18 @@ const AnswerCommunityPuzzle = () => {
           primaryAction: () => {},
         });
       } catch (error) {
-        if (activeVerifyRequestIdRef.current === requestId) {
+        if (isActiveVerification(requestId)) {
           showBottomToast('error', t('toast.verificationError'));
         }
       } finally {
-        if (activeVerifyRequestIdRef.current === requestId) {
-          activeVerifyRequestIdRef.current = null;
+        if (isActiveVerification(requestId)) {
+          finishVerification(requestId);
           setIsVerifyDisabled(false);
           setIsVerifyLoading(false);
         }
       }
     });
   };
-
-  useEffect(() => {
-    return () => {
-      cancelActiveVerification();
-    };
-  }, [cancelActiveVerification]);
 
   const handleVerificationSuccess = (result: string) => {
     console.log('Verification successful with sequence: ' + result);
