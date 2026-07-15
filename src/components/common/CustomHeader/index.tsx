@@ -1,6 +1,6 @@
 import { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import React from 'react';
-import { menuThemeMap, MenuType } from '../../../types';
+import { getMenuTypeByRouteName } from '../../../types';
 import { CurrencyWrapper, HeaderContainer, MenuWrapper } from './index.styles';
 import MenuButton from '../../features/MenuButton';
 import CustomText from '../CustomText';
@@ -36,10 +36,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
     ? theme.color['gray/grayBG']
     : theme.color['gray/grayBGDim'];
 
-  const matchedEntry = Object.entries(menuThemeMap).find(
-    ([, value]) => value.titleKey === options.title,
-  );
-  const matchedType = matchedEntry?.[0] as MenuType | undefined;
+  const matchedType = getMenuTypeByRouteName(route.name);
 
   const handlePuzzleClick = () => {
     // TODO: 퍼즐 구매 로직 추가

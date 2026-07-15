@@ -9,6 +9,7 @@ export const HeaderContainer = styled(View)`
   align-items: center;
   padding: 20px;
   gap: 10px;
+  flex: 1;
 `;
 
 export const LeftInfoWrapper = styled(View)`

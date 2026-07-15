@@ -53,7 +53,8 @@
     "verify": "검증",
     "certifiedUpload": "인증 업로드",
     "uncertifiedUpload": "미인증 업로드",
-    "enterAnswer": "정답 입력"
+    "enterAnswer": "정답 입력",
+    "complete": "완료"
   },
   "placeholder": {
     "email": "이메일",
@@ -212,6 +213,7 @@
     "viewAnswer": "정답보기",
     "retry": "새로하기",
     "resign": "포기하기",
+    "review": "검토하기",
     "solvedCount": "풀이",
     "views": "조회",
     "level": {

@@ -27,6 +27,7 @@ import {
   CommunityPuzzlePatch,
   ReactionType,
   RootStackParamList,
+  TrainingPuzzleReviewAction,
 } from '../../types';
 import { ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
@@ -35,6 +36,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore } from '../../store/useUserStore';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
+import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
+import ReviewButton from '../../components/features/ReviewButton';
 
 const CommunityPuzzleSolve = () => {
   const { t } = useTranslation();
@@ -43,16 +46,34 @@ const CommunityPuzzleSolve = () => {
   const {
     isModalVisible,
     activateModal,
+    closeModal,
     closePrimarily,
     closeSecondarily,
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
   const { fromScreen = 'CommunityPuzzles' } = route.params;
+  const { navigateToCommunityPuzzleReview } = usePuzzleReviewNavigation();
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
+  const [currentSequence, setCurrentSequence] = useState(puzzleDetail?.boardStatus ?? '');
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
+
+  const isPuzzleResultModal =
+    modalCategory === 'COMMUNITY_PUZZLE_SUCCESS' || modalCategory === 'COMMUNITY_PUZZLE_FAILURE';
+
+  const reviewAction: TrainingPuzzleReviewAction | undefined =
+    modalCategory === 'COMMUNITY_PUZZLE_SUCCESS'
+      ? 'complete'
+      : modalCategory === 'COMMUNITY_PUZZLE_FAILURE'
+        ? 'retry'
+        : undefined;
+
+  const shouldShowReviewButton =
+    isPuzzleResultModal &&
+    !!puzzleDetail &&
+    currentSequence.length > puzzleDetail.boardStatus.length;
 
   const { showAdIfReady } = usePuzzleAd();
 
@@ -137,7 +158,41 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    if (puzzleDetail) {
+      setCurrentSequence(puzzleDetail.boardStatus);
+    }
     setBoardKey((prevKey) => prevKey + 1);
+  };
+
+  const handleReviewPress = (
+    answer = currentSequence.slice(puzzleDetail?.boardStatus.length),
+    backBehavior?: 'popTwo',
+    nextReviewAction?: TrainingPuzzleReviewAction,
+  ) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    closeModal();
+
+    navigateToCommunityPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      backBehavior,
+      reviewAction: nextReviewAction,
+    });
+  };
+
+  const handleViewAnswerPress = (answer: string) => {
+    if (!puzzleDetail || !answer) {
+      return;
+    }
+
+    navigateToCommunityPuzzleReview({
+      puzzle: puzzleDetail,
+      answer,
+      destination: 'viewAnswer',
+    });
   };
 
   const handleShowAnswer = () => {
@@ -152,17 +207,9 @@ const CommunityPuzzleSolve = () => {
 
         markSolved();
 
-        const problemSequence = puzzleDetail.boardStatus;
-        const mainSequence = problemSequence + data.answer;
-
         await updateUser();
         showBottomToast('success', t('toast.purchaseComplete'));
-        navigation.navigate('CommunityPuzzleReview', {
-          problemSequence,
-          mainSequence,
-          puzzle: puzzleDetail,
-          isCommunityPuzzle: true,
-        });
+        handleViewAnswerPress(data.answer);
       } catch (error) {
         showBottomToast('error', error as string);
       } finally {
@@ -178,6 +225,31 @@ const CommunityPuzzleSolve = () => {
   useEffect(() => {
     puzzleDetailRef.current = puzzleDetail;
   }, [puzzleDetail]);
+
+  useEffect(() => {
+    if (puzzleDetail?.boardStatus) {
+      setCurrentSequence(puzzleDetail.boardStatus);
+    }
+  }, [puzzleDetail?.boardStatus]);
+
+  useEffect(() => {
+    const currentReviewAction = route.params.reviewAction;
+
+    if (!currentReviewAction) {
+      return;
+    }
+
+    navigation.setParams({ reviewAction: undefined });
+
+    if (currentReviewAction === 'complete') {
+      navigation.goBack();
+      return;
+    }
+
+    if (currentReviewAction === 'retry') {
+      handleRetry();
+    }
+  }, [route.params.reviewAction]);
 
   useEffect(() => {
     return () => {
@@ -266,7 +338,7 @@ const CommunityPuzzleSolve = () => {
           key={boardKey}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
-          setSequence={() => {}}
+          setSequence={setCurrentSequence}
           setIsWin={handleResult}
           setIsLoading={setIsLoading}
         />
@@ -284,6 +356,13 @@ const CommunityPuzzleSolve = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
+        titleRight={
+          shouldShowReviewButton && reviewAction ? (
+            <ReviewButton onPress={() => handleReviewPress(undefined, 'popTwo', reviewAction)}>
+              {t('puzzle.review')}
+            </ReviewButton>
+          ) : undefined
+        }
         gameOutcome={{ price: 100 }}
         isLoading={isLoading}
       />
