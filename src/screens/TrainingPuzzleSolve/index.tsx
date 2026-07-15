@@ -274,6 +274,7 @@ const TrainingPuzzleSolve = () => {
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
           setIsLoading={() => {}}
+          puzzleCache={{ puzzleType: 'TRAINING', puzzleId: puzzleDetail.id }}
         />
       </BoardWrapper>
 

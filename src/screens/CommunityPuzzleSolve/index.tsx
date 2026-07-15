@@ -341,6 +341,7 @@ const CommunityPuzzleSolve = () => {
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
           setIsLoading={setIsLoading}
+          puzzleCache={{ puzzleType: 'COMMUNITY', puzzleId: puzzleDetail.id }}
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle

@@ -41,6 +41,35 @@ export const valueToCoordinates = (value: number): { x: number; y: number } | nu
   return { x, y };
 };
 
+export const coordinatesToValue = (x: number, y: number): number | null => {
+  if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) {
+    return null;
+  }
+
+  return y * BOARD_SIZE + (BOARD_SIZE - 1 - x);
+};
+
+export const coordinatesToPosition = (x: number, y: number): string | null => {
+  if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) {
+    return null;
+  }
+
+  return `${convertToLowercaseAlphabet(y)}${convertToReverseNumber(x)}`;
+};
+
+export const positionToValue = (position: string): number | null => {
+  const match = position.match(/^([a-o])(1[0-5]|[1-9])$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const y = convertLowercaseAlphabetToNumber(match[1]);
+  const x = convertToReverseNumber(parseInt(match[2], 10));
+
+  return coordinatesToValue(x, y);
+};
+
 export interface Move {
   x: number;
   y: number;
