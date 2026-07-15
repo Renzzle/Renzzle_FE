@@ -40,7 +40,7 @@ PUBLIC
     Value evaluate();
     Value evaluateTactical();
 
-};
+}; 
 
 inline Value evaluateTacticalSummary(Board& board) {
     Piece self = board.isBlackTurn() ? BLACK : WHITE;
@@ -316,7 +316,7 @@ Pos Evaluator::getSureMove() {
 MoveList Evaluator::getFours() {
     FixedMoveList<BOARD_SIZE * BOARD_SIZE> result;
     if (hasPattern(self, WINNING)) {
-        result.push_back(bucket(self, WINNING).front());
+        result.push_back(bucket(self, WINNING).front()); 
         return result.toMoveList();
     }
     if (hasPattern(self, MATE)) {
@@ -504,6 +504,32 @@ MoveList Evaluator::getFourThreeMakers() {
         }
     });
 
+    bucket(self, F3_PLUS).forEach([&](const Pos& center) {
+        for (Direction dir = DIRECTION_START; dir < DIRECTION_SIZE; dir++) {
+            Cell& c = board.getCell(center);
+            if (c.getPiece() != EMPTY) continue;
+            if (c.getPattern(self, dir) != BLOCKED_3) continue;
+
+            const int baseX = center.getX();
+            const int baseY = center.getY();
+            const int dx = getDirectionDx(dir);
+            const int dy = getDirectionDy(dir);
+            constexpr int SCAN_RADIUS = 3;
+            for (int offset = -SCAN_RADIUS; offset <= SCAN_RADIUS; offset++) {
+                const int x = baseX + (dx * offset);
+                const int y = baseY + (dy * offset);
+                if (!isBoardCoord(x, y)) continue;
+
+                Cell& lineCell = board.getCell(x, y);
+                if (lineCell.getPiece() != EMPTY) continue;
+                if (lineCell.getPattern(self, dir) != BLOCKED_3) continue;
+                if (lineCell.getCompositePattern(self) == F3_PLUS) continue;  // already a F3_PLUS spot — handled elsewhere
+
+                appendUniqueLegal(Pos(x, y));
+            }
+        }
+    });
+
     // sort omitted — Search::sortChildNodes handles ordering uniformly (cellScore + TT/history)
     return result.toMoveList();
 }
@@ -623,7 +649,7 @@ MoveList Evaluator::getFourThreeDefend() {
                     const int y = baseY + (dy * offset);
                     if (!isBoardCoord(x, y)) continue;
                     if (board.getCell(x, y).getPiece() != EMPTY) continue;
-                    if (board.getCell(x, y).getPattern(oppo, dir) == FREE_3
+                    if (board.getCell(x, y).getPattern(oppo, dir) == FREE_3 
                         || board.getCell(x, y).getPattern(oppo, dir) == FREE_3A
                         || board.getCell(x, y).getPattern(oppo, dir) == BLOCKED_3) {
                         emit(Pos(x, y));
