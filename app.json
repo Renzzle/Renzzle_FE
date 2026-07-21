@@ -3,6 +3,7 @@
   "displayName": "Renzzle_FE",
 
   "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-8517144519151386~7296776987"
+    "android_app_id": "ca-app-pub-8517144519151386~7296776987",
+    "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
   }
 }

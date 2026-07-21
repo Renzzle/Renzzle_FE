@@ -24,6 +24,8 @@
 		497B0EAC736D414287312E30 /* Pretendard-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = F3F0BF32ED294F3A94D1317C /* Pretendard-Black.otf */; };
 		4B9E2DC0ECB391AC61810A65 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9095129BA970934F7713F120 /* PrivacyInfo.xcprivacy */; };
 		66B4D082EE5147C3B0A0A270 /* ChangaOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EA43DD933DD409B87ADC870 /* ChangaOne-Regular.ttf */; };
+		6FE3888C2FA0B19800896508 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6FE388892FA0B19800896508 /* CMakeLists.txt */; };
+		6FE3889D2FA0C51E00896508 /* RenzzleModules.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6FE3889C2FA0C51500896508 /* RenzzleModules.mm */; };
 		7699B88040F8A987B510C191 /* libPods-Renzzle_FE-Renzzle_FETests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-Renzzle_FE-Renzzle_FETests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9085CAA35B024E76BCF482A0 /* Pretendard-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 88B3B96D986C4663893824F7 /* Pretendard-Thin.otf */; };
@@ -54,16 +56,26 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Renzzle_FE/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Renzzle_FE/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-Renzzle_FE-Renzzle_FETests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Renzzle_FE-Renzzle_FETests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		28D808D49BE040D9895EFF05 /* Pretendard-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Light.otf"; path = "../src/assets/fonts/Pretendard-Light.otf"; sourceTree = "<group>"; };
-		29A48C873C5344E395AF89BC /* Pretendard-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Regular.otf"; path = "../src/assets/fonts/Pretendard-Regular.otf"; sourceTree = "<group>"; };
-		2F4C0F0A452F44359F23BEE1 /* NanumSquareNeoOTF-Lt.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Lt.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Lt.otf"; sourceTree = "<group>"; };
+		28D808D49BE040D9895EFF05 /* Pretendard-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Light.otf"; path = "../src/assets/fonts/Pretendard-Light.otf"; sourceTree = "<group>"; };
+		29A48C873C5344E395AF89BC /* Pretendard-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Regular.otf"; path = "../src/assets/fonts/Pretendard-Regular.otf"; sourceTree = "<group>"; };
+		2F4C0F0A452F44359F23BEE1 /* NanumSquareNeoOTF-Lt.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Lt.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Lt.otf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-Renzzle_FE.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Renzzle_FE.debug.xcconfig"; path = "Target Support Files/Pods-Renzzle_FE/Pods-Renzzle_FE.debug.xcconfig"; sourceTree = "<group>"; };
-		4EA43DD933DD409B87ADC870 /* ChangaOne-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "ChangaOne-Regular.ttf"; path = "../src/assets/fonts/ChangaOne-Regular.ttf"; sourceTree = "<group>"; };
+		4EA43DD933DD409B87ADC870 /* ChangaOne-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ChangaOne-Regular.ttf"; path = "../src/assets/fonts/ChangaOne-Regular.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-Renzzle_FE.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Renzzle_FE.release.xcconfig"; path = "Target Support Files/Pods-Renzzle_FE/Pods-Renzzle_FE.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-Renzzle_FE-Renzzle_FETests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Renzzle_FE-Renzzle_FETests.debug.xcconfig"; path = "Target Support Files/Pods-Renzzle_FE-Renzzle_FETests/Pods-Renzzle_FE-Renzzle_FETests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-Renzzle_FE.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Renzzle_FE.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		62757638245E4E56B4E93AA8 /* NanumSquareNeoOTF-Hv.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Hv.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Hv.otf"; sourceTree = "<group>"; };
-		6B1C038D5546405C80BCB651 /* Pretendard-ExtraBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-ExtraBold.otf"; path = "../src/assets/fonts/Pretendard-ExtraBold.otf"; sourceTree = "<group>"; };
+		62757638245E4E56B4E93AA8 /* NanumSquareNeoOTF-Hv.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Hv.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Hv.otf"; sourceTree = "<group>"; };
+		6B1C038D5546405C80BCB651 /* Pretendard-ExtraBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-ExtraBold.otf"; path = "../src/assets/fonts/Pretendard-ExtraBold.otf"; sourceTree = "<group>"; };
+		6F007ADC2FC56E8E00384F15 /* fixed_move_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fixed_move_list.h; sourceTree = "<group>"; };
+		6F007ADD2FC56EB000384F15 /* move_bucket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = move_bucket.h; sourceTree = "<group>"; };
+		6F007AE32FC5700D00384F15 /* core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
+		6F007AE42FC5701D00384F15 /* history.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = history.h; sourceTree = "<group>"; };
+		6F007AE52FC5702500384F15 /* lifecycle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lifecycle.h; sourceTree = "<group>"; };
+		6F007AE62FC5702E00384F15 /* qvcf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = qvcf.h; sourceTree = "<group>"; };
+		6F007AE72FC5703700384F15 /* runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
+		6F007AE82FC5703D00384F15 /* tt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tt.h; sourceTree = "<group>"; };
+		6F007AE92FC5708C00384F15 /* transposition_table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transposition_table.h; sourceTree = "<group>"; };
+		6F007AEA2FC5709B00384F15 /* vcf_candidate_finder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vcf_candidate_finder.h; sourceTree = "<group>"; };
 		6FDD2D212CB90E2F005BD15A /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
 		6FDD2D222CB90E2F005BD15A /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
 		6FDD2D232CB90E2F005BD15A /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
@@ -83,19 +95,36 @@
 		6FDD2D312CB90E2F005BD15A /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
 		6FDD2D322CB90E2F005BD15A /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
 		6FDD2D332CB90E2F005BD15A /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Zocial.ttf; sourceTree = "<group>"; };
-		7964682888524A1FA27098AA /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-SemiBold.otf"; path = "../src/assets/fonts/Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
+		6FE388702FA0B19800896508 /* engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
+		6FE388722FA0B19800896508 /* evaluator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = evaluator.h; sourceTree = "<group>"; };
+		6FE388732FA0B19800896508 /* value.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = value.h; sourceTree = "<group>"; };
+		6FE388752FA0B19800896508 /* board.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = board.h; sourceTree = "<group>"; };
+		6FE388762FA0B19800896508 /* cell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cell.h; sourceTree = "<group>"; };
+		6FE388772FA0B19800896508 /* line.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = line.h; sourceTree = "<group>"; };
+		6FE388782FA0B19800896508 /* pos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pos.h; sourceTree = "<group>"; };
+		6FE388792FA0B19800896508 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		6FE3887A2FA0B19800896508 /* zobrist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zobrist.h; sourceTree = "<group>"; };
+		6FE3887E2FA0B19800896508 /* search.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = search.h; sourceTree = "<group>"; };
+		6FE3887F2FA0B19800896508 /* search_monitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = search_monitor.h; sourceTree = "<group>"; };
+		6FE388802FA0B19800896508 /* search_win.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = search_win.h; sourceTree = "<group>"; };
+		6FE388822FA0B19800896508 /* profiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = profiler.h; sourceTree = "<group>"; };
+		6FE388832FA0B19800896508 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
+		6FE388842FA0B19800896508 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		6FE388892FA0B19800896508 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		6FE3889C2FA0C51500896508 /* RenzzleModules.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RenzzleModules.mm; sourceTree = "<group>"; };
+		7964682888524A1FA27098AA /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-SemiBold.otf"; path = "../src/assets/fonts/Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Renzzle_FE/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		88B3B96D986C4663893824F7 /* Pretendard-Thin.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Thin.otf"; path = "../src/assets/fonts/Pretendard-Thin.otf"; sourceTree = "<group>"; };
+		88B3B96D986C4663893824F7 /* Pretendard-Thin.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Thin.otf"; path = "../src/assets/fonts/Pretendard-Thin.otf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-Renzzle_FE-Renzzle_FETests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Renzzle_FE-Renzzle_FETests.release.xcconfig"; path = "Target Support Files/Pods-Renzzle_FE-Renzzle_FETests/Pods-Renzzle_FE-Renzzle_FETests.release.xcconfig"; sourceTree = "<group>"; };
 		9095129BA970934F7713F120 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Renzzle_FE/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		93A6A0D3F7F9454FBFEA3DEF /* NanumSquareNeoOTF-Eb.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Eb.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Eb.otf"; sourceTree = "<group>"; };
-		9DD44397068D492B8B279E26 /* NanumSquareNeoOTF-Bd.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Bd.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Bd.otf"; sourceTree = "<group>"; };
-		A012B297AA8049D4AEBAF65B /* Pretendard-ExtraLight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-ExtraLight.otf"; path = "../src/assets/fonts/Pretendard-ExtraLight.otf"; sourceTree = "<group>"; };
-		CE530029F2F04054B9B81F9A /* Pretendard-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Bold.otf"; path = "../src/assets/fonts/Pretendard-Bold.otf"; sourceTree = "<group>"; };
-		CF811C82C76342228AE69237 /* NanumSquareNeoOTF-Rg.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Rg.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Rg.otf"; sourceTree = "<group>"; };
+		93A6A0D3F7F9454FBFEA3DEF /* NanumSquareNeoOTF-Eb.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Eb.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Eb.otf"; sourceTree = "<group>"; };
+		9DD44397068D492B8B279E26 /* NanumSquareNeoOTF-Bd.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Bd.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Bd.otf"; sourceTree = "<group>"; };
+		A012B297AA8049D4AEBAF65B /* Pretendard-ExtraLight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-ExtraLight.otf"; path = "../src/assets/fonts/Pretendard-ExtraLight.otf"; sourceTree = "<group>"; };
+		CE530029F2F04054B9B81F9A /* Pretendard-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Bold.otf"; path = "../src/assets/fonts/Pretendard-Bold.otf"; sourceTree = "<group>"; };
+		CF811C82C76342228AE69237 /* NanumSquareNeoOTF-Rg.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NanumSquareNeoOTF-Rg.otf"; path = "../src/assets/fonts/NanumSquareNeoOTF-Rg.otf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F3F0BF32ED294F3A94D1317C /* Pretendard-Black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Black.otf"; path = "../src/assets/fonts/Pretendard-Black.otf"; sourceTree = "<group>"; };
-		FDE99AAE8D6C4A559F29954E /* Pretendard-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Medium.otf"; path = "../src/assets/fonts/Pretendard-Medium.otf"; sourceTree = "<group>"; };
+		F3F0BF32ED294F3A94D1317C /* Pretendard-Black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Black.otf"; path = "../src/assets/fonts/Pretendard-Black.otf"; sourceTree = "<group>"; };
+		FDE99AAE8D6C4A559F29954E /* Pretendard-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Medium.otf"; path = "../src/assets/fonts/Pretendard-Medium.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +167,7 @@
 		13B07FAE1A68108700A75B9A /* Renzzle_FE */ = {
 			isa = PBXGroup;
 			children = (
+				6FE3889C2FA0C51500896508 /* RenzzleModules.mm */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -146,6 +176,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				9095129BA970934F7713F120 /* PrivacyInfo.xcprivacy */,
+				6FE3888A2FA0B19800896508 /* cpp */,
 			);
 			name = Renzzle_FE;
 			sourceTree = "<group>";
@@ -180,7 +211,19 @@
 				CF811C82C76342228AE69237 /* NanumSquareNeoOTF-Rg.otf */,
 			);
 			name = Resources;
-			path = "";
+			sourceTree = "<group>";
+		};
+		6F007AE22FC5700900384F15 /* detail */ = {
+			isa = PBXGroup;
+			children = (
+				6F007AE82FC5703D00384F15 /* tt.h */,
+				6F007AE72FC5703700384F15 /* runtime.h */,
+				6F007AE62FC5702E00384F15 /* qvcf.h */,
+				6F007AE52FC5702500384F15 /* lifecycle.h */,
+				6F007AE42FC5701D00384F15 /* history.h */,
+				6F007AE32FC5700D00384F15 /* core.h */,
+			);
+			path = detail;
 			sourceTree = "<group>";
 		};
 		6FDD2D202CB90E08005BD15A /* Fonts */ = {
@@ -207,6 +250,74 @@
 				6FDD2D332CB90E2F005BD15A /* Zocial.ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		6FE388712FA0B19800896508 /* engine */ = {
+			isa = PBXGroup;
+			children = (
+				6FE388702FA0B19800896508 /* engine.h */,
+			);
+			path = engine;
+			sourceTree = "<group>";
+		};
+		6FE388742FA0B19800896508 /* evaluate */ = {
+			isa = PBXGroup;
+			children = (
+				6FE388722FA0B19800896508 /* evaluator.h */,
+				6FE388732FA0B19800896508 /* value.h */,
+			);
+			path = evaluate;
+			sourceTree = "<group>";
+		};
+		6FE3887B2FA0B19800896508 /* game */ = {
+			isa = PBXGroup;
+			children = (
+				6F007ADD2FC56EB000384F15 /* move_bucket.h */,
+				6F007ADC2FC56E8E00384F15 /* fixed_move_list.h */,
+				6FE388752FA0B19800896508 /* board.h */,
+				6FE388762FA0B19800896508 /* cell.h */,
+				6FE388772FA0B19800896508 /* line.h */,
+				6FE388782FA0B19800896508 /* pos.h */,
+				6FE388792FA0B19800896508 /* types.h */,
+				6FE3887A2FA0B19800896508 /* zobrist.h */,
+			);
+			path = game;
+			sourceTree = "<group>";
+		};
+		6FE388812FA0B19800896508 /* search */ = {
+			isa = PBXGroup;
+			children = (
+				6F007AEA2FC5709B00384F15 /* vcf_candidate_finder.h */,
+				6F007AE92FC5708C00384F15 /* transposition_table.h */,
+				6F007AE22FC5700900384F15 /* detail */,
+				6FE3887E2FA0B19800896508 /* search.h */,
+				6FE3887F2FA0B19800896508 /* search_monitor.h */,
+				6FE388802FA0B19800896508 /* search_win.h */,
+			);
+			path = search;
+			sourceTree = "<group>";
+		};
+		6FE388852FA0B19800896508 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				6FE388822FA0B19800896508 /* profiler.h */,
+				6FE388832FA0B19800896508 /* test.h */,
+				6FE388842FA0B19800896508 /* util.h */,
+			);
+			path = test;
+			sourceTree = "<group>";
+		};
+		6FE3888A2FA0B19800896508 /* cpp */ = {
+			isa = PBXGroup;
+			children = (
+				6FE388712FA0B19800896508 /* engine */,
+				6FE388742FA0B19800896508 /* evaluate */,
+				6FE3887B2FA0B19800896508 /* game */,
+				6FE388812FA0B19800896508 /* search */,
+				6FE388852FA0B19800896508 /* test */,
+				6FE388892FA0B19800896508 /* CMakeLists.txt */,
+			);
+			path = cpp;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -288,6 +399,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				127BE3C232512420BB313F2D /* [CP-User] [RNGoogleMobileAds] Configuration */,
 			);
 			buildRules = (
 			);
@@ -358,6 +470,7 @@
 				C43FD785CFE34445B240CEB1 /* Pretendard-Regular.otf in Resources */,
 				0ED8DA9F1E0042CFA57FD1CD /* Pretendard-SemiBold.otf in Resources */,
 				9085CAA35B024E76BCF482A0 /* Pretendard-Thin.otf in Resources */,
+				6FE3888C2FA0B19800896508 /* CMakeLists.txt in Resources */,
 				66B4D082EE5147C3B0A0A270 /* ChangaOne-Regular.ttf in Resources */,
 				1A61B76662E04871A09D57E3 /* NanumSquareNeoOTF-Bd.otf in Resources */,
 				39E08EABC86149AC82E64B10 /* NanumSquareNeoOTF-Eb.otf in Resources */,
@@ -402,6 +515,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Renzzle_FE/Pods-Renzzle_FE-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		127BE3C232512420BB313F2D /* [CP-User] [RNGoogleMobileAds] Configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "[CP-User] [RNGoogleMobileAds] Configuration";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\n\n##########################################################################\n##########################################################################\n#\n#  NOTE THAT IF YOU CHANGE THIS FILE YOU MUST RUN pod install AFTERWARDS\n#\n#  This file is installed as an Xcode build script in the project file\n#  by cocoapods, and you will not see your changes until you pod install\n#\n##########################################################################\n##########################################################################\n\nset -e\n\nif [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_PROJECT_ABBREVIATION=\"RNGoogleMobileAds\"\n_JSON_ROOT=\"'react-native-google-mobile-ads'\"\n_JSON_FILE_NAME='app.json'\n_JS_APP_CONFIG_FILE_NAME='app.config.js'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n_IS_CONFIG_JS=false\n_PACKAGE_JSON_NAME='package.json'\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"info:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"info:      '$1' already exists\"\n}\n\nfunction getJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -KU -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"info: -> ${_PROJECT_ABBREVIATION} build script started\"\necho \"info: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then\n    break;\n  fi;\n\n  echo \"info:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME}/${_JS_APP_CONFIG_FILE_NAME} file.\"\n\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 \\( -name ${_JSON_FILE_NAME} -o -name ${_JS_APP_CONFIG_FILE_NAME} \\) -print | /usr/bin/head -n 1)\n\n  if [[ \"$(basename ${_SEARCH_RESULT})\" = \"${_JS_APP_CONFIG_FILE_NAME}\" ]]; then\n    _IS_CONFIG_JS=true\n    echo \"info:      ${_JS_APP_CONFIG_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n\n  if [[ \"$(basename ${_SEARCH_RESULT})\" = \"${_JSON_FILE_NAME}\" ]]; then\n    echo \"info:      ${_JSON_FILE_NAME} found at ${_SEARCH_RESULT}\"\n    break;\n  fi;\n\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\n# Bail out if project is using Expo\n_PACKAGE_JSON_PATH=$(dirname \"${_SEARCH_RESULT}\")/${_PACKAGE_JSON_NAME}\n_IS_PROJECT_USING_EXPO=$(ruby -KU -e \"require 'json'; package=JSON.parse(File.read('${_PACKAGE_JSON_PATH}')); puts package['dependencies'].key?('expo')\")\n\nif [[ ${_IS_PROJECT_USING_EXPO} == \"true\" ]]; then\n  echo \"info: Expo project detected, assume Expo Config Plugin is used.\"\n  exit 0\nfi\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  if [[ ${_IS_CONFIG_JS} == \"true\" ]]; then\n    _JSON_OUTPUT_RAW=$(\"${NODE_BINARY}\" -e \"console.log(JSON.stringify(require('${_SEARCH_RESULT}')));\")\n  else\n    _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  fi;\n\n  _RN_ROOT_EXISTS=$(ruby -KU -e \"require 'rubygems';require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\" || echo '')\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    if ! python3 --version >/dev/null 2>&1; then echo \"python3 not found, app.json file processing error.\" && exit 1; fi\n    _JSON_OUTPUT_BASE64=$(python3 -c 'import json,sys,base64;print(base64.b64encode(bytes(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"', '\"'rb'\"').read())['${_JSON_ROOT}']), '\"'utf-8'\"')).decode())' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"google_mobile_ads_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.delay_app_measurement_init\n  _DELAY_APP_MEASUREMENT=$(getJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"delay_app_measurement_init\")\n  if [[ $_DELAY_APP_MEASUREMENT == \"true\" ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GADDelayAppMeasurementInit\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"YES\")\n  fi\n\n  # config.ios_app_id\n  _IOS_APP_ID=$(getJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"ios_app_id\")\n  if [[ $_IOS_APP_ID ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GADApplicationIdentifier\")\n    _PLIST_ENTRY_TYPES+=(\"string\")\n    _PLIST_ENTRY_VALUES+=(\"$_IOS_APP_ID\")\n  fi\n\n  # config.sk_ad_network_items\n  _SK_AD_NETWORK_ITEMS=$(getJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"sk_ad_network_items\")\n  if [[ $_SK_AD_NETWORK_ITEMS ]]; then\n    _PLIST_ENTRY_KEYS+=(\"SKAdNetworkItems\")\n    _PLIST_ENTRY_TYPES+=(\"array\")\n    _PLIST_ENTRY_VALUES+=(\"\")\n\n    oldifs=$IFS\n    IFS=\"\n\"\n    array=($(echo \"$_SK_AD_NETWORK_ITEMS\"))\n    IFS=$oldifs\n    for i in \"${!array[@]}\"; do\n      _PLIST_ENTRY_KEYS+=(\"SKAdNetworkItems:$i:SKAdNetworkIdentifier\")\n      _PLIST_ENTRY_TYPES+=(\"string\")\n      _PLIST_ENTRY_VALUES+=(\"${array[i]}\")  \n    done\n  fi\n\n    # config.user_tracking_usage_description\n  _USER_TRACKING_USAGE_DESCRIPTION=$(getJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"user_tracking_usage_description\")\n  if [[ $_USER_TRACKING_USAGE_DESCRIPTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"NSUserTrackingUsageDescription\")\n    _PLIST_ENTRY_TYPES+=(\"string\")\n    _PLIST_ENTRY_VALUES+=(\"$_USER_TRACKING_USAGE_DESCRIPTION\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"google_mobile_ads_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A ${_JSON_FILE_NAME} file was not found, whilst this file is optional it is recommended to include it to auto-configure services.\"\nfi;\n\necho \"info: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nif ! [[ -f \"${_TARGET_PLIST}\" ]]; then\n  echo \"error: unable to locate Info.plist to set properties. App will crash without GADApplicationIdentifier set.\"\n  exit 1\nfi\n\nif ! [[ $_IOS_APP_ID ]]; then\n  echo \"error: ios_app_id key not found in react-native-google-mobile-ads key in app.json. App will crash without it.\"\n  exit 1\nfi\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally\n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"info: <- ${_PROJECT_ABBREVIATION} build script finished\"\n\n";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -515,6 +641,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				6FE3889D2FA0C51E00896508 /* RenzzleModules.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

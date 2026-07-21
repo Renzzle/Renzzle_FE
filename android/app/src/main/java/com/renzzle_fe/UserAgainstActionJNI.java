@@ -3,23 +3,20 @@ package com.renzzle_fe;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableMap;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
 
     private static final int ENGINE_CANCELLED_MOVE = -2;
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Set<Integer> cancelledRequestIds = Collections.synchronizedSet(new HashSet<>());
 
     static {
@@ -43,27 +40,33 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
     public void calculateSomethingWrapper(int requestId, String boardData, Promise promise) {
         Log.d("JNI", "calculateSomethingWrapper: requestId=" + requestId + ", boardData=" + boardData);
 
-        executor.execute(() -> {
-            try {
-                if (cancelledRequestIds.remove(requestId)) {
-                    promise.resolve(createCancelledResponse());
-                    return;
-                }
+        JNIExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    android.os.Trace.beginSection("JNI:calculateSomethingWrapper");
 
-                int result = reactUserMove(requestId, boardData);
-                if (result == ENGINE_CANCELLED_MOVE || cancelledRequestIds.remove(requestId)) {
-                    promise.resolve(createCancelledResponse());
-                    return;
-                }
+                    if (cancelledRequestIds.remove(requestId)) {
+                        promise.resolve(createCancelledResponse());
+                        return;
+                    }
 
-                WritableMap response = Arguments.createMap();
-                response.putString("status", "ok");
-                response.putInt("move", result);
-                promise.resolve(response);
-            } catch (Exception e) {
-                promise.reject("ERROR", "Failed to react user move", e);
-            } finally {
-                cancelledRequestIds.remove(requestId);
+                    int result = reactUserMove(requestId, boardData);
+                    if (result == ENGINE_CANCELLED_MOVE || cancelledRequestIds.remove(requestId)) {
+                        promise.resolve(createCancelledResponse());
+                        return;
+                    }
+
+                    WritableMap response = Arguments.createMap();
+                    response.putString("status", "ok");
+                    response.putInt("move", result);
+                    promise.resolve(response);
+                } catch (Exception e) {
+                    promise.reject("ERROR", "Failed to react user move", e);
+                } finally {
+                    cancelledRequestIds.remove(requestId);
+                    android.os.Trace.endSection();
+                }
             }
         });
     }
@@ -76,8 +79,8 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
 
     @Override
     public void invalidate() {
-        executor.shutdownNow();
         super.invalidate();
+        JNIExecutor.shutdownNow();
     }
 
     private WritableMap createCancelledResponse() {
@@ -85,5 +88,4 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
         response.putString("status", "cancelled");
         return response;
     }
-
 }
