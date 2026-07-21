@@ -131,8 +131,9 @@ Search::ChildSearchResult Search::searchChildPVS(int depth, bool isMax, size_t m
     nextBestVal.decreaseResultDepth();
 
     if (moveIndex == 0) {
-        result.value = abp(depth - 1, !isMax, nextAlpha, nextBeta, &result.pv);
-        result.hasExactPV = result.value.getType() == Value::Type::EXACT;
+        MoveList* childPV = pv != nullptr ? &result.pv : nullptr;
+        result.value = abp(depth - 1, !isMax, nextAlpha, nextBeta, childPV);
+        result.hasExactPV = childPV != nullptr && result.value.getType() == Value::Type::EXACT;
         return result;
     }
 
@@ -237,7 +238,8 @@ Value Search::finalizeNodeValue(bool isMax, Value originalAlpha, Value originalB
     return result;
 }
 
-void Search::updateHistoryFromNode(int depth, const Pos& bestMove, const MoveList& searchedMoves,
+void Search::updateHistoryFromNode(int depth, const Pos& bestMove,
+    const uint8_t* searchedMoveCodes, size_t searchedMoveCount,
     bool causedCutoff, Value result, bool sideToMoveIsBlack) {
     if (!searchActive() || bestMove.isDefault()) {
         return;
@@ -246,9 +248,18 @@ void Search::updateHistoryFromNode(int depth, const Pos& bestMove, const MoveLis
     const int bonus = std::max(1, std::min(depth * depth, 256));
     if (causedCutoff || result.getType() == Value::Type::LOWER_BOUND) {
         updateHistoryScore(bestMove, sideToMoveIsBlack, bonus);
+        // killer slots only remember cutoff moves that make at least a four for the
+        // mover: those transfer to sibling nodes, while quiet cutoff moves would just
+        // displace the static block-the-biggest-threat order and grow the tree
+        if (board.getCell(bestMove).getScore(sideToMoveIsBlack ? BLACK : WHITE)
+            >= KILLER_MIN_FOUR_SCORE) {
+            updateKillerMove(getSearchPly(), packMoveCode(bestMove));
+        }
 
         const int penalty = std::max(1, bonus / 2);
-        for (const Pos& move : searchedMoves) {
+        for (size_t i = 0; i < searchedMoveCount; ++i) {
+            const uint8_t code = searchedMoveCodes[i];
+            const Pos move(code >> 4, code & 0x0F);
             if (!(move == bestMove)) {
                 updateHistoryScore(move, sideToMoveIsBlack, -penalty);
             }
@@ -326,7 +337,7 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
     // applying it in DEFENSIVE mode would invent false LOSE/WIN at quiet positions.
     const bool threatBrokenLeaf = options.mode == Mode::VCT
         && !attackerTurn && !evaluator.isOppoMateExist();
-    MoveList moves = getCandidates(evaluator, isMax);
+    CandidateList moves = getCandidates(evaluator, isMax);
     if (moves.empty()) {
         return threatBrokenLeaf
             ? evaluateThreatBrokenLeaf(isMax, depth)
@@ -342,8 +353,8 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
         : Value(MAX_VALUE + 1, Value::Type::UNKNOWN);
     Pos bestMove;
     MoveList bestChildPV;
-    MoveList searchedMoves;
-    searchedMoves.reserve(moves.size());
+    uint8_t searchedMoveCodes[BOARD_SIZE * BOARD_SIZE];
+    size_t searchedMoveCount = 0;
 
     const int shallowMoveLimit = getShallowMoveLimit(evaluator, depth, attackerTurn);
     const bool sideToMoveIsBlack = board.isBlackTurn();
@@ -366,7 +377,8 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
         tt.prefetch(getTTKey(board));
 
         searchedAny = true;
-        searchedMoves.push_back(move);
+        searchedMoveCodes[searchedMoveCount++] =
+            static_cast<uint8_t>((move.getX() << 4) | move.getY());
         recordNodeVisit();
         const size_t nodeCountBeforeMove = isRootNode ? monitor.getVisitCnt() : 0;
         const double elapsedBeforeMove = isRootNode ? monitor.getElapsedTime() : 0.0;
@@ -409,7 +421,8 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
     }
 
     Value result = finalizeNodeValue(isMax, originalAlpha, originalBeta, alpha, beta, bestVal);
-    updateHistoryFromNode(depth, bestMove, searchedMoves, causedCutoff, result, sideToMoveIsBlack);
+    updateHistoryFromNode(depth, bestMove, searchedMoveCodes, searchedMoveCount,
+        causedCutoff, result, sideToMoveIsBlack);
 
     if (searchActive()) {
         storeTT(board, result, depth, bestMove);
@@ -423,8 +436,8 @@ Value Search::evaluateNode(Evaluator& evaluator) {
     return evaluator.evaluateTactical();
 }
 
-MoveList Search::getCandidates(Evaluator& evaluator, bool isMax) {
-    MoveList moves;
+CandidateList Search::getCandidates(Evaluator& evaluator, bool isMax) {
+    CandidateList moves;
 
     Pos sureMove = evaluator.getSureMove();
     if (!sureMove.isDefault()) {
@@ -438,21 +451,24 @@ MoveList Search::getCandidates(Evaluator& evaluator, bool isMax) {
         const bool atRoot = (board.getPath().size() == rootBoard.getPath().size());
 
         if (evaluator.isOppoMateExist()) {
-            moves = evaluator.getThreatDefend();
-            MoveList fours = evaluator.getFours();
-            moves.insert(moves.end(), fours.begin(), fours.end());
+            evaluator.getThreatDefend(moves);
+            CandidateList fours;
+            evaluator.getFours(fours);
+            appendUniqueMoves(moves, fours);
         } else if (evaluator.isOppoFourThreeExist()) {
-            moves = evaluator.getFourThreeDefend();
-            MoveList fours = evaluator.getFours();
-            moves.insert(moves.end(), fours.begin(), fours.end());
+            evaluator.getFourThreeDefend(moves);
+            CandidateList fours;
+            evaluator.getFours(fours);
+            appendUniqueMoves(moves, fours);
         } else {
             if (atRoot) {
-                moves = evaluator.getCandidates();
+                evaluator.getCandidates(moves);
                 return moves;
             }
-            moves = evaluator.getThreats();
-            MoveList makers = evaluator.getFourThreeMakers();
-            moves.insert(moves.end(), makers.begin(), makers.end());
+            evaluator.getThreats(moves);
+            CandidateList makers;
+            evaluator.getFourThreeMakers(makers);
+            appendUniqueMoves(moves, makers);
         }
         return moves;
     }
@@ -460,42 +476,64 @@ MoveList Search::getCandidates(Evaluator& evaluator, bool isMax) {
     if (options.mode == Mode::VCT) {
         const bool attackerTurn = (board.isBlackTurn() == rootBoard.isBlackTurn());
         if (attackerTurn) {
-            moves = evaluator.getThreats();
-            MoveList makers = evaluator.getFourThreeMakers();
-            moves.insert(moves.end(), makers.begin(), makers.end());
+            evaluator.getThreats(moves);
+            CandidateList makers;
+            evaluator.getFourThreeMakers(makers);
+            appendUniqueMoves(moves, makers);
         } else if (evaluator.isOppoMateExist()) {
-            moves = evaluator.getThreatDefend();
-            MoveList fours = evaluator.getFours();
-            moves.insert(moves.end(), fours.begin(), fours.end());
+            evaluator.getThreatDefend(moves);
+            CandidateList fours;
+            evaluator.getFours(fours);
+            appendUniqueMoves(moves, fours);
         } else if (evaluator.isOppoFourThreeExist()) {
-            moves = evaluator.getFourThreeDefend();
-            MoveList fours = evaluator.getFours();
-            moves.insert(moves.end(), fours.begin(), fours.end());
+            evaluator.getFourThreeDefend(moves);
+            CandidateList fours;
+            evaluator.getFours(fours);
+            appendUniqueMoves(moves, fours);
         }
     }
 
     return moves;
 }
 
-void Search::sortChildNodes(MoveList& moves, bool isMax, const TTEntry* entry) {
+void Search::appendUniqueMoves(CandidateList& moves, const CandidateList& extraMoves) const {
+    if (extraMoves.empty()) {
+        return;
+    }
+
+    moves.reserve(moves.size() + extraMoves.size());
+    for (const Pos& move : extraMoves) {
+        if (std::find(moves.begin(), moves.end(), move) == moves.end()) {
+            moves.push_back(move);
+        }
+    }
+}
+
+void Search::sortChildNodes(CandidateList& moves, bool isMax, const TTEntry* entry) {
     if (moves.size() < 2) {
         return;
     }
 
     struct MoveOrderInfo {
-        Pos move;
+        uint8_t moveCode;
         bool isTTBest;
         bool hasTT;
         int flagPriority;
         int32_t ttScore;
         int historyScore;
         int cellScore;
+        int killerRank;
     };
 
     const Pos ttBestMove = (entry != nullptr && entry->bestMove != TranspositionTable::INVALID_MOVE)
         ? TranspositionTable::decodeMove(entry->bestMove)
         : Pos();
     const bool sideToMoveIsBlack = board.isBlackTurn();
+    const size_t searchPly = getSearchPly();
+    const uint8_t killerCode0 =
+        searchPly < state.killerMoves.size() ? state.killerMoves[searchPly][0] : 0;
+    const uint8_t killerCode1 =
+        searchPly < state.killerMoves.size() ? state.killerMoves[searchPly][1] : 0;
     bool hasHistorySignal = false;
 
     for (const Pos& move : moves) {
@@ -524,8 +562,8 @@ void Search::sortChildNodes(MoveList& moves, bool isMax, const TTEntry* entry) {
         return 2;
     };
 
-    vector<MoveOrderInfo> infos;
-    infos.reserve(moves.size());
+    MoveOrderInfo infos[BOARD_SIZE * BOARD_SIZE];
+    size_t infoCount = 0;
 
     // Attacker (isMax) prefers self-attack score; defender wants to block opponent's most
     // threatening spot, so uses opponent's score. Matches the evaluator's previous sort intent.
@@ -545,17 +583,25 @@ void Search::sortChildNodes(MoveList& moves, bool isMax, const TTEntry* entry) {
                 ? &childEntryStorage
                 : nullptr;
         MoveOrderInfo info;
-        info.move = move;
+        info.moveCode = static_cast<uint8_t>((move.getX() << 4) | move.getY());
         info.isTTBest = !ttBestMove.isDefault() && move == ttBestMove;
         info.hasTT = childEntry != nullptr;
         info.flagPriority = childEntry != nullptr ? getValueTypePriority(childEntry->getFlag()) : getValueTypePriority(TTFlag::NONE);
         info.ttScore = childEntry != nullptr ? childEntry->score : 0;
         info.historyScore = getHistoryScore(move, sideToMoveIsBlack);
         info.cellScore = board.getCell(move).getScore(scorePiece);
-        infos.push_back(info);
+        info.killerRank = 0;
+        if (info.moveCode == killerCode0 || info.moveCode == killerCode1) {
+            // stored killers made a four where they cut off; re-validate on this
+            // board since the same cell may no longer make one here
+            if (board.getCell(move).getScore(sideToMovePiece) >= KILLER_MIN_FOUR_SCORE) {
+                info.killerRank = info.moveCode == killerCode0 ? 2 : 1;
+            }
+        }
+        infos[infoCount++] = info;
     }
 
-    std::stable_sort(infos.begin(), infos.end(), [&](const MoveOrderInfo& a, const MoveOrderInfo& b) {
+    std::stable_sort(infos, infos + infoCount, [&](const MoveOrderInfo& a, const MoveOrderInfo& b) {
         if (a.isTTBest != b.isTTBest) {
             return a.isTTBest;
         }
@@ -572,6 +618,11 @@ void Search::sortChildNodes(MoveList& moves, bool isMax, const TTEntry* entry) {
         if (a.flagPriority != b.flagPriority) {
             return a.flagPriority < b.flagPriority;
         }
+        // recent four-making cutoff moves outrank the static cell score: they either
+        // refute the line the same way they refuted a sibling, or fail fast (forcing)
+        if (a.killerRank != b.killerRank) {
+            return a.killerRank > b.killerRank;
+        }
         if (a.cellScore != b.cellScore) {
             return a.cellScore > b.cellScore;
         }
@@ -582,7 +633,8 @@ void Search::sortChildNodes(MoveList& moves, bool isMax, const TTEntry* entry) {
     });
 
     for (size_t i = 0; i < moves.size(); ++i) {
-        moves[i] = infos[i].move;
+        const uint8_t code = infos[i].moveCode;
+        moves[i] = Pos(code >> 4, code & 0x0F);
     }
 }
 

@@ -62,6 +62,8 @@ PRIVATE
         Value bestValue;
         std::vector<RootMoveStat> lastRootStats;
         std::array<std::array<int, BOARD_SIZE * BOARD_SIZE>, 2> historyScores = {};
+        // two killer slots per ply from root; entries are packed (x<<4)|y codes, 0 = empty
+        std::array<std::array<uint8_t, 2>, BOARD_SIZE * BOARD_SIZE + 4> killerMoves = {};
         size_t nodesSinceMonitorPoll = 0;
     };
 
@@ -83,13 +85,17 @@ PRIVATE
     static constexpr uint64_t QVCF_TT_KEY = 0x6a09e667f3bcc909ULL;
     static constexpr int QVCF_HEURISTIC_WIN_SCORE = MAX_VALUE - (BOARD_SIZE * BOARD_SIZE) - 1024;
     static constexpr int HISTORY_ABS_LIMIT = 16384;
+    // attackScore[B4] — a killer must make at least a four (for the mover) to be
+    // stored and to outrank the static cell score during move ordering
+    static constexpr int KILLER_MIN_FOUR_SCORE = 400;
     static constexpr int ASPIRATION_START_DELTA = 32;
     Value abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv = nullptr);
     Value searchRootWithAspiration(int depth, MoveList* pv);
     Value evaluateNode(Evaluator& evaluator);
     bool searchActive() const;
-    MoveList getCandidates(Evaluator& evaluator, bool isMax);
-    void sortChildNodes(MoveList& moves, bool isMax, const TTEntry* entry);
+    CandidateList getCandidates(Evaluator& evaluator, bool isMax);
+    void appendUniqueMoves(CandidateList& moves, const CandidateList& extraMoves) const;
+    void sortChildNodes(CandidateList& moves, bool isMax, const TTEntry* entry);
     bool isGameOver(Board& board);
     uint64_t getTTKey(Board& board) const;
     uint64_t getChildTTKey(const Pos& move);
@@ -106,6 +112,9 @@ PRIVATE
     int getHistoryScore(const Pos& move, bool isBlackTurn) const;
     void updateHistoryScore(const Pos& move, bool isBlackTurn, int delta);
     void clearHistory();
+    size_t getSearchPly();
+    static uint8_t packMoveCode(const Pos& move);
+    void updateKillerMove(size_t ply, uint8_t moveCode);
     bool tryResolveFromTT(int depth, Value& alpha, Value& beta, MoveList* pv,
         TTEntry& ttEntryStorage, const TTEntry*& ttEntry, Value& resolvedValue);
     int getShallowMoveLimit(Evaluator& evaluator, int depth, bool attackerTurn);
@@ -121,7 +130,8 @@ PRIVATE
         size_t nodeCountBeforeMove, double elapsedBeforeMove, const Pos& ttBestMove);
     Value finalizeNodeValue(bool isMax, Value originalAlpha, Value originalBeta,
         Value alpha, Value beta, Value bestVal) const;
-    void updateHistoryFromNode(int depth, const Pos& bestMove, const MoveList& searchedMoves,
+    void updateHistoryFromNode(int depth, const Pos& bestMove,
+        const uint8_t* searchedMoveCodes, size_t searchedMoveCount,
         bool causedCutoff, Value result, bool sideToMoveIsBlack);
     void rebuildPV(const Pos& bestMove, const MoveList& bestChildPV, Value result, MoveList* pv) const;
     void completeWinPV(Value value, MoveList& pv);
@@ -129,7 +139,7 @@ PRIVATE
     Result getRootWinResult();
     uint64_t getQVCFTTKey(Board& targetBoard) const;
     bool enterQVCFNode(QVCFContext& context);
-    void moveQVCFTTBestFirst(MoveList& moves, const Pos& bestMove) const;
+    void moveQVCFTTBestFirst(CandidateList& moves, const Pos& bestMove) const;
     bool probeQVCFTT(Board& targetBoard, int remainingPly, Value& value, Pos& bestMove) const;
     void storeQVCFWin(Board& targetBoard, Value value, int remainingPly, const Pos& bestMove);
     void storeQVCFFail(Board& targetBoard, int remainingPly);
