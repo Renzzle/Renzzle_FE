@@ -1,5 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   BoardBackground,
   CellContainer,
@@ -34,6 +40,7 @@ import {
   PuzzleCacheType,
   savePuzzleCache,
 } from '../../../apis/puzzleCache';
+import useCancellableNativeRequest from '../../../hooks/useCancellableNativeRequest';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -69,6 +76,7 @@ interface CellType {
 export interface BoardRef {
   undo: () => void;
   redo: () => void;
+  cancelAiTurn: () => void;
 }
 
 const createEmptyBoard = (): CellType[][] => {
@@ -79,6 +87,15 @@ const createEmptyBoard = (): CellType[][] => {
     })),
   );
 };
+
+type AiMoveResponse =
+  | {
+      status: 'ok';
+      move: number;
+    }
+  | {
+      status: 'cancelled';
+    };
 
 interface BoardProps {
   mode: 'make' | 'solve';
@@ -128,228 +145,251 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const [stoneX, setStoneX] = useState<number | null>(null);
   const [stoneY, setStoneY] = useState<number | null>(null);
 
-  const [aiAnswer, setAiAnswer] = useState<number>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [localSequence, setLocalSequence] = useState(sequence);
 
   const [history, setHistory] = useState<string[]>([sequence]);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Benchmark Ref
   const aiBenchmarkRef = useRef<AiBenchmarkResult | null>(null);
 
-  useImperativeHandle(ref, () => ({
-    undo: () => {
-      if (mode !== 'make') {
-        return;
-      }
+  // Cancellable Request Refs
+  const isMountedRef = useRef(true);
+  const checkWinRequestIdRef = useRef(0);
 
-      if (makeMode === 'create') {
-        if (currentIndex > 0) {
-          setCurrentIndex(currentIndex - 1);
-        }
-      } else if (makeMode === 'review') {
-        // 현재 시퀀스가 문제 시퀀스보다 길 때만 undo 가능
-        if (localSequence.length > problemSequence.length) {
-          const lastMoveMatch = localSequence.match(/[a-o](?:1[0-5]|[1-9])$/);
-          if (lastMoveMatch) {
-            const lastMove = lastMoveMatch[0];
-            const newSequence = localSequence.slice(0, -lastMove.length);
-            setLocalSequence(newSequence);
-            setSequence(newSequence);
-          }
-        }
+  const cancelCalculate = useCallback(
+    (activeRequestId: number) => {
+      UserAgainstActionJNI.cancelCalculate?.(activeRequestId);
+    },
+    [UserAgainstActionJNI],
+  );
+
+  const {
+    cancelActiveRequest: cancelActiveAiRequest,
+    finishRequest: finishAiRequest,
+    isActiveRequest: isActiveAiRequest,
+    scheduleRequest: scheduleAiRequest,
+  } = useCancellableNativeRequest({ cancelRequest: cancelCalculate });
+
+  const cancelActiveAiTurn = useCallback(
+    (resetUi = false) => {
+      cancelActiveAiRequest();
+      if (resetUi) {
+        setIsDisabled(false);
+        setIsLoading?.(false);
       }
     },
-    redo: () => {
-      if (mode !== 'make') {
-        return;
-      }
+    [cancelActiveAiRequest, setIsLoading],
+  );
 
-      if (makeMode === 'create') {
-        if (currentIndex < history.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        }
-      } else if (makeMode === 'review') {
-        // 현재 시퀀스가 메인 시퀀스보다 짧고, 메인 시퀀스의 일부일 때만 redo 가능
-        if (localSequence.length < mainSequence.length && mainSequence.startsWith(localSequence)) {
-          // 다음 수를 메인 시퀀스에서 가져와 추가
-          const nextMoveMatch = mainSequence
-            .substring(localSequence.length)
-            .match(/^[a-o](?:1[0-5]|[1-9])/);
-          if (nextMoveMatch) {
-            const nextMove = nextMoveMatch[0];
-            const newSequence = localSequence + nextMove;
-            setLocalSequence(newSequence);
-            setSequence(newSequence);
-          }
-        }
-      }
-    },
-  }));
-
-  const updateBoard = (x: number, y: number) => {
-    // copy board
-    const newBoard: CellType[][] = board.map((row) => row.map((cell) => ({ ...cell })));
-
-    // 기존 마지막 수 표시 제거
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      for (let j = 0; j < BOARD_SIZE; j++) {
-        if (newBoard[i][j].moveNumber === -1) {
-          newBoard[i][j].moveNumber = null;
-        }
-      }
-    }
-
-    // 새 돌 추가 및 마지막 수 표시
-    newBoard[x][y] = {
-      stone: isBlackTurn ? 1 : 2,
-      moveNumber: -1,
-    };
-
-    setBoard(newBoard);
-  };
-
-  const addToSequence = (x: number, y: number) => {
-    const letter = convertToLowercaseAlphabet(y);
-    const number = convertToReverseNumber(x).toString();
-    const updatedSequence = localSequence + letter + number;
-
-    if (mode === 'make' && makeMode === 'create') {
-      const newHistory = [...history.slice(0, currentIndex + 1), updatedSequence];
-      setHistory(newHistory);
-      setCurrentIndex(newHistory.length - 1);
-      setLocalSequence(updatedSequence);
-      setSequence(updatedSequence);
-    } else {
-      setLocalSequence(updatedSequence);
-      setSequence(updatedSequence);
-    }
-
-    return updatedSequence;
-  };
-
-  const handlePut = async () => {
-    if (stoneX !== undefined && stoneY !== undefined && stoneX !== null && stoneY !== null) {
-      if (board[stoneX][stoneY].stone !== 0) {
-        return;
-      }
-
-      const newSequence = addToSequence(stoneX, stoneY);
-      updateBoard(stoneX, stoneY);
-      setIsBlackTurn(!isBlackTurn);
-      setStoneX(null);
-      setStoneY(null);
-
-      if (mode === 'solve') {
-        if (await checkWin(newSequence)) {
-          setIsWin?.(true);
-          setIsLoading?.(false);
-          setIsDisabled(false);
+  useImperativeHandle(
+    ref,
+    () => ({
+      cancelAiTurn: () => {
+        cancelActiveAiTurn(true);
+      },
+      undo: () => {
+        if (mode !== 'make') {
           return;
         }
 
-        setIsDisabled(true);
-        setIsLoading?.(true);
-        await handleAiTurn(newSequence);
+        if (makeMode === 'create') {
+          if (currentIndex > 0) {
+            setCurrentIndex(currentIndex - 1);
+          }
+        } else if (makeMode === 'review') {
+          if (localSequence.length > problemSequence.length) {
+            const lastMoveMatch = localSequence.match(/[a-o](?:1[0-5]|[1-9])$/);
+            if (lastMoveMatch) {
+              const lastMove = lastMoveMatch[0];
+              const newSequence = localSequence.slice(0, -lastMove.length);
+              setLocalSequence(newSequence);
+              setSequence(newSequence);
+            }
+          }
+        }
+      },
+      redo: () => {
+        if (mode !== 'make') {
+          return;
+        }
+
+        if (makeMode === 'create') {
+          if (currentIndex < history.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+          }
+        } else if (makeMode === 'review') {
+          if (
+            localSequence.length < mainSequence.length &&
+            mainSequence.startsWith(localSequence)
+          ) {
+            const nextMoveMatch = mainSequence
+              .substring(localSequence.length)
+              .match(/^[a-o](?:1[0-5]|[1-9])/);
+            if (nextMoveMatch) {
+              const nextMove = nextMoveMatch[0];
+              const newSequence = localSequence + nextMove;
+              setLocalSequence(newSequence);
+              setSequence(newSequence);
+            }
+          }
+        }
+      },
+    }),
+    [
+      cancelActiveAiTurn,
+      currentIndex,
+      history.length,
+      localSequence,
+      mainSequence,
+      makeMode,
+      mode,
+      problemSequence,
+      setSequence,
+    ],
+  );
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const updateBoard = useCallback(
+    (x: number, y: number, isBlackStone = isBlackTurn) => {
+      setBoard((currentBoard) => {
+        const newBoard: CellType[][] = currentBoard.map((row) => row.map((cell) => ({ ...cell })));
+
+        for (let i = 0; i < BOARD_SIZE; i++) {
+          for (let j = 0; j < BOARD_SIZE; j++) {
+            if (newBoard[i][j].moveNumber === -1) {
+              newBoard[i][j].moveNumber = null;
+            }
+          }
+        }
+
+        newBoard[x][y] = {
+          stone: isBlackStone ? 1 : 2,
+          moveNumber: -1,
+        };
+
+        return newBoard;
+      });
+    },
+    [isBlackTurn],
+  );
+
+  const addToSequence = useCallback(
+    (x: number, y: number, baseSequence = localSequence) => {
+      const letter = convertToLowercaseAlphabet(y);
+      const number = convertToReverseNumber(x).toString();
+      const updatedSequence = baseSequence + letter + number;
+
+      if (mode === 'make' && makeMode === 'create') {
+        const newHistory = [...history.slice(0, currentIndex + 1), updatedSequence];
+        setHistory(newHistory);
+        setCurrentIndex(newHistory.length - 1);
+        setLocalSequence(updatedSequence);
+        setSequence(updatedSequence);
+      } else {
+        setLocalSequence(updatedSequence);
+        setSequence(updatedSequence);
       }
-    }
-  };
 
-  const handleCellPress = (x: number, y: number) => {
-    if (isDisabled) {
-      return;
-    }
-    if (stoneX === x && stoneY === y) {
-      handlePut();
-    } else {
-      setStoneX(x);
-      setStoneY(y);
-    }
-  };
+      return updatedSequence;
+    },
+    [currentIndex, history, localSequence, makeMode, mode, setSequence],
+  );
 
-  const getCachedAiAnswer = async (
-    userSequence: string,
-  ): Promise<{
-    answer: number | null;
-    shouldSave: boolean;
-    cacheLookupMs?: number;
-    position?: string | null;
-  }> => {
-    if (!puzzleCache) {
-      return { answer: null, shouldSave: false };
-    }
+  const getCachedAiAnswer = useCallback(
+    async (
+      userSequence: string,
+    ): Promise<{
+      answer: number | null;
+      shouldSave: boolean;
+      cacheLookupMs?: number;
+      position?: string | null;
+    }> => {
+      if (!puzzleCache) {
+        return { answer: null, shouldSave: false };
+      }
 
-    try {
-      const cacheStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
-      const cache = await getPuzzleCacheAiResponse({
+      try {
+        const cacheStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+        const cache = await getPuzzleCacheAiResponse({
+          ...puzzleCache,
+          currentBoardState: userSequence,
+        });
+        const cacheLookupMs = IS_AI_BENCHMARK_ENABLED ? Date.now() - cacheStartedAt : undefined;
+
+        if (!cache.position) {
+          return { answer: null, shouldSave: true, cacheLookupMs, position: null };
+        }
+
+        const cachedAnswer = positionToValue(cache.position);
+
+        return { answer: cachedAnswer, shouldSave: false, cacheLookupMs, position: cache.position };
+      } catch (error) {
+        console.log('AI cache request failed:', error);
+        return { answer: null, shouldSave: false };
+      }
+    },
+    [puzzleCache],
+  );
+
+  const saveAiAnswerCache = useCallback(
+    (userSequence: string, aiResult: number) => {
+      if (!puzzleCache) {
+        return;
+      }
+
+      const coordinates = valueToCoordinates(aiResult);
+      if (!coordinates) {
+        return;
+      }
+
+      const answerPuzzle = coordinatesToPosition(coordinates.x, coordinates.y);
+      if (!answerPuzzle) {
+        return;
+      }
+
+      const saveStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+      savePuzzleCache({
         ...puzzleCache,
         currentBoardState: userSequence,
-      });
-      const cacheLookupMs = IS_AI_BENCHMARK_ENABLED ? Date.now() - cacheStartedAt : undefined;
-
-      if (!cache.position) {
-        return { answer: null, shouldSave: true, cacheLookupMs, position: null };
-      }
-
-      const cachedAnswer = positionToValue(cache.position);
-
-      return { answer: cachedAnswer, shouldSave: false, cacheLookupMs, position: cache.position };
-    } catch (error) {
-      console.log('AI cache request failed:', error);
-      return { answer: null, shouldSave: false };
-    }
-  };
-
-  const saveAiAnswerCache = (userSequence: string, aiResult: number) => {
-    if (!puzzleCache) {
-      return;
-    }
-
-    const coordinates = valueToCoordinates(aiResult);
-    if (!coordinates) {
-      return;
-    }
-
-    const answerPuzzle = coordinatesToPosition(coordinates.x, coordinates.y);
-    if (!answerPuzzle) {
-      return;
-    }
-
-    const saveStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
-    savePuzzleCache({
-      ...puzzleCache,
-      currentBoardState: userSequence,
-      answerPuzzle,
-    })
-      .then((response) => {
-        if (IS_AI_BENCHMARK_ENABLED) {
-          console.log('[AiBenchmark] cache save:', {
-            puzzleType: puzzleCache.puzzleType,
-            puzzleId: puzzleCache.puzzleId,
-            boardDepth: getSequenceDepth(userSequence),
-            isSuccess: response.isSuccess,
-            ms: Date.now() - saveStartedAt,
-            answerPuzzle,
-          });
-        }
+        answerPuzzle,
       })
-      .catch((error) => {
-        console.log('AI cache save failed:', error);
-      });
-  };
+        .then((response) => {
+          if (IS_AI_BENCHMARK_ENABLED) {
+            console.log('[AiBenchmark] cache save:', {
+              puzzleType: puzzleCache.puzzleType,
+              puzzleId: puzzleCache.puzzleId,
+              boardDepth: getSequenceDepth(userSequence),
+              isSuccess: response.isSuccess,
+              ms: Date.now() - saveStartedAt,
+              answerPuzzle,
+            });
+          }
+        })
+        .catch((error) => {
+          console.log('AI cache save failed:', error);
+        });
+    },
+    [puzzleCache],
+  );
 
-  const logAiBenchmark = (result: 'move-applied' | 'ai-win' | 'terminal') => {
+  const logAiBenchmark = useCallback((result: 'move-applied' | 'ai-win' | 'terminal') => {
     if (!IS_AI_BENCHMARK_ENABLED) {
       return;
     }
 
     const benchmark = aiBenchmarkRef.current;
-
     if (!benchmark) {
       return;
     }
 
     const { turnStartedAt, ...payload } = benchmark;
-
     console.log(`[AiBenchmark] ${benchmark.source}:`, {
       ...payload,
       turnCompleteMs: Date.now() - turnStartedAt,
@@ -357,142 +397,265 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     });
 
     aiBenchmarkRef.current = null;
-  };
+  }, []);
 
-  const handleAiTurn = async (userSequence: string) => {
-    setTimeout(async () => {
-      try {
-        const aiMode = getPuzzleAiMode();
-        const turnStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
-        aiBenchmarkRef.current = null;
+  const checkWin = useCallback(
+    (sequenceToCheck: string, turn: string): Promise<boolean | null> => {
+      checkWinRequestIdRef.current += 1;
+      const requestId = checkWinRequestIdRef.current;
 
-        const {
-          answer: cachedAnswer,
-          shouldSave,
-          cacheLookupMs,
-          position,
-        } = aiMode === 'CACHE'
-          ? await getCachedAiAnswer(userSequence)
-          : {
-              answer: null,
-              shouldSave: false,
-              cacheLookupMs: undefined,
-              position: undefined,
-            };
+      return new Promise((resolve) => {
+        setTimeout(async () => {
+          if (!isMountedRef.current || checkWinRequestIdRef.current !== requestId) {
+            resolve(null);
+            return;
+          }
 
-        if (cachedAnswer !== null) {
+          try {
+            const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
+            if (!isMountedRef.current || checkWinRequestIdRef.current !== requestId) {
+              resolve(null);
+              return;
+            }
+
+            console.log(turn, ' sequence:', sequenceToCheck);
+            console.log(turn, ' :', check);
+            resolve(check === 1);
+          } catch (error) {
+            if (!isMountedRef.current || checkWinRequestIdRef.current !== requestId) {
+              resolve(null);
+              return;
+            }
+
+            console.log(error);
+            showBottomToast('error', t('toast.numberProcessingError'));
+            resolve(false);
+          }
+        }, 0);
+      });
+    },
+    [CheckWinJNI, t],
+  );
+
+  const handleAiTurn = useCallback(
+    (userSequence: string, aiIsBlackTurn: boolean) => {
+      scheduleAiRequest(async (requestId) => {
+        try {
+          const aiMode = getPuzzleAiMode();
+          const turnStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+          aiBenchmarkRef.current = null;
+
+          const {
+            answer: cachedAnswer,
+            shouldSave,
+            cacheLookupMs,
+            position,
+          } = aiMode === 'CACHE'
+            ? await getCachedAiAnswer(userSequence)
+            : {
+                answer: null,
+                shouldSave: false,
+                cacheLookupMs: undefined,
+                position: undefined,
+              };
+
+          if (!isActiveAiRequest(requestId)) {
+            return;
+          }
+
+          let result: number;
+          let source: PuzzleAiAnswerSource;
+          let localAiMs: number | undefined;
+
+          if (cachedAnswer !== null) {
+            source = 'cache-hit';
+            result = cachedAnswer;
+          } else {
+            source =
+              aiMode === 'LOCAL_ONLY' ? 'local-only' : shouldSave ? 'cache-miss' : 'cache-fallback';
+            const localAiStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+
+            const response = (await UserAgainstActionJNI.calculateSomethingWrapper(
+              requestId,
+              userSequence,
+            )) as AiMoveResponse | number;
+
+            if (!isActiveAiRequest(requestId)) {
+              return;
+            }
+
+            if (typeof response !== 'number' && response.status === 'cancelled') {
+              finishAiRequest(requestId);
+              setIsDisabled(false);
+              setIsLoading?.(false);
+              return;
+            }
+
+            result = typeof response === 'number' ? response : response.move;
+            localAiMs = Date.now() - localAiStartedAt;
+          }
+
           if (IS_AI_BENCHMARK_ENABLED) {
             aiBenchmarkRef.current = {
               mode: aiMode,
-              source: 'cache-hit',
+              source,
               turnStartedAt,
               boardDepth: getSequenceDepth(userSequence),
               puzzleType: puzzleCache?.puzzleType,
               puzzleId: puzzleCache?.puzzleId,
               cacheLookupMs,
+              localAiMs,
               answerReadyMs: Date.now() - turnStartedAt,
-              aiAnswer: cachedAnswer,
+              aiAnswer: result,
               position,
             };
           }
-          setAiAnswer(cachedAnswer);
-          return;
-        }
 
-        const source =
-          aiMode === 'LOCAL_ONLY' ? 'local-only' : shouldSave ? 'cache-miss' : 'cache-fallback';
+          if (result === -1) {
+            logAiBenchmark('terminal');
+            console.log('졌다!');
+            finishAiRequest(requestId);
+            setIsWin?.(false);
+            setIsLoading?.(false);
+            setIsDisabled(false);
+            return;
+          }
 
-        const localAiStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
-        const result = await UserAgainstActionJNI.calculateSomethingWrapper(userSequence);
-        if (IS_AI_BENCHMARK_ENABLED) {
-          aiBenchmarkRef.current = {
-            mode: aiMode,
-            source,
-            turnStartedAt,
-            boardDepth: getSequenceDepth(userSequence),
-            puzzleType: puzzleCache?.puzzleType,
-            puzzleId: puzzleCache?.puzzleId,
-            cacheLookupMs,
-            localAiMs: Date.now() - localAiStartedAt,
-            answerReadyMs: Date.now() - turnStartedAt,
-            aiAnswer: result,
-            position,
-          };
-        }
+          if (result === 1000) {
+            logAiBenchmark('terminal');
+            console.log('이겼다!');
+            finishAiRequest(requestId);
+            setIsWin?.(true);
+            setIsLoading?.(false);
+            setIsDisabled(false);
+            return;
+          }
 
-        if (result === -1) {
-          logAiBenchmark('terminal');
-          setIsWin?.(false);
-          setIsLoading?.(false);
+          if (shouldSave && result !== -1 && result !== 1000) {
+            saveAiAnswerCache(userSequence, result);
+          }
+
+          const coordinates = valueToCoordinates(result);
+          if (!coordinates) {
+            finishAiRequest(requestId);
+            setIsDisabled(false);
+            setIsLoading?.(false);
+            return;
+          }
+
+          const { x, y } = coordinates;
+          const newSequence = addToSequence(x, y, userSequence);
+          const isAiWin = await checkWin(newSequence, 'ai');
+
+          if (isAiWin === null || !isActiveAiRequest(requestId)) {
+            return;
+          }
+
+          if (isAiWin) {
+            logAiBenchmark('ai-win');
+            finishAiRequest(requestId);
+            setIsWin?.(false);
+            setIsLoading?.(false);
+            setIsDisabled(false);
+            return;
+          }
+
+          updateBoard(x, y, aiIsBlackTurn);
+          setIsBlackTurn(!aiIsBlackTurn);
+          finishAiRequest(requestId);
           setIsDisabled(false);
-        }
-        if (result === 1000) {
-          logAiBenchmark('terminal');
-          setIsWin?.(true);
           setIsLoading?.(false);
-          setIsDisabled(false);
-        }
-        if (shouldSave && result !== -1 && result !== 1000) {
-          saveAiAnswerCache(userSequence, result);
-        }
-        setAiAnswer(result);
-      } catch (error) {
-        showBottomToast('error', t('toast.aiCalculationFailed'));
-        setIsLoading?.(false);
-        setIsDisabled(false);
-      }
-    }, 0);
-  };
-
-  const checkWin = (sequenceToCheck: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        try {
-          const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
-          resolve(check === 1);
+          logAiBenchmark('move-applied');
         } catch (error) {
-          console.log(error);
-          showBottomToast('error', t('toast.numberProcessingError'));
-          resolve(false);
+          if (isActiveAiRequest(requestId)) {
+            finishAiRequest(requestId);
+            setIsDisabled(false);
+            setIsLoading?.(false);
+            showBottomToast('error', t('toast.aiCalculationFailed'));
+          }
         }
-      }, 0);
-    });
-  };
+      });
+    },
+    [
+      UserAgainstActionJNI,
+      addToSequence,
+      checkWin,
+      finishAiRequest,
+      getCachedAiAnswer,
+      isActiveAiRequest,
+      logAiBenchmark,
+      puzzleCache,
+      saveAiAnswerCache,
+      scheduleAiRequest,
+      setIsLoading,
+      setIsWin,
+      t,
+      updateBoard,
+    ],
+  );
 
-  useEffect(() => {
-    const processAiAnswer = async () => {
-      if (aiAnswer !== null && aiAnswer !== undefined) {
-        if (aiAnswer === 1000 || aiAnswer === -1) {
-          setIsDisabled(false);
-          setIsLoading?.(false);
-          return;
-        }
+  const handlePut = useCallback(async () => {
+    if (stoneX === undefined || stoneY === undefined || stoneX === null || stoneY === null) {
+      return;
+    }
 
-        const coordinates = valueToCoordinates(aiAnswer);
-        if (!coordinates) {
-          return;
-        }
+    if (board[stoneX][stoneY].stone !== 0) {
+      return;
+    }
 
-        const { x, y } = coordinates;
-        const newSequence = addToSequence(x, y);
-        if (await checkWin(newSequence)) {
-          logAiBenchmark('ai-win');
-          setIsWin?.(false);
-          setIsLoading?.(false);
-          setIsDisabled(false);
-          return;
-        }
+    const newSequence = addToSequence(stoneX, stoneY);
+    updateBoard(stoneX, stoneY);
+    setIsBlackTurn(!isBlackTurn);
+    setStoneX(null);
+    setStoneY(null);
 
-        updateBoard(x, y);
-        setIsBlackTurn(!isBlackTurn);
-        setIsDisabled(false);
-        setIsLoading?.(false);
-        logAiBenchmark('move-applied');
+    if (mode === 'solve') {
+      const isUserWin = await checkWin(newSequence, 'user');
+
+      if (isUserWin === null) {
+        return;
       }
-    };
 
-    processAiAnswer();
-  }, [aiAnswer]);
+      if (isUserWin) {
+        setIsWin?.(true);
+        setIsLoading?.(false);
+        setIsDisabled(false);
+        return;
+      }
+
+      setIsDisabled(true);
+      setIsLoading?.(true);
+      handleAiTurn(newSequence, !isBlackTurn);
+    }
+  }, [
+    addToSequence,
+    board,
+    checkWin,
+    handleAiTurn,
+    isBlackTurn,
+    mode,
+    setIsLoading,
+    setIsWin,
+    stoneX,
+    stoneY,
+    updateBoard,
+  ]);
+
+  const handleCellPress = useCallback(
+    (x: number, y: number) => {
+      if (isDisabled) {
+        return;
+      }
+
+      if (stoneX === x && stoneY === y) {
+        handlePut();
+      } else {
+        setStoneX(x);
+        setStoneY(y);
+      }
+    },
+    [handlePut, isDisabled, stoneX, stoneY],
+  );
 
   useEffect(() => {
     if (mode === 'make' && makeMode === 'create') {
@@ -532,7 +695,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     onUndoRedoStateChange,
   ]);
 
-  const initializeBoard = () => {
+  const initializeBoard = useCallback(() => {
+    console.log('보드 초기화 - 시퀀스: ' + sequence);
     const newBoard = createEmptyBoard();
     let turn = true;
     const problemSequenceLength = problemSequence ? getSequenceDepth(problemSequence) : 0;
@@ -567,11 +731,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setLocalSequence(sequence);
     setBoard(newBoard);
     setIsBlackTurn(turn);
-  };
+  }, [mode, problemSequence, sequence, t]);
 
   useEffect(() => {
     initializeBoard();
-  }, [sequence]);
+  }, [initializeBoard]);
 
   return (
     <BoardBackground boardWidth={boardWidth}>

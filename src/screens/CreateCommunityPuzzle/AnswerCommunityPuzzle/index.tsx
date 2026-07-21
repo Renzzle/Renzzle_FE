@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BoardHeaderWrapper,
   Container,
@@ -19,6 +19,16 @@ import { showBottomToast } from '../../../components/common/Toast/toastMessage';
 import { getSequenceDepth } from '../../../utils/utils';
 import { uploadPuzzle } from '../../../apis/community';
 import HelperText from '../../../components/common/HelperText';
+import useCancellableNativeRequest from '../../../hooks/useCancellableNativeRequest';
+
+type ValidationResponse =
+  | {
+      status: 'ok';
+      result: string;
+    }
+  | {
+      status: 'cancelled';
+    };
 
 const AnswerCommunityPuzzle = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -51,6 +61,16 @@ const AnswerCommunityPuzzle = () => {
   }, [problemSequence]);
 
   const boardRef = useRef<BoardRef>(null);
+
+  const cancelFindWin = useCallback((activeRequestId: number) => {
+    SearchJNI.cancelFindWin?.(activeRequestId);
+  }, [SearchJNI]);
+  const {
+    cancelActiveRequest: cancelActiveVerification,
+    finishRequest: finishVerification,
+    isActiveRequest: isActiveVerification,
+    scheduleRequest: scheduleVerification,
+  } = useCancellableNativeRequest({ cancelRequest: cancelFindWin });
 
   const handleUndo = () => {
     boardRef.current?.undo();
@@ -91,9 +111,25 @@ const AnswerCommunityPuzzle = () => {
     setIsUploadDisabled(true);
     setIsVerifyLoading(true);
 
-    setTimeout(async () => {
+    scheduleVerification(async (requestId) => {
       try {
-        const result = await SearchJNI.findWinWrapper(problemSequence);
+        const response = (await SearchJNI.findWinWrapper(requestId, problemSequence)) as
+          | ValidationResponse
+          | string;
+
+        if (!isActiveVerification(requestId)) {
+          return;
+        }
+
+        if (typeof response !== 'string' && response.status === 'cancelled') {
+          finishVerification(requestId);
+          setIsVerifyDisabled(false);
+          setIsVerifyLoading(false);
+          setIsUploadDisabled(currentSequence.length <= problemSequence.length);
+          return;
+        }
+
+        const result = typeof response === 'string' ? response : response.result;
         console.log('VCF Wrapper Result: ', result);
 
         if (result.length === 0) {
@@ -110,12 +146,17 @@ const AnswerCommunityPuzzle = () => {
           primaryAction: () => {},
         });
       } catch (error) {
-        showBottomToast('error', t('toast.verificationError'));
+        if (isActiveVerification(requestId)) {
+          showBottomToast('error', t('toast.verificationError'));
+        }
       } finally {
-        setIsVerifyDisabled(false);
-        setIsVerifyLoading(false);
+        if (isActiveVerification(requestId)) {
+          finishVerification(requestId);
+          setIsVerifyDisabled(false);
+          setIsVerifyLoading(false);
+        }
       }
-    }, 0);
+    });
   };
 
   const handleVerificationSuccess = (result: string) => {
@@ -186,6 +227,12 @@ const AnswerCommunityPuzzle = () => {
   };
 
   const handleSequenceChangeByUser = (newSequence: string) => {
+    if (isVerifyLoading) {
+      cancelActiveVerification();
+      setIsVerifyDisabled(false);
+      setIsVerifyLoading(false);
+    }
+
     setCurrentSequence(newSequence);
     const slicedAnswer = newSequence.slice(problemSequence.length);
     setAnswerSequence(slicedAnswer);

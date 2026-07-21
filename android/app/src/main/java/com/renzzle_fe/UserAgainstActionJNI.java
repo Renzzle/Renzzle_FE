@@ -2,12 +2,25 @@ package com.renzzle_fe;
 
 import android.util.Log;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
+
+    private static final int ENGINE_CANCELLED_MOVE = -2;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Set<Integer> cancelledRequestIds = Collections.synchronizedSet(new HashSet<>());
 
     static {
         System.loadLibrary("native-lib");
@@ -22,17 +35,55 @@ public class UserAgainstActionJNI extends ReactContextBaseJavaModule {
         return "UserAgainstActionJNI";
     }
 
-    public native int reactUserMove(String boardData);
+    public native int reactUserMove(int requestId, String boardData);
+
+    private native void cancelUserMoveNative(int requestId);
 
     @ReactMethod
-    public void calculateSomethingWrapper(String boardData, Promise promise) {
-        try {
-            Log.d("JNI", "calculateSomethingWrapper: boardData" + boardData);
-            int result = reactUserMove(boardData); // 전달받은 값을 네이티브로 전달
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject("ERROR", "Failed to react user move", e);
-        }
+    public void calculateSomethingWrapper(int requestId, String boardData, Promise promise) {
+        Log.d("JNI", "calculateSomethingWrapper: requestId=" + requestId + ", boardData=" + boardData);
+
+        executor.execute(() -> {
+            try {
+                if (cancelledRequestIds.remove(requestId)) {
+                    promise.resolve(createCancelledResponse());
+                    return;
+                }
+
+                int result = reactUserMove(requestId, boardData);
+                if (result == ENGINE_CANCELLED_MOVE || cancelledRequestIds.remove(requestId)) {
+                    promise.resolve(createCancelledResponse());
+                    return;
+                }
+
+                WritableMap response = Arguments.createMap();
+                response.putString("status", "ok");
+                response.putInt("move", result);
+                promise.resolve(response);
+            } catch (Exception e) {
+                promise.reject("ERROR", "Failed to react user move", e);
+            } finally {
+                cancelledRequestIds.remove(requestId);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void cancelCalculate(int requestId) {
+        cancelledRequestIds.add(requestId);
+        cancelUserMoveNative(requestId);
+    }
+
+    @Override
+    public void invalidate() {
+        executor.shutdownNow();
+        super.invalidate();
+    }
+
+    private WritableMap createCancelledResponse() {
+        WritableMap response = Arguments.createMap();
+        response.putString("status", "cancelled");
+        return response;
     }
 
 }
