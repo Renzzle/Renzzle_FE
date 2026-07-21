@@ -62,16 +62,6 @@ const AnswerCommunityPuzzle = () => {
 
   const boardRef = useRef<BoardRef>(null);
 
-  const cancelFindWin = useCallback((activeRequestId: number) => {
-    SearchJNI.cancelFindWin?.(activeRequestId);
-  }, [SearchJNI]);
-  const {
-    cancelActiveRequest: cancelActiveVerification,
-    finishRequest: finishVerification,
-    isActiveRequest: isActiveVerification,
-    scheduleRequest: scheduleVerification,
-  } = useCancellableNativeRequest({ cancelRequest: cancelFindWin });
-
   const cancelFindWin = useCallback(
     (activeRequestId: number) => {
       SearchJNI.cancelFindWin?.(activeRequestId);

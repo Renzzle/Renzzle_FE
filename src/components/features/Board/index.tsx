@@ -400,7 +400,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   }, []);
 
   const checkWin = useCallback(
-    (sequenceToCheck: string, turn: string): Promise<boolean | null> => {
+    (sequenceToCheck: string): Promise<boolean | null> => {
       checkWinRequestIdRef.current += 1;
       const requestId = checkWinRequestIdRef.current;
 
@@ -418,8 +418,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
               return;
             }
 
-            console.log(turn, ' sequence:', sequenceToCheck);
-            console.log(turn, ' :', check);
             resolve(check === 1);
           } catch (error) {
             if (!isMountedRef.current || checkWinRequestIdRef.current !== requestId) {
@@ -513,7 +511,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
           if (result === -1) {
             logAiBenchmark('terminal');
-            console.log('졌다!');
             finishAiRequest(requestId);
             setIsWin?.(false);
             setIsLoading?.(false);
@@ -523,7 +520,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
           if (result === 1000) {
             logAiBenchmark('terminal');
-            console.log('이겼다!');
             finishAiRequest(requestId);
             setIsWin?.(true);
             setIsLoading?.(false);
@@ -545,7 +541,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
           const { x, y } = coordinates;
           const newSequence = addToSequence(x, y, userSequence);
-          const isAiWin = await checkWin(newSequence, 'ai');
+          const isAiWin = await checkWin(newSequence);
 
           if (isAiWin === null || !isActiveAiRequest(requestId)) {
             return;
@@ -610,7 +606,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setStoneY(null);
 
     if (mode === 'solve') {
-      const isUserWin = await checkWin(newSequence, 'user');
+      const isUserWin = await checkWin(newSequence);
 
       if (isUserWin === null) {
         return;
@@ -696,7 +692,6 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   ]);
 
   const initializeBoard = useCallback(() => {
-    console.log('보드 초기화 - 시퀀스: ' + sequence);
     const newBoard = createEmptyBoard();
     let turn = true;
     const problemSequenceLength = problemSequence ? getSequenceDepth(problemSequence) : 0;
