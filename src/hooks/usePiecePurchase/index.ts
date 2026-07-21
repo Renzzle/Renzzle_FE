@@ -66,6 +66,10 @@ const usePiecePurchase = ({ onPurchaseComplete }: UsePiecePurchaseOptions = {}) 
   }, [ensureStoreReady]);
 
   useEffect(() => {
+    if (!isStoreReady) {
+      return;
+    }
+
     const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
       if (!isPieceProductId(purchase.productId)) {
         return;
@@ -103,7 +107,7 @@ const usePiecePurchase = ({ onPurchaseComplete }: UsePiecePurchaseOptions = {}) 
       purchaseUpdateSubscription.remove();
       purchaseErrorSubscription.remove();
     };
-  }, [onPurchaseComplete, t, updateUser]);
+  }, [isStoreReady, onPurchaseComplete, t, updateUser]);
 
   const purchasePiece = useCallback(
     async (productId: PieceProductId) => {

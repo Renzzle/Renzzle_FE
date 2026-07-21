@@ -419,4 +419,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withIAPContext(App);
+export default __DEV__ ? App : withIAPContext(App);
