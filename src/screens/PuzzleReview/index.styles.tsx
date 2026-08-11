@@ -18,6 +18,8 @@ export const HeaderWrapper = styled(View)`
   flex-direction: row;
   justify-content: space-between;
   align-items: start;
+  /* 뒤에 렌더되는 형제 뷰가 헤더 영역을 덮지 않도록 터치 우선순위 확보 */
+  z-index: 1;
 `;
 
 export const ButtonWrapper = styled(View)`

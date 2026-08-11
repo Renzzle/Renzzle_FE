@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
-import Board from '../../components/features/Board';
+import Board, { BoardRef } from '../../components/features/Board';
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import {
   GameOutcome,
@@ -70,6 +70,7 @@ const TrainingPuzzleSolve = () => {
   const { showAdIfReady } = usePuzzleAd();
 
   const updatedItemsRef = useRef<Map<number, TrainingPuzzle>>(new Map());
+  const boardRef = useRef<BoardRef>(null);
 
   const handleNextPuzzle = () => {
     if (puzzles.length <= currentPuzzleNumber) {
@@ -134,6 +135,7 @@ const TrainingPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    boardRef.current?.cancelAiTurn();
     if (puzzleDetail) {
       setCurrentSequence(puzzleDetail.boardStatus);
     }
@@ -153,6 +155,7 @@ const TrainingPuzzleSolve = () => {
         markSolved(puzzleDetail);
 
         await updateUser();
+        boardRef.current?.cancelAiTurn();
         showBottomToast('success', t('toast.purchaseComplete'));
         handleViewAnswerPress(data.answer);
       } catch (error) {
@@ -269,11 +272,11 @@ const TrainingPuzzleSolve = () => {
       <BoardWrapper>
         <Board
           key={boardKey}
+          ref={boardRef}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
-          setIsLoading={() => {}}
           puzzleCache={{ puzzleType: 'TRAINING', puzzleId: puzzleDetail.id }}
         />
       </BoardWrapper>
