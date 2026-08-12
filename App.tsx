@@ -20,6 +20,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/components/common/Toast/toast.config.tsx';
 import Signup from './src/screens/Signup/index.tsx';
 import Signin from './src/screens/Signin';
+import FindPassword from './src/screens/FindPassword/index.tsx';
 import Home from './src/screens/Home/index.tsx';
 import MyPuzzles from './src/screens/MyPuzzles/index.tsx';
 import LikedPuzzles from './src/screens/LikedPuzzles/index.tsx';
@@ -183,6 +184,11 @@ function App(): React.JSX.Element | null {
                     name="Signup"
                     component={Signup}
                     options={{ title: 'auth.signup' }}
+                  />
+                  <Stack.Screen
+                    name="FindPassword"
+                    component={FindPassword}
+                    options={{ title: 'auth.findPassword' }}
                   />
                 </>
               )}

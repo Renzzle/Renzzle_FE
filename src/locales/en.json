@@ -28,6 +28,11 @@
     "changePassword": {
       "prefix": "To use from now on,",
       "title": "Enter a new password"
+    },
+    "resetPassword": {
+      "prefix": "The one you signed up with,",
+      "title": "Enter your email address",
+      "description": "A verification email will be sent to this address."
     }
   },
   "common": {

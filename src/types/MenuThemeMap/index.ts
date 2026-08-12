@@ -111,6 +111,13 @@ export const menuThemeMap = {
     iconName: 'LogoIcon',
     route: null,
   },
+  findPassword: {
+    titleKey: 'auth.findPassword',
+    background: 'sub_color/indigo/bg',
+    iconColor: 'main_color/blue_p',
+    iconName: 'LogoIcon',
+    route: null,
+  },
   home: {
     titleKey: 'common.appName',
     background: 'sub_color/indigo/bg',
@@ -125,6 +132,7 @@ export type MenuType = keyof typeof menuThemeMap;
 export const headerMenuTypeMap = {
   Home: 'home',
   Signup: 'signup',
+  FindPassword: 'findPassword',
   MyPuzzles: 'myPuzzle',
   LikedPuzzles: 'likes',
   Ranking: 'ranking',

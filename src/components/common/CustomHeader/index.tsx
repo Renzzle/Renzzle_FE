@@ -26,6 +26,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
 
   const grayBGRoutes = [
     'Signup',
+    'FindPassword',
     'TrainingPuzzleSolve',
     'CommunityPuzzleSolve',
     'CreateCommunityPuzzle',
