@@ -97,6 +97,13 @@ export const menuThemeMap = {
     iconName: 'SettingIcon',
     route: 'ChangeNickname',
   },
+  changePassword: {
+    titleKey: 'settings.changePassword',
+    background: 'gray/gray100',
+    iconColor: 'gray/gray400',
+    iconName: 'SettingIcon',
+    route: 'ChangePassword',
+  },
   signup: {
     titleKey: 'auth.signup',
     background: 'sub_color/indigo/bg',
@@ -124,6 +131,7 @@ export const headerMenuTypeMap = {
   Settings: 'settings',
   Language: 'language',
   ChangeNickname: 'changeNickname',
+  ChangePassword: 'changePassword',
   TrainingPacks: 'trainingPuzzle',
   TrainingPuzzles: 'trainingPuzzle',
   TrainingPuzzleSolve: 'trainingPuzzle',
