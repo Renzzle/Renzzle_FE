@@ -87,7 +87,9 @@ const ChangePassword = () => {
           onChangeText={setCurrentPassword}
           isPassword
         />
-        <HelperWrapper />
+        <HelperWrapper>
+          <HelperText type="info">{t('auth.changePassword.description')}</HelperText>
+        </HelperWrapper>
       </InputWithHelperWrapper>
 
       <InputWithHelperWrapper>

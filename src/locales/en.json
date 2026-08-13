@@ -27,7 +27,8 @@
     },
     "changePassword": {
       "prefix": "To use from now on,",
-      "title": "Enter a new password"
+      "title": "Enter a new password",
+      "description": "Enter your current password to verify your identity."
     },
     "resetPassword": {
       "prefix": "The one you signed up with,",
