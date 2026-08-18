@@ -237,7 +237,9 @@
     },
     "author": "'s puzzle",
     "createDescription": "Click on the board to create a puzzle. Pay attention to the order of black and white stones.",
-    "verifyDescription": "Get AI certification using the verify button. You can still publish even if it is not certified."
+    "verifyDescription": "Get AI certification using the verify button. You can still publish even if it is not certified.",
+    "aiThinking": "Thinking of a move",
+    "aiThinkingDeep": "Taking its time"
   },
   "ranking": {
     "title": "Ranking",

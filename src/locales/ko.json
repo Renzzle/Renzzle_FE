@@ -237,7 +237,9 @@
     },
     "author": "님 출제",
     "createDescription": "보드를 클릭하여 문제를 만들어 보세요. 흑돌과 백돌 순서에 주의하세요.",
-    "verifyDescription": "검증 버튼으로 AI 인증을 받으세요. 인증되지 않아도 출제 가능해요."
+    "verifyDescription": "검증 버튼으로 AI 인증을 받으세요. 인증되지 않아도 출제 가능해요.",
+    "aiThinking": "다음 수를 생각하고 있어요",
+    "aiThinkingDeep": "신중하게 두는 중이에요"
   },
   "ranking": {
     "title": "랭킹",
