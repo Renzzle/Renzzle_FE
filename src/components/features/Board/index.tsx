@@ -47,7 +47,7 @@ export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 type PuzzleAiBenchmarkMode = 'LOCAL_ONLY' | 'CACHE';
 type PuzzleAiAnswerSource = 'local-only' | 'cache-hit' | 'cache-miss' | 'cache-fallback';
 
-const PUZZLE_AI_BENCHMARK_MODE = 'LOCAL_ONLY' as PuzzleAiBenchmarkMode;
+const PUZZLE_AI_BENCHMARK_MODE = 'CACHE' as PuzzleAiBenchmarkMode;
 const IS_AI_BENCHMARK_ENABLED = __DEV__;
 
 const getPuzzleAiMode = (): PuzzleAiBenchmarkMode => {
