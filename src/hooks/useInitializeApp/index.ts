@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import SplashScreen from 'react-native-splash-screen';
+import BootSplash from 'react-native-bootsplash';
 import useAuthStore from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
@@ -46,7 +46,7 @@ const useInitializeApp = (): boolean => {
         showBottomToast('error', i18n.t('toast.appStartError'));
         await clearTokens();
       } finally {
-        SplashScreen.hide();
+        await BootSplash.hide({ fade: true });
         setIsLoading(false);
         console.log('App initialization complete');
       }

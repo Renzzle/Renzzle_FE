@@ -1,5 +1,5 @@
 #import "AppDelegate.h"
-#import "RNSplashScreen.h"
+#import "RNBootSplash.h"
 
 #import <React/RCTBundleURLProvider.h>
 
@@ -12,10 +12,12 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
-  [super application:application didFinishLaunchingWithOptions:launchOptions];
-  [RNSplashScreen show];  // 추가
+  return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
 
-  return YES; // 수정
+- (void)customizeRootView:(RCTRootView *)rootView {
+  [super customizeRootView:rootView];
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
