@@ -54,6 +54,44 @@ export const registerUser = async (
   }
 };
 
+export const sendPasswordResetCode = async (email: string) => {
+  try {
+    const response = await apiClient.post('/api/auth/password/reset/email', { email });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const resetPassword = async (
+  email: string,
+  authVerityToken: string,
+  newPassword: string,
+) => {
+  try {
+    const response = await apiClient.patch('/api/auth/password/reset', {
+      email,
+      authVerityToken,
+      newPassword,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const changePassword = async (currentPassword: string, newPassword: string) => {
+  try {
+    const response = await apiClient.patch('/api/auth/password', { currentPassword, newPassword });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAuth = async (email: string, password: string) => {
   try {
     const response = await apiClient.post('/api/auth/login', { email, password });

@@ -68,6 +68,7 @@ const Settings = () => {
   const menuItems = [
     { label: t('settings.language'), onPress: () => navigation.navigate('Language') },
     { label: t('settings.changeNickname'), onPress: () => navigation.navigate('ChangeNickname') },
+    { label: t('settings.changePassword'), onPress: () => navigation.navigate('ChangePassword') },
     { label: t('settings.removeAds'), onPress: () => handleRemoveAds },
     {
       label: t('settings.privacyPolicy'),

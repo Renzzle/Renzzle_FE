@@ -26,11 +26,13 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
 
   const grayBGRoutes = [
     'Signup',
+    'FindPassword',
     'TrainingPuzzleSolve',
     'CommunityPuzzleSolve',
     'CreateCommunityPuzzle',
     'RankedPuzzleSolve',
     'ChangeNickname',
+    'ChangePassword',
   ];
   const backgroundColor = grayBGRoutes.includes(route.name)
     ? theme.color['gray/grayBG']

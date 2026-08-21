@@ -24,6 +24,16 @@
       "prefix": "To represent you,",
       "title": "Enter a nickname",
       "description": "Use 2 to 8 letters or numbers. (Excluding special characters)"
+    },
+    "changePassword": {
+      "prefix": "To use from now on,",
+      "title": "Enter a new password",
+      "description": "Enter your current password to verify your identity."
+    },
+    "resetPassword": {
+      "prefix": "The one you signed up with,",
+      "title": "Enter your email address",
+      "description": "A verification email will be sent to this address."
     }
   },
   "common": {
@@ -38,6 +48,7 @@
   "settings": {
     "language": "Language",
     "changeNickname": "Change Nickname",
+    "changePassword": "Change Password",
     "removeAds": "Remove Ads",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
@@ -61,6 +72,9 @@
     "code": "Verification Code",
     "password": "Password",
     "confirmPassword": "Confirm Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
     "nickname": "Nickname",
     "description": "Enter description",
     "communitySearch": "Enter author or puzzle No."
@@ -223,7 +237,9 @@
     },
     "author": "'s puzzle",
     "createDescription": "Click on the board to create a puzzle. Pay attention to the order of black and white stones.",
-    "verifyDescription": "Get AI certification using the verify button. You can still publish even if it is not certified."
+    "verifyDescription": "Get AI certification using the verify button. You can still publish even if it is not certified.",
+    "aiThinking": "Thinking of a move",
+    "aiThinkingDeep": "Taking its time"
   },
   "ranking": {
     "title": "Ranking",
@@ -263,6 +279,9 @@
     "nicknameAlreadyInUse": "This nickname is already in use.",
     "nicknameChanged": "Nickname changed.",
     "nicknameChangeFailed": "Failed to change nickname.",
+
+    "passwordChanged": "Password changed.",
+    "passwordChangeFailed": "Failed to change password.",
 
     "enterEmail": "Enter your email.",
     "enterPassword": "Enter your password.",

@@ -14,7 +14,6 @@ import {
   FrameRow,
   IndicatePoint,
   LastMoveHighlight,
-  LoadingWrapper,
   Stone,
   StoneRow,
 } from './index.styles';
@@ -30,9 +29,8 @@ import {
   positionToValue,
   valueToCoordinates,
 } from '../../../utils/utils';
-import { ActivityIndicator, NativeModules, ViewStyle } from 'react-native';
+import { Animated, Easing, NativeModules, ViewStyle } from 'react-native';
 import { CustomText, Icon } from '../../common';
-import theme from '../../../styles/theme';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 import { useTranslation } from 'react-i18next';
 import {
@@ -41,6 +39,8 @@ import {
   savePuzzleCache,
 } from '../../../apis/puzzleCache';
 import useCancellableNativeRequest from '../../../hooks/useCancellableNativeRequest';
+import useDelayedVisibility from '../../../hooks/useDelayedVisibility';
+import AiThinkingIndicator from './AiThinkingIndicator';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
 
@@ -147,6 +147,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [localSequence, setLocalSequence] = useState(sequence);
+
+  const isAiThinkingVisible = useDelayedVisibility(mode === 'solve' && isDisabled);
 
   const [history, setHistory] = useState<string[]>([sequence]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -757,18 +759,48 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
               stoneY={stoneY}
               sequence={cell.moveNumber}
               onPress={() => handleCellPress(x, y)}
+              pulseLastMove={isAiThinkingVisible}
             />
           ))}
         </StoneRow>
       ))}
-      {isDisabled && (
-        <LoadingWrapper>
-          <ActivityIndicator color={theme.color['main_color/yellow_p']} />
-        </LoadingWrapper>
-      )}
+      {mode === 'solve' && <AiThinkingIndicator visible={isAiThinkingVisible} />}
     </BoardBackground>
   );
 });
+
+// highlight the last move with a pulsing animation
+const PulsingLastMoveHighlight = ({ width }: { width: number }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scale, {
+          toValue: 1.5,
+          duration: 500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scale, {
+          toValue: 1,
+          duration: 500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    pulse.start();
+
+    return () => pulse.stop();
+  }, [scale]);
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <LastMoveHighlight width={width} />
+    </Animated.View>
+  );
+};
 
 interface CellProps {
   pos: string;
@@ -779,6 +811,7 @@ interface CellProps {
   sequence: number | null;
   onPress: () => void;
   showHighlights?: boolean;
+  pulseLastMove?: boolean;
   style?: ViewStyle;
 }
 
@@ -791,6 +824,7 @@ export const Cell = ({
   sequence,
   onPress,
   showHighlights = true,
+  pulseLastMove = false,
   style,
 }: CellProps) => {
   return (
@@ -803,7 +837,12 @@ export const Cell = ({
                 {sequence}
               </CustomText>
             ) : (
-              sequence === -1 && <LastMoveHighlight width={cellWidth / 3.3} />
+              sequence === -1 &&
+              (pulseLastMove ? (
+                <PulsingLastMoveHighlight width={cellWidth / 3.3} />
+              ) : (
+                <LastMoveHighlight width={cellWidth / 3.3} />
+              ))
             ))}
         </Stone>
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (

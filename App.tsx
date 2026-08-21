@@ -20,6 +20,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/components/common/Toast/toast.config.tsx';
 import Signup from './src/screens/Signup/index.tsx';
 import Signin from './src/screens/Signin';
+import FindPassword from './src/screens/FindPassword/index.tsx';
 import Home from './src/screens/Home/index.tsx';
 import MyPuzzles from './src/screens/MyPuzzles/index.tsx';
 import LikedPuzzles from './src/screens/LikedPuzzles/index.tsx';
@@ -39,6 +40,7 @@ import useNetworkStore from './src/store/useNetworkStore.ts';
 import { CustomModal } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
 import ChangeNickname from './src/screens/Settings/ChangeNickname/index.tsx';
+import ChangePassword from './src/screens/Settings/ChangePassword/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -110,6 +112,11 @@ function App(): React.JSX.Element | null {
                     options={{ title: 'settings.changeNickname' }}
                   />
                   <Stack.Screen
+                    name="ChangePassword"
+                    component={ChangePassword}
+                    options={{ title: 'settings.changePassword' }}
+                  />
+                  <Stack.Screen
                     name="TrainingPacks"
                     component={TrainingPacks}
                     options={{ title: 'home.trainingPuzzle' }}
@@ -177,6 +184,11 @@ function App(): React.JSX.Element | null {
                     name="Signup"
                     component={Signup}
                     options={{ title: 'auth.signup' }}
+                  />
+                  <Stack.Screen
+                    name="FindPassword"
+                    component={FindPassword}
+                    options={{ title: 'auth.findPassword' }}
                   />
                 </>
               )}

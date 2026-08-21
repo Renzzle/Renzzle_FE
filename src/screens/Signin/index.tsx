@@ -89,12 +89,14 @@ const Signin = () => {
               {t('auth.signup')}
             </CustomText>
           </NavigationButton>
-          {/* TODO: 비밀번호 찾기 기능 */}
-          {/* <NavigationButton>
+          <NavigationButton
+            onPress={() => {
+              navigation.navigate('FindPassword');
+            }}>
             <CustomText size={12} lineHeight="sm" color="gray/gray500">
               {t('auth.findPassword')}
             </CustomText>
-          </NavigationButton> */}
+          </NavigationButton>
         </NavigationWrapper>
       </SigninWrapper>
 
