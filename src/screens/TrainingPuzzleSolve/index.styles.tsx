@@ -15,6 +15,8 @@ export const HeaderWrapper = styled(View)`
   position: absolute;
   top: 0;
   left: 0;
+  /* BoardWrapper(flex: 1)가 화면 전체를 덮으므로, 헤더가 터치를 받으려면 z-index가 필요함 */
+  z-index: 1;
 `;
 
 export const BoardWrapper = styled(View)`

@@ -11,7 +11,7 @@ import {
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 import { CustomModal, CustomText } from '../../components/common';
 import PuzzleStats from '../../components/features/PuzzleStats';
-import Board from '../../components/features/Board';
+import Board, { BoardRef } from '../../components/features/Board';
 import LikeDislikeToggle from '../../components/features/LikeDislikeToggle';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import {
@@ -59,6 +59,7 @@ const CommunityPuzzleSolve = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
+  const boardRef = useRef<BoardRef>(null);
 
   const isPuzzleResultModal =
     modalCategory === 'COMMUNITY_PUZZLE_SUCCESS' || modalCategory === 'COMMUNITY_PUZZLE_FAILURE';
@@ -158,6 +159,7 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    boardRef.current?.cancelAiTurn();
     if (puzzleDetail) {
       setCurrentSequence(puzzleDetail.boardStatus);
     }
@@ -196,7 +198,7 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleShowAnswer = () => {
-    if (isLoading || !puzzleDetail?.id) {
+    if (!puzzleDetail?.id) {
       return;
     }
 
@@ -208,6 +210,7 @@ const CommunityPuzzleSolve = () => {
         markSolved();
 
         await updateUser();
+        boardRef.current?.cancelAiTurn();
         showBottomToast('success', t('toast.purchaseComplete'));
         handleViewAnswerPress(data.answer);
       } catch (error) {
@@ -336,11 +339,11 @@ const CommunityPuzzleSolve = () => {
         </BoardStatsWrapper>
         <Board
           key={boardKey}
+          ref={boardRef}
           mode="solve"
           sequence={puzzleDetail.boardStatus}
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
-          setIsLoading={setIsLoading}
           puzzleCache={{ puzzleType: 'COMMUNITY', puzzleId: puzzleDetail.id }}
         />
         <BoardReactionWrapper>
