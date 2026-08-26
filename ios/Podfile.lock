@@ -2133,7 +2133,7 @@ PODS:
     - React-Core
   - RNDeviceInfo (13.2.0):
     - React-Core
-  - RNGestureHandler (3.1.0):
+  - RNGestureHandler (2.28.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2748,7 +2748,7 @@ SPEC CHECKSUMS:
   ReactCommon: 7aca047f2f453a7d7f0adeccb63810d61829235a
   RNBootSplash: 2404c592271f188766c010c77a7d629e2ed7c9b2
   RNDeviceInfo: 29e01d5ae94bdb5a0f6c11a4c438132545b4df80
-  RNGestureHandler: 3f30a2110f7d78d2fa05db6305894c348153cd78
+  RNGestureHandler: 971c0e79a6a10390f90cd21901f8f890312ab28c
   RNGoogleMobileAds: d7b2e90876e2ac1b71e67990b3c34043d56861f7
   RNLocalize: 4372ecce8b0d483980847e04f6567ad342ca97d6
   RNReanimated: 3618ec386caf7222b78b33b00e1072e7f03d60e1

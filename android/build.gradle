@@ -23,3 +23,16 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+subprojects { subproject ->
+    if (subproject.name == "react-native-safe-area-context") {
+        subproject.afterEvaluate {
+            def isSafeAreaNewArchEnabled =
+                    subproject.hasProperty("newArchEnabled") && subproject.newArchEnabled == "true"
+
+            if (!isSafeAreaNewArchEnabled && subproject.plugins.hasPlugin("com.android.library")) {
+                subproject.android.sourceSets.main.java.srcDirs += "src/paper/java"
+            }
+        }
+    }
+}
