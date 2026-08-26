@@ -76,7 +76,7 @@ const TimerWithProgressBar = ({
     }
 
     if (bonusTimeTrigger !== undefined) {
-      setRemainingTime((prev) => prev + BONUS_TIME);
+      setRemainingTime((prev) => Math.min(prev + BONUS_TIME, TOTAL_DURATION));
     }
   }, [bonusTimeTrigger]);
 
