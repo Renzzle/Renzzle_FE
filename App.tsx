@@ -33,6 +33,7 @@ import CommunityPuzzles from './src/screens/CommunityPuzzles/index.tsx';
 import CommunityPuzzleSolve from './src/screens/CommunityPuzzleSolve/index.tsx';
 import CreateCommunityPuzzle from './src/screens/CreateCommunityPuzzle/index.tsx';
 import RankedPuzzleSolve from './src/screens/RankedPuzzleSolve/index.tsx';
+import RankedGameResult from './src/screens/RankedGameResult/index.tsx';
 import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
 import theme from './src/styles/theme.ts';
@@ -174,6 +175,11 @@ function App(): React.JSX.Element | null {
                   <Stack.Screen
                     name="RankedPuzzleSolve"
                     component={RankedPuzzleSolve}
+                    options={{ title: 'home.rankingPuzzle' }}
+                  />
+                  <Stack.Screen
+                    name="RankedGameResult"
+                    component={RankedGameResult}
                     options={{ title: 'home.rankingPuzzle' }}
                   />
                 </>

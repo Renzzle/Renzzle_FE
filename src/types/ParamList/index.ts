@@ -45,5 +45,10 @@ export type RootStackParamList = {
     problemSequence: string;
     description: string;
   };
+  RankedGameResult: {
+    rating?: number;
+    reward?: number;
+    ratingDelta?: number;
+  };
   OtherScreen: undefined;
 };

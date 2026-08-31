@@ -259,6 +259,18 @@
     "rank": "Rank {{rank}}",
     "topPercent": "Top {{percent}}%"
   },
+  "rankedResult": {
+    "myRating": "My Rating",
+    "totalCount": "Puzzles",
+    "successCount": "Success",
+    "failureCount": "Failed",
+    "reward": "Reward",
+    "rewardPieces": "+{{count}} Pieces",
+    "reviewTitle": "Review Puzzles",
+    "reviewCaption": "Tap a puzzle to review it",
+    "home": "Home",
+    "retry": "Play Again"
+  },
   "alert": {
     "noData": "No data available."
   },

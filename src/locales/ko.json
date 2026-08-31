@@ -259,6 +259,18 @@
     "rank": "{{rank}}위",
     "topPercent": "상위{{percent}}%"
   },
+  "rankedResult": {
+    "myRating": "내 레이팅",
+    "totalCount": "푼 문제",
+    "successCount": "성공",
+    "failureCount": "실패",
+    "reward": "획득 재화",
+    "rewardPieces": "+{{count}} 조각",
+    "reviewTitle": "문제 다시보기",
+    "reviewCaption": "문제를 누르면 복습할 수 있어요",
+    "home": "홈으로",
+    "retry": "다시 도전하기"
+  },
   "alert": {
     "noData": "데이터가 없습니다."
   },

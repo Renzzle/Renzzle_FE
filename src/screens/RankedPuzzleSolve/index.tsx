@@ -44,7 +44,6 @@ const RankedPuzzleSolve = () => {
   const { updateUser } = useUserStore();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
-  const [outcome, setOutcome] = useState<GameOutcome>();
   const [puzzleData, setPuzzleData] = useState<PuzzleData>();
   const [bonusTrigger, setBonusTrigger] = useState(0);
   const [shouldFinish, setShouldFinish] = useState(false);
@@ -101,28 +100,18 @@ const RankedPuzzleSolve = () => {
     isFinishingRef.current = true;
 
     try {
-      const data = await finishRankingGame();
-      setOutcome(data);
+      const data: GameOutcome = await finishRankingGame();
       setIsGameFinished(true);
       await updateUser();
-      activateModal('RANKING_PUZZLE_OUTRO', {
-        primaryAction: () => {
-          navigation.navigate('Home');
-        },
-        secondaryAction: () => {
-          // TODO: 복습 화면으로 이동
-          activateModal('FEATURE_IN_PROGRESS', {
-            primaryAction: () => {
-              navigation.goBack();
-            },
-          });
-        },
+      navigation.replace('RankedGameResult', {
+        rating: data.rating,
+        reward: data.reward,
+        ratingDelta: data.ratingDelta,
       });
     } catch (error) {
       isFinishingRef.current = false;
       showBottomToast('error', error as string);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation, updateUser]);
 
   // 종료 확인 모달이 닫힌 뒤에 게임을 정산해야 결과 모달이 바로 닫히지 않는다
@@ -224,7 +213,6 @@ const RankedPuzzleSolve = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
-        gameOutcome={outcome}
       />
     </Container>
   );

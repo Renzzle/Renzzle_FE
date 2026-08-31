@@ -49,3 +49,13 @@ export const finishRankingGame = async () => {
     throw error;
   }
 };
+
+export const getRankGameArchive = async () => {
+  try {
+    const response = await apiClient.get('/api/rank/game/archive');
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};

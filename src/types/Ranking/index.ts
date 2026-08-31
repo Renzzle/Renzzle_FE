@@ -58,4 +58,13 @@ export interface GameOutcome {
   reward?: number;
   price?: number;
   puzzleCount?: number;
+  /** 레이팅 변동치 (백엔드 추가 예정, 없으면 결과 화면에서 칩 미표시) */
+  ratingDelta?: number;
+}
+
+export interface RankArchive {
+  boardStatus: string;
+  winColor: 'BLACK' | 'WHITE';
+  answer: string;
+  isSolved: boolean;
 }
