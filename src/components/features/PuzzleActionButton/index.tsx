@@ -4,7 +4,7 @@ import { CustomText, Icon } from '../../common';
 import { IconName } from '../../../assets/icons';
 import { useTranslation } from 'react-i18next';
 
-type PuzzleActionMode = 'showAnswer' | 'retry' | 'giveUp';
+type PuzzleActionMode = 'showAnswer' | 'retry' | 'giveUp' | 'skip' | 'endGame';
 
 interface PuzzleActionButtonProps {
   mode: PuzzleActionMode;
@@ -19,12 +19,16 @@ const PuzzleActionButton = ({ mode, disabled = false, onPress }: PuzzleActionBut
     showAnswer: t('puzzle.viewAnswer'),
     retry: t('puzzle.retry'),
     giveUp: t('puzzle.resign'),
+    skip: t('puzzle.skip'),
+    endGame: t('puzzle.endGame'),
   };
 
   const modeIcon: Record<PuzzleActionMode, IconName> = {
     showAnswer: 'LightbulbAlertIcon',
     retry: 'RefreshIcon',
     giveUp: 'FlagIcon',
+    skip: 'ChevronDoubleRightIcon',
+    endGame: 'FlagIcon',
   };
 
   const color = disabled ? 'gray/gray200' : 'gray/gray500';

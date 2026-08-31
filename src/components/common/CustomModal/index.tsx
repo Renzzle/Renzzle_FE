@@ -28,6 +28,7 @@ export type ModalCategoryType =
   | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_PUZZLE_OUTRO'
+  | 'RANKING_GAME_END_CONFIRM'
   | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
@@ -111,6 +112,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.rankingPuzzleOutro.title',
     BODY: 'modal.rankingPuzzleOutro.message',
     FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
+  },
+  RANKING_GAME_END_CONFIRM: {
+    TITLE: 'modal.rankingGameEndConfirm.title',
+    BODY: 'modal.rankingGameEndConfirm.message',
+    FOOTER: ['modal.rankingGameEndConfirm.cancel', 'modal.rankingGameEndConfirm.confirm'],
   },
   COMMUNITY_FILTER: {
     TITLE: 'modal.communityFilter.title',

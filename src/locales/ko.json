@@ -163,6 +163,12 @@
       "confirm": "확인",
       "cancel": "복습하기"
     },
+    "rankingGameEndConfirm": {
+      "title": "게임 종료",
+      "message": "게임을 종료할까요?\n남은 시간은 사라지고 바로 결과가 정산돼요.",
+      "confirm": "종료하기",
+      "cancel": "계속하기"
+    },
     "communityFilter": {
       "title": "필터",
       "confirm": "적용",
@@ -227,6 +233,8 @@
     "viewAnswer": "정답보기",
     "retry": "새로하기",
     "resign": "포기하기",
+    "skip": "건너뛰기",
+    "endGame": "게임 종료",
     "review": "검토하기",
     "solvedCount": "풀이",
     "views": "조회",

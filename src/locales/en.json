@@ -163,6 +163,12 @@
       "confirm": "Confirm",
       "cancel": "Review"
     },
+    "rankingGameEndConfirm": {
+      "title": "Finish Game",
+      "message": "Finish the game now?\nYour remaining time will be lost and the results will be finalized.",
+      "confirm": "Finish",
+      "cancel": "Keep Playing"
+    },
     "communityFilter": {
       "title": "Filter",
       "confirm": "Apply",
@@ -227,6 +233,8 @@
     "viewAnswer": "answer",
     "retry": "retry",
     "resign": "resign",
+    "skip": "skip",
+    "endGame": "finish",
     "review": "Review",
     "solvedCount": "solved",
     "views": "views",
