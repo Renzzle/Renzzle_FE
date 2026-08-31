@@ -20,6 +20,16 @@ export const getCommunityRanking = async () => {
   }
 };
 
+export const getMyRating = async () => {
+  try {
+    const response = await apiClient.get('/api/rank/rating/my');
+
+    return response.data.response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const startRankingGame = async () => {
   try {
     const response = await apiClient.post('api/rank/game/start');

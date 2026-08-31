@@ -12,7 +12,12 @@ import {
   StatusHeaderWrapper,
 } from './index.styles';
 import Board from '../../components/features/Board';
-import { finishRankingGame, startRankingGame, submitRankingGameResult } from '../../apis/rank';
+import {
+  finishRankingGame,
+  getMyRating,
+  startRankingGame,
+  submitRankingGameResult,
+} from '../../apis/rank';
 import { CustomModal, CustomText } from '../../components/common';
 import useModal from '../../hooks/useModal';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -49,12 +54,24 @@ const RankedPuzzleSolve = () => {
   const [shouldFinish, setShouldFinish] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
   const isFinishingRef = useRef(false);
+  // 게임 시작 직전 레이팅. 종료 시 변동치(delta)를 프론트에서 계산하기 위해 보관
+  const startRatingRef = useRef<number | null>(null);
 
   const successCount = results.filter((result) => result.variant === 'success').length;
   const failureCount = results.length - successCount;
   const currentPuzzleNumber = results.length + 1;
 
   useEffect(() => {
+    const fetchStartRating = async () => {
+      try {
+        const data = await getMyRating();
+        startRatingRef.current = data?.rating ?? null;
+      } catch (error) {
+        // 시작 레이팅을 못 받아도 게임 진행에는 지장 없음 (결과 화면에서 변동치만 미표시)
+        startRatingRef.current = null;
+      }
+    };
+
     const initializeGame = async () => {
       try {
         setIsLoading(true);
@@ -67,6 +84,7 @@ const RankedPuzzleSolve = () => {
       }
     };
 
+    fetchStartRating();
     initializeGame();
   }, []);
 
@@ -103,10 +121,16 @@ const RankedPuzzleSolve = () => {
       const data: GameOutcome = await finishRankingGame();
       setIsGameFinished(true);
       await updateUser();
+
+      const ratingDelta =
+        startRatingRef.current !== null && data.rating !== undefined
+          ? data.rating - startRatingRef.current
+          : undefined;
+
       navigation.replace('RankedGameResult', {
         rating: data.rating,
         reward: data.reward,
-        ratingDelta: data.ratingDelta,
+        ratingDelta,
       });
     } catch (error) {
       isFinishingRef.current = false;
