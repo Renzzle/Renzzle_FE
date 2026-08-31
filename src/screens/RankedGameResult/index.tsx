@@ -3,11 +3,13 @@ import { ActivityIndicator, FlatList, View } from 'react-native';
 import {
   Container,
   DeltaChip,
+  DeltaChipPositioner,
   HeroCard,
   LoadingWrapper,
   ProblemNumberWrapper,
   ProblemRow,
   RatingRow,
+  RatingSideSlot,
   ResultIconCircle,
   RewardLabelWrapper,
   RewardRow,
@@ -103,20 +105,25 @@ const RankedGameResult = () => {
           {t('rankedResult.myRating')}
         </CustomText>
         <RatingRow>
+          <RatingSideSlot align="left" />
           <CustomText size={52} weight="bold" lineHeight="sm" color="gray/black">
             {rating !== undefined ? Math.round(rating).toLocaleString() : '-'}
           </CustomText>
-          {roundedDelta !== undefined && roundedDelta !== 0 && (
-            <DeltaChip isPositive={roundedDelta > 0}>
-              <CustomText
-                size={14}
-                weight="bold"
-                lineHeight="sm"
-                color={roundedDelta > 0 ? 'main_color/blue_p' : 'sub_color/red/p'}>
-                {roundedDelta > 0 ? `+${roundedDelta}` : `${roundedDelta}`}
-              </CustomText>
-            </DeltaChip>
-          )}
+          <RatingSideSlot align="right">
+            {roundedDelta !== undefined && (
+              <DeltaChipPositioner>
+                <DeltaChip isPositive={roundedDelta >= 0}>
+                  <CustomText
+                    size={14}
+                    weight="bold"
+                    lineHeight="sm"
+                    color={roundedDelta >= 0 ? 'main_color/blue_p' : 'main_color/yellow_p'}>
+                    {roundedDelta >= 0 ? `+${roundedDelta}` : `${roundedDelta}`}
+                  </CustomText>
+                </DeltaChip>
+              </DeltaChipPositioner>
+            )}
+          </RatingSideSlot>
         </RatingRow>
       </HeroCard>
 

@@ -11,7 +11,7 @@ import {
   ProgressBarContainer,
   StatusHeaderWrapper,
 } from './index.styles';
-import Board from '../../components/features/Board';
+import Board, { BoardRef } from '../../components/features/Board';
 import {
   finishRankingGame,
   getMyRating,
@@ -53,8 +53,9 @@ const RankedPuzzleSolve = () => {
   const [bonusTrigger, setBonusTrigger] = useState(0);
   const [shouldFinish, setShouldFinish] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
   const isFinishingRef = useRef(false);
-  // 게임 시작 직전 레이팅. 종료 시 변동치(delta)를 프론트에서 계산하기 위해 보관
+  const boardRef = useRef<BoardRef>(null);
   const startRatingRef = useRef<number | null>(null);
 
   const successCount = results.filter((result) => result.variant === 'success').length;
@@ -117,6 +118,11 @@ const RankedPuzzleSolve = () => {
     }
     isFinishingRef.current = true;
 
+    // 진행 중인 AI 턴은 더 이상 의미 없으므로 취소하고, 정산 동안 조작을 잠근다
+    boardRef.current?.cancelAiTurn();
+    setIsFinishing(true);
+    setIsLoading(true);
+
     try {
       const data: GameOutcome = await finishRankingGame();
       setIsGameFinished(true);
@@ -127,6 +133,16 @@ const RankedPuzzleSolve = () => {
           ? data.rating - startRatingRef.current
           : undefined;
 
+      // TODO: 델타 미표시 디버깅용 임시 로그
+      console.log(
+        '[RankDelta] start:',
+        startRatingRef.current,
+        'end:',
+        data.rating,
+        'delta:',
+        ratingDelta,
+      );
+
       navigation.replace('RankedGameResult', {
         rating: data.rating,
         reward: data.reward,
@@ -134,6 +150,8 @@ const RankedPuzzleSolve = () => {
       });
     } catch (error) {
       isFinishingRef.current = false;
+      setIsFinishing(false);
+      setIsLoading(false);
       showBottomToast('error', error as string);
     }
   }, [navigation, updateUser]);
@@ -218,11 +236,13 @@ const RankedPuzzleSolve = () => {
       <BoardWrapper>
         {!!puzzleData && (
           <Board
+            ref={boardRef}
             mode="solve"
             sequence={puzzleData.boardStatus}
             setSequence={() => {}}
             setIsWin={handleResult}
             setIsLoading={setIsLoading}
+            hideAiIndicator={isFinishing}
           />
         )}
       </BoardWrapper>

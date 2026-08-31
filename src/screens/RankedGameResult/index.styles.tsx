@@ -23,17 +23,29 @@ export const HeroCard = styled(View)`
   elevation: 2;
 `;
 
+/* 좌우 대칭 슬롯(flex: 1) 사이에 숫자를 두어, 칩 유무와 무관하게 숫자가 정중앙에 오도록 함 */
 export const RatingRow = styled(View)`
+  align-self: stretch;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+`;
+
+export const RatingSideSlot = styled(View)<{ align: 'left' | 'right' }>`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: ${({ align }) => (align === 'left' ? 'flex-end' : 'flex-start')};
+`;
+
+export const DeltaChipPositioner = styled(View)`
+  margin-left: 10px;
 `;
 
 export const DeltaChip = styled(View)<{ isPositive: boolean }>`
   flex-direction: row;
   align-items: center;
   background-color: ${({ isPositive }) =>
-    isPositive ? theme.color['sub_color/indigo/bg'] : theme.color['sub_color/red/bg']};
+    isPositive ? theme.color['sub_color/indigo/bg'] : theme.color['sub_color/yellow/bg']};
   border-radius: 12px;
   padding: 5px 10px;
 `;
