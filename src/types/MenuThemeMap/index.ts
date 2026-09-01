@@ -48,6 +48,13 @@ export const menuThemeMap = {
     iconName: 'CommunityIcon',
     route: 'CommunityPuzzleReview',
   },
+  rankingPuzzleReview: {
+    titleKey: 'puzzle.review',
+    background: 'sub_color/yellow/bg',
+    iconColor: 'main_color/yellow_p',
+    iconName: 'LightningIcon',
+    route: 'RankedPuzzleReview',
+  },
   ranking: {
     titleKey: 'common.ranking',
     background: 'sub_color/green/bg',
@@ -152,6 +159,8 @@ export const headerMenuTypeMap = {
   CreateCommunityPuzzle: 'communityPuzzle',
   AnswerCommunityPuzzle: 'communityPuzzle',
   RankedPuzzleSolve: 'rankingPuzzle',
+  RankedGameResult: 'rankingPuzzle',
+  RankedPuzzleReview: 'rankingPuzzleReview',
 } as const satisfies Record<string, MenuType>;
 
 export const getMenuTypeByRouteName = (routeName: string): MenuType | undefined =>
