@@ -9,6 +9,10 @@ export const Container = styled(View)`
   position: relative;
 `;
 
+export const FixedTopWrapper = styled(View)`
+  padding: 0 20px;
+`;
+
 export const HeroCard = styled(View)`
   align-items: center;
   gap: 8px;

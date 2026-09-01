@@ -133,16 +133,6 @@ const RankedPuzzleSolve = () => {
           ? data.rating - startRatingRef.current
           : undefined;
 
-      // TODO: 델타 미표시 디버깅용 임시 로그
-      console.log(
-        '[RankDelta] start:',
-        startRatingRef.current,
-        'end:',
-        data.rating,
-        'delta:',
-        ratingDelta,
-      );
-
       navigation.replace('RankedGameResult', {
         rating: data.rating,
         reward: data.reward,

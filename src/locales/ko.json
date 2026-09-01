@@ -157,12 +157,6 @@
       "confirm": "시작하기",
       "cancel": "취소"
     },
-    "rankingPuzzleOutro": {
-      "title": "랭킹 퍼즐 종료",
-      "message": "레이팅: {{rating}}점\n획득 재화: {{reward}}조각",
-      "confirm": "확인",
-      "cancel": "복습하기"
-    },
     "rankingGameEndConfirm": {
       "title": "게임 종료",
       "message": "게임을 종료할까요?\n남은 시간은 사라지고 바로 결과가 정산돼요.",
@@ -267,9 +261,14 @@
     "reward": "획득 재화",
     "rewardPieces": "+{{count}} 조각",
     "reviewTitle": "문제 다시보기",
-    "reviewCaption": "문제를 누르면 복습할 수 있어요",
     "home": "홈으로",
     "retry": "다시 도전하기"
+  },
+  "rankedReview": {
+    "solved": "성공",
+    "failed": "실패",
+    "prev": "이전 문제",
+    "next": "다음 문제"
   },
   "alert": {
     "noData": "데이터가 없습니다."

@@ -1,4 +1,5 @@
 import { CommunityPuzzle, TrainingPack, TrainingPuzzle } from '../Puzzle';
+import { RankArchive } from '../Ranking';
 
 export type PuzzleReviewBackBehavior = 'popTwo';
 export type TrainingPuzzleReviewAction = 'next' | 'retry' | 'complete';
@@ -49,6 +50,10 @@ export type RootStackParamList = {
     rating?: number;
     reward?: number;
     ratingDelta?: number;
+  };
+  RankedPuzzleReview: {
+    archive: RankArchive[];
+    initialIndex: number;
   };
   OtherScreen: undefined;
 };

@@ -4,6 +4,7 @@ import {
   Container,
   DeltaChip,
   DeltaChipPositioner,
+  FixedTopWrapper,
   HeroCard,
   LoadingWrapper,
   ProblemNumberWrapper,
@@ -62,11 +63,11 @@ const RankedGameResult = () => {
     fetchArchive();
   }, []);
 
-  const handleProblemPress = () => {
-    // TODO: 복습 화면으로 이동
-    activateModal('FEATURE_IN_PROGRESS', {
-      primaryAction: () => {},
-    });
+  const handleProblemPress = (index: number) => {
+    if (!archive || archive.length === 0) {
+      return;
+    }
+    navigation.navigate('RankedPuzzleReview', { archive, initialIndex: index });
   };
 
   const handleRetry = () => {
@@ -83,7 +84,7 @@ const RankedGameResult = () => {
     const resultTheme = RankingResultTheme[variant];
 
     return (
-      <ProblemRow onPress={handleProblemPress}>
+      <ProblemRow onPress={() => handleProblemPress(index)}>
         <ResultIconCircle variant={variant}>
           <Icon name={resultTheme.iconName} size={18} color={resultTheme.primary} />
         </ResultIconCircle>
@@ -98,8 +99,8 @@ const RankedGameResult = () => {
     );
   };
 
-  const listHeader = (
-    <View>
+  const fixedTopContent = (
+    <FixedTopWrapper>
       <HeroCard>
         <CustomText size={12} lineHeight="sm" color="gray/gray500">
           {t('rankedResult.myRating')}
@@ -170,20 +171,19 @@ const RankedGameResult = () => {
         <CustomText size={14} weight="bold" lineHeight="sm" color="gray/gray800">
           {t('rankedResult.reviewTitle')}
         </CustomText>
-        <CustomText size={10} lineHeight="sm" color="gray/gray500">
-          {t('rankedResult.reviewCaption')}
-        </CustomText>
       </SectionHeader>
-    </View>
+    </FixedTopWrapper>
   );
 
   return (
     <Container>
+      {fixedTopContent}
+
+      {/* 상단 요약은 고정하고 문제 리스트 영역만 스크롤 */}
       <FlatList
         data={archive ?? []}
         keyExtractor={(_, index) => index.toString()}
         renderItem={renderProblemRow}
-        ListHeaderComponent={listHeader}
         ListEmptyComponent={
           isLoading ? (
             <LoadingWrapper>
@@ -193,7 +193,9 @@ const RankedGameResult = () => {
         }
         ItemSeparatorComponent={ItemSeparator}
         // eslint-disable-next-line react-native/no-inline-styles
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
+        style={{ flex: 1 }}
+        // eslint-disable-next-line react-native/no-inline-styles
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
       />
 
