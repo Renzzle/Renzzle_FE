@@ -107,7 +107,7 @@ const RankedGameResult = () => {
         </CustomText>
         <RatingRow>
           <RatingSideSlot align="left" />
-          <CustomText size={52} weight="bold" lineHeight="sm" color="gray/black">
+          <CustomText size={52} weight="bold" lineHeight="sm" color="gray/gray900">
             {rating !== undefined ? Math.round(rating).toLocaleString() : '-'}
           </CustomText>
           <RatingSideSlot align="right">
@@ -156,13 +156,13 @@ const RankedGameResult = () => {
       </StatsRow>
 
       <RewardRow>
-        <Icon name="PuzzleXSmallIcon" size={22} color="sub_color/yellow/p" />
+        <Icon name="PuzzleXSmallIcon" size={22} color="main_color/blue_p" />
         <RewardLabelWrapper>
           <CustomText size={12} lineHeight="sm" color="gray/gray600">
             {t('rankedResult.reward')}
           </CustomText>
         </RewardLabelWrapper>
-        <CustomText size={14} weight="bold" lineHeight="sm" color="sub_color/yellow/p">
+        <CustomText size={14} weight="bold" lineHeight="sm" color="main_color/blue_p">
           {t('rankedResult.rewardPieces', { count: reward ?? 0 })}
         </CustomText>
       </RewardRow>

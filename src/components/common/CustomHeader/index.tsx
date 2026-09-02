@@ -34,7 +34,6 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
     'CreateCommunityPuzzle',
     'AnswerCommunityPuzzle',
     'RankedPuzzleSolve',
-    'RankedGameResult',
     'RankedPuzzleReview',
     'PuzzleReview',
     'TrainingPuzzleReview',

@@ -5,7 +5,7 @@ import { RankingResultTheme, ResultVariant } from '../../types';
 
 export const Container = styled(View)`
   flex: 1;
-  background-color: ${theme.color['gray/grayBG']};
+  background-color: ${theme.color['gray/grayBGDim']};
   position: relative;
 `;
 
@@ -20,11 +20,6 @@ export const HeroCard = styled(View)`
   border-radius: 13px;
   padding: 20px 20px 18px;
   margin-top: 12px;
-  shadow-color: ${theme.color['gray/black']};
-  shadow-offset: 0px 0px;
-  shadow-opacity: 0.08;
-  shadow-radius: 4px;
-  elevation: 2;
 `;
 
 /* 좌우 대칭 슬롯(flex: 1) 사이에 숫자를 두어, 칩 유무와 무관하게 숫자가 정중앙에 오도록 함 */
@@ -73,7 +68,7 @@ export const RewardRow = styled(View)`
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  background-color: ${theme.color['sub_color/yellow/bg']};
+  background-color: ${theme.color['sub_color/indigo/bg']};
   border-radius: 13px;
   padding: 13px 16px;
   margin-top: 12px;
