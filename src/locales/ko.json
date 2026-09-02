@@ -55,6 +55,9 @@
     "feedback": "개발자에게 피드백하기",
     "deleteAccount": "탈퇴하기"
   },
+  "notice": {
+    "empty": "공지사항이 없습니다."
+  },
   "button": {
     "createPuzzle": "출제",
     "uploadPuzzle": "업로드",
@@ -307,6 +310,7 @@
 
     "missingRequiredFields": "필수 항목이 누락되었습니다. 처음으로 돌아갑니다.",
 
-    "trainingPackLoadFailed": "문제 팩 불러오기 실패: "
+    "trainingPackLoadFailed": "문제 팩 불러오기 실패: ",
+    "noticeLoadFailed": "공지사항을 불러오지 못했습니다."
   }
 }

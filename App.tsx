@@ -43,6 +43,7 @@ import { CustomModal } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
 import ChangeNickname from './src/screens/Settings/ChangeNickname/index.tsx';
 import ChangePassword from './src/screens/Settings/ChangePassword/index.tsx';
+import Notice from './src/screens/Notice/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -97,6 +98,11 @@ function App(): React.JSX.Element | null {
                     name="Ranking"
                     component={Ranking}
                     options={{ title: 'common.ranking' }}
+                  />
+                  <Stack.Screen
+                    name="Notice"
+                    component={Notice}
+                    options={{ title: 'common.notice' }}
                   />
                   <Stack.Screen
                     name="Settings"

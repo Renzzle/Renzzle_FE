@@ -55,6 +55,9 @@
     "feedback": "Send Feedback",
     "deleteAccount": "Delete Account"
   },
+  "notice": {
+    "empty": "No notices available."
+  },
   "button": {
     "createPuzzle": "Create",
     "uploadPuzzle": "Upload",
@@ -307,6 +310,7 @@
 
     "missingRequiredFields": "Required fields are missing. Returning to the beginning.",
 
-    "trainingPackLoadFailed": "Failed to load training pack: "
+    "trainingPackLoadFailed": "Failed to load training pack: ",
+    "noticeLoadFailed": "Failed to load notices."
   }
 }
