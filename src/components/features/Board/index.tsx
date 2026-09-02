@@ -34,7 +34,7 @@ import { CustomText, Icon } from '../../common';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 import { useTranslation } from 'react-i18next';
 import {
-  getPuzzleCacheAiResponse,
+  getPuzzleCacheNextMoves,
   PuzzleCacheType,
   savePuzzleCache,
 } from '../../../apis/puzzleCache';
@@ -304,6 +304,50 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     [currentIndex, history, localSequence, makeMode, mode, setSequence],
   );
 
+  // 사용자 차례의 보드 상태별로 미리 받아둔 (사용자 수 -> AI 응답) 후보 목록
+  const nextMovesPrefetchRef = useRef<{
+    boardState: string;
+    promise: Promise<Map<string, string> | null>;
+  } | null>(null);
+
+  const prefetchNextMoves = useCallback(
+    (userTurnBoardState: string) => {
+      if (!puzzleCache || getPuzzleAiMode() !== 'CACHE') {
+        return;
+      }
+
+      if (nextMovesPrefetchRef.current?.boardState === userTurnBoardState) {
+        return;
+      }
+
+      const prefetchStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+      const promise = getPuzzleCacheNextMoves({
+        ...puzzleCache,
+        userTurnBoardState,
+      })
+        .then((candidates) => {
+          if (IS_AI_BENCHMARK_ENABLED) {
+            console.log('[AiBenchmark] next-moves prefetch:', {
+              puzzleType: puzzleCache.puzzleType,
+              puzzleId: puzzleCache.puzzleId,
+              boardDepth: getSequenceDepth(userTurnBoardState),
+              candidateCount: candidates.length,
+              ms: Date.now() - prefetchStartedAt,
+            });
+          }
+
+          return new Map(candidates.map((candidate) => [candidate.userMove, candidate.aiResponse]));
+        })
+        .catch((error) => {
+          console.log('AI next-moves prefetch failed:', error);
+          return null;
+        });
+
+      nextMovesPrefetchRef.current = { boardState: userTurnBoardState, promise };
+    },
+    [puzzleCache],
+  );
+
   const getCachedAiAnswer = useCallback(
     async (
       userSequence: string,
@@ -317,27 +361,39 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         return { answer: null, shouldSave: false };
       }
 
-      try {
-        const cacheStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
-        const cache = await getPuzzleCacheAiResponse({
-          ...puzzleCache,
-          currentBoardState: userSequence,
-        });
-        const cacheLookupMs = IS_AI_BENCHMARK_ENABLED ? Date.now() - cacheStartedAt : undefined;
-
-        if (!cache.position) {
-          return { answer: null, shouldSave: true, cacheLookupMs, position: null };
-        }
-
-        const cachedAnswer = positionToValue(cache.position);
-
-        return { answer: cachedAnswer, shouldSave: false, cacheLookupMs, position: cache.position };
-      } catch (error) {
-        console.log('AI cache request failed:', error);
+      const lastMoveMatch = userSequence.match(/[a-o](?:1[0-5]|[1-9])$/);
+      if (!lastMoveMatch) {
         return { answer: null, shouldSave: false };
       }
+
+      const userMove = lastMoveMatch[0];
+      const userTurnBoardState = userSequence.slice(0, -userMove.length);
+
+      // 미리 받아둔 목록이 없거나 다른 보드 상태의 것이라면 이 시점에 조회
+      prefetchNextMoves(userTurnBoardState);
+      const prefetch = nextMovesPrefetchRef.current;
+      if (!prefetch || prefetch.boardState !== userTurnBoardState) {
+        return { answer: null, shouldSave: false };
+      }
+
+      const cacheStartedAt = IS_AI_BENCHMARK_ENABLED ? Date.now() : 0;
+      const nextMoves = await prefetch.promise;
+      const cacheLookupMs = IS_AI_BENCHMARK_ENABLED ? Date.now() - cacheStartedAt : undefined;
+
+      if (!nextMoves) {
+        return { answer: null, shouldSave: false, cacheLookupMs };
+      }
+
+      const position = nextMoves.get(userMove) ?? null;
+      if (!position) {
+        return { answer: null, shouldSave: true, cacheLookupMs, position: null };
+      }
+
+      const cachedAnswer = positionToValue(position);
+
+      return { answer: cachedAnswer, shouldSave: false, cacheLookupMs, position };
     },
-    [puzzleCache],
+    [prefetchNextMoves, puzzleCache],
   );
 
   const saveAiAnswerCache = useCallback(
@@ -558,6 +614,9 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
             return;
           }
 
+          // 다시 사용자 차례가 되었으므로, 다음 수 후보 목록을 미리 받아둔다
+          prefetchNextMoves(newSequence);
+
           updateBoard(x, y, aiIsBlackTurn);
           setIsBlackTurn(!aiIsBlackTurn);
           finishAiRequest(requestId);
@@ -582,6 +641,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       getCachedAiAnswer,
       isActiveAiRequest,
       logAiBenchmark,
+      prefetchNextMoves,
       puzzleCache,
       saveAiAnswerCache,
       scheduleAiRequest,
@@ -733,6 +793,13 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   useEffect(() => {
     initializeBoard();
   }, [initializeBoard]);
+
+  // solve 모드 진입 시(사용자 차례) 다음 수 후보 목록을 미리 받아둔다
+  useEffect(() => {
+    if (mode === 'solve') {
+      prefetchNextMoves(sequence);
+    }
+  }, [mode, prefetchNextMoves, sequence]);
 
   return (
     <BoardBackground boardWidth={boardWidth}>

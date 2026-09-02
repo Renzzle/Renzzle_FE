@@ -8,25 +8,32 @@ export interface PuzzleCacheRequest {
   currentBoardState: string;
 }
 
-export interface PuzzleCacheAiResponse {
-  position: string | null;
+export interface NextMoveCandidate {
+  userMove: string;
+  aiResponse: string;
 }
 
-export const getPuzzleCacheAiResponse = async ({
+export interface NextMovesRequest {
+  puzzleType: PuzzleCacheType;
+  puzzleId: number;
+  userTurnBoardState: string;
+}
+
+export const getPuzzleCacheNextMoves = async ({
   puzzleType,
   puzzleId,
-  currentBoardState,
-}: PuzzleCacheRequest): Promise<PuzzleCacheAiResponse> => {
+  userTurnBoardState,
+}: NextMovesRequest): Promise<NextMoveCandidate[]> => {
   try {
-    const response = await apiClient.get('/api/puzzle/cache/ai-response', {
+    const response = await apiClient.get('/api/puzzle/cache/next-moves', {
       params: {
         puzzleType,
         puzzleId,
-        currentBoardState,
+        userTurnBoardState,
       },
     });
 
-    return response.data.response;
+    return response.data.response ?? [];
   } catch (error) {
     throw error;
   }
