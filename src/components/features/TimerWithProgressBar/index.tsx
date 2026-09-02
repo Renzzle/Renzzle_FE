@@ -30,6 +30,7 @@ const TimerWithProgressBar = ({
   const backgroundTimestamp = useRef<number | null>(null);
   const started = useRef<boolean>(false);
   const isInitialMount = useRef(true);
+  const finishTriggeredRef = useRef(false);
 
   const progress = remainingTime / TOTAL_DURATION;
 
@@ -44,29 +45,35 @@ const TimerWithProgressBar = ({
     }
   }, []);
 
+  const finishTimer = useCallback(() => {
+    if (finishTriggeredRef.current) {
+      return;
+    }
+
+    finishTriggeredRef.current = true;
+    stopTimer();
+    remainingTimeRef.current = 0;
+    setRemainingTime(0);
+    onFinish?.();
+  }, [onFinish, stopTimer]);
+
   const startTimer = useCallback(() => {
-    if (intervalRef.current) {
+    if (intervalRef.current || finishTriggeredRef.current) {
       return;
     }
 
     intervalRef.current = setInterval(() => {
-      setRemainingTime((prev) => {
-        // Prevent onFinish from being called multiple times
-        if (prev <= 0) {
-          stopTimer();
-          return 0;
-        }
+      const next = remainingTimeRef.current - 1000;
 
-        const next = prev - 1000;
-        if (next <= 0) {
-          stopTimer();
-          onFinish?.();
-          return 0;
-        }
-        return next;
-      });
+      if (next <= 0) {
+        finishTimer();
+        return;
+      }
+
+      remainingTimeRef.current = next;
+      setRemainingTime(next);
     }, 1000);
-  }, [onFinish, stopTimer]);
+  }, [finishTimer]);
 
   // Add bonus time
   useEffect(() => {
@@ -76,7 +83,9 @@ const TimerWithProgressBar = ({
     }
 
     if (bonusTimeTrigger !== undefined) {
-      setRemainingTime((prev) => Math.min(prev + BONUS_TIME, TOTAL_DURATION));
+      const next = Math.min(remainingTimeRef.current + BONUS_TIME, TOTAL_DURATION);
+      remainingTimeRef.current = next;
+      setRemainingTime(next);
     }
   }, [bonusTimeTrigger]);
 
@@ -104,11 +113,12 @@ const TimerWithProgressBar = ({
           const currentRemaining = remainingTimeRef.current; // Ref에서 최신 시간 가져옴
           const newRemaining = Math.max(currentRemaining - elapsed, 0);
 
-          setRemainingTime((prev) => Math.max(prev - elapsed, 0));
+          remainingTimeRef.current = newRemaining;
+          setRemainingTime(newRemaining);
           backgroundTimestamp.current = null;
 
           if (newRemaining <= 0) {
-            onFinish?.();
+            finishTimer();
           } else {
             startTimer();
           }
@@ -119,7 +129,7 @@ const TimerWithProgressBar = ({
 
       appState.current = nextAppState;
     },
-    [paused, startTimer, stopTimer, onFinish],
+    [paused, startTimer, stopTimer, finishTimer],
   );
 
   // Listen for app state changes
@@ -134,6 +144,8 @@ const TimerWithProgressBar = ({
   // Timer initial start
   useEffect(() => {
     if (start && !started.current) {
+      finishTriggeredRef.current = false;
+      remainingTimeRef.current = TOTAL_DURATION;
       setRemainingTime(TOTAL_DURATION);
       started.current = true;
       if (!paused) {
