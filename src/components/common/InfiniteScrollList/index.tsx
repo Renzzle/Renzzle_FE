@@ -1,10 +1,9 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-import { ActivityIndicator, FlatList, FlatListProps, View } from 'react-native';
+import { ActivityIndicator, FlatList, FlatListProps, RefreshControl, View } from 'react-native';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../Toast/toastMessage';
-import { RefreshControl } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 
 export interface ApiCallParams {

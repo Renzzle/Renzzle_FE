@@ -5,7 +5,7 @@ gradle.startParameter.excludedTaskNames.addAll(
 buildscript {
     ext {
         buildToolsVersion = "35.0.0"
-        minSdkVersion = 23
+        minSdkVersion = 24
         compileSdkVersion = 35
         targetSdkVersion = 35
         ndkVersion = "26.1.10909125"
@@ -23,3 +23,16 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+subprojects { subproject ->
+    if (subproject.name == "react-native-safe-area-context") {
+        subproject.afterEvaluate {
+            def isSafeAreaNewArchEnabled =
+                    subproject.hasProperty("newArchEnabled") && subproject.newArchEnabled == "true"
+
+            if (!isSafeAreaNewArchEnabled && subproject.plugins.hasPlugin("com.android.library")) {
+                subproject.android.sourceSets.main.java.srcDirs += "src/paper/java"
+            }
+        }
+    }
+}

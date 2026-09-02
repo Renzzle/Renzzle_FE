@@ -1,4 +1,4 @@
-import { TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
 
@@ -15,7 +15,7 @@ export const StyledTextInput = styled(TextInput)<StyledTextInputProps>`
   border-width: 1px;
   border-radius: 13px;
 
-  font-family: 'NanumSquareNeoOTF-Bd';
+  font-family: ${Platform.OS === 'ios' ? 'NanumSquareNeo-cBd' : 'NanumSquareNeoOTF-Bd'};
   font-size: 14px;
 
   border-color: ${({ isFocused, hasError }) =>
