@@ -9,17 +9,18 @@ type BottomButtonBarType = {
     disabled?: boolean;
     loading?: boolean;
   }[];
+  variant?: 'default' | 'dim';
 };
 
 export function BottomBar({ children }: { children: ReactNode }) {
   return { children };
 }
 
-export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
+export default function BottomButtonBar({ transitions, variant = 'default' }: BottomButtonBarType) {
   if (transitions.length === 2) {
     const [secondaryTransition, primaryTransition] = transitions;
     return (
-      <StyledBottomButtonBar>
+      <StyledBottomButtonBar variant={variant}>
         <CustomButton
           onPress={secondaryTransition.onAction}
           disabled={secondaryTransition.disabled}
@@ -41,7 +42,7 @@ export default function BottomButtonBar({ transitions }: BottomButtonBarType) {
   if (transitions.length === 1) {
     const primaryTransition = transitions[0];
     return (
-      <StyledBottomButtonBar>
+      <StyledBottomButtonBar variant={variant}>
         <CustomButton
           onPress={primaryTransition.onAction}
           disabled={primaryTransition.disabled}
