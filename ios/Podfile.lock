@@ -1653,7 +1653,7 @@ PODS:
     - SocketRocket
   - react-native-encrypted-storage (4.0.3):
     - React-Core
-  - react-native-safe-area-context (5.9.0):
+  - react-native-safe-area-context (5.9.1):
     - React-Core
   - React-NativeModulesApple (0.80.2):
     - boost
@@ -2133,7 +2133,7 @@ PODS:
     - React-Core
   - RNDeviceInfo (13.2.0):
     - React-Core
-  - RNGestureHandler (2.28.0):
+  - RNGestureHandler (2.32.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2714,7 +2714,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: a5d550d1add940ed2bc65b20dc1413407bf1a63f
   React-microtasksnativemodule: 5d00fefc19f0bc9a6432e5533683d6fc9c3da4e1
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
-  react-native-safe-area-context: d4a23eaf2a5bca22eabfc93aa9680b9675716cf4
+  react-native-safe-area-context: 88321784469a79bf0e3c8d98dcf355e29744ea71
   React-NativeModulesApple: b22e6abb44d78270dfdfc7d85efe29e35e0333a7
   React-oscompat: 56d6de59f9ae95cd006a1c40be2cde83bc06a4e1
   React-perflogger: 0633844e495d8b34798c9bf0cb32ce315f1d5c9f
@@ -2748,7 +2748,7 @@ SPEC CHECKSUMS:
   ReactCommon: 7aca047f2f453a7d7f0adeccb63810d61829235a
   RNBootSplash: 2404c592271f188766c010c77a7d629e2ed7c9b2
   RNDeviceInfo: 29e01d5ae94bdb5a0f6c11a4c438132545b4df80
-  RNGestureHandler: 971c0e79a6a10390f90cd21901f8f890312ab28c
+  RNGestureHandler: bea67e11d3d2e16dfcdb5d8cbfbf31cee267685e
   RNGoogleMobileAds: d7b2e90876e2ac1b71e67990b3c34043d56861f7
   RNLocalize: 4372ecce8b0d483980847e04f6567ad342ca97d6
   RNReanimated: 3618ec386caf7222b78b33b00e1072e7f03d60e1
