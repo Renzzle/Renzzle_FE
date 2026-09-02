@@ -212,6 +212,7 @@ const RankedGameResult = () => {
             onAction: handleRetry,
           },
         ]}
+        variant="dim"
       />
 
       <CustomModal
