@@ -16,12 +16,17 @@ const AiThinkingIndicator = ({ visible }: AiThinkingIndicatorProps) => {
   const { t } = useTranslation();
 
   const [isDeepThinking, setIsDeepThinking] = useState(false);
+  const [shouldRender, setShouldRender] = useState(visible);
   const chipOpacity = useRef(new Animated.Value(0)).current;
   const dotOpacities = useRef(
     Array.from({ length: DOT_COUNT }, () => new Animated.Value(0.3)),
   ).current;
 
   useEffect(() => {
+    if (visible) {
+      setShouldRender(true);
+    }
+
     Animated.timing(chipOpacity, {
       toValue: visible ? 1 : 0,
       duration: FADE_DURATION_MS,
@@ -30,6 +35,7 @@ const AiThinkingIndicator = ({ visible }: AiThinkingIndicatorProps) => {
       // reset deep thinking state when the indicator is hidden
       if (!visible && finished) {
         setIsDeepThinking(false);
+        setShouldRender(false);
       }
     });
 
@@ -69,6 +75,10 @@ const AiThinkingIndicator = ({ visible }: AiThinkingIndicatorProps) => {
       dotAnimation.stop();
     };
   }, [chipOpacity, dotOpacities, visible]);
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <IndicatorSlot pointerEvents="none">

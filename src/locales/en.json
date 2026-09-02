@@ -157,11 +157,11 @@
       "confirm": "Start",
       "cancel": "Cancel"
     },
-    "rankingPuzzleOutro": {
-      "title": "Ranking Puzzle Ended",
-      "message": "Rating: {{rating}} pts\nReward: {{reward}} Pieces",
-      "confirm": "Confirm",
-      "cancel": "Review"
+    "rankingGameEndConfirm": {
+      "title": "Finish Game",
+      "message": "Finish the game now?\nYour remaining time will be lost and the results will be finalized.",
+      "confirm": "Finish",
+      "cancel": "Keep Playing"
     },
     "communityFilter": {
       "title": "Filter",
@@ -227,6 +227,8 @@
     "viewAnswer": "answer",
     "retry": "retry",
     "resign": "resign",
+    "skip": "skip",
+    "endGame": "finish",
     "review": "Review",
     "solvedCount": "solved",
     "views": "views",
@@ -250,6 +252,23 @@
     "score": "{{score}} pts",
     "rank": "Rank {{rank}}",
     "topPercent": "Top {{percent}}%"
+  },
+  "rankedResult": {
+    "myRating": "My Rating",
+    "totalCount": "Puzzles",
+    "successCount": "Success",
+    "failureCount": "Failed",
+    "reward": "Reward",
+    "rewardPieces": "+{{count}} Pieces",
+    "reviewTitle": "Review Puzzles",
+    "home": "Home",
+    "retry": "Play Again"
+  },
+  "rankedReview": {
+    "solved": "Success",
+    "failed": "Failed",
+    "prev": "Previous",
+    "next": "Next"
   },
   "alert": {
     "noData": "No data available."
