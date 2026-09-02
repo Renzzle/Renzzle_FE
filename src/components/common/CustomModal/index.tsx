@@ -27,7 +27,7 @@ export type ModalCategoryType =
   | 'PUZZLE_UPLOAD_FAILED'
   | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
-  | 'RANKING_PUZZLE_OUTRO'
+  | 'RANKING_GAME_END_CONFIRM'
   | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
@@ -38,7 +38,6 @@ export type ModalCategoryType =
 
 const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
   'NETWORK_ERROR',
-  'RANKING_PUZZLE_OUTRO',
   'TRAINING_PUZZLE_SUCCESS',
   'COMMUNITY_PUZZLE_SUCCESS',
   'RANKING_PUZZLE_SUCCESS',
@@ -107,10 +106,10 @@ export const MODAL_TEXTS = {
     BODY: 'modal.rankingPuzzleIntro.message',
     FOOTER: ['modal.rankingPuzzleIntro.cancel', 'modal.rankingPuzzleIntro.confirm'],
   },
-  RANKING_PUZZLE_OUTRO: {
-    TITLE: 'modal.rankingPuzzleOutro.title',
-    BODY: 'modal.rankingPuzzleOutro.message',
-    FOOTER: ['modal.rankingPuzzleOutro.cancel', 'modal.rankingPuzzleOutro.confirm'],
+  RANKING_GAME_END_CONFIRM: {
+    TITLE: 'modal.rankingGameEndConfirm.title',
+    BODY: 'modal.rankingGameEndConfirm.message',
+    FOOTER: ['modal.rankingGameEndConfirm.cancel', 'modal.rankingGameEndConfirm.confirm'],
   },
   COMMUNITY_FILTER: {
     TITLE: 'modal.communityFilter.title',

@@ -116,6 +116,9 @@ interface BoardProps {
     puzzleType: PuzzleCacheType;
     puzzleId: number;
   };
+
+  // 게임 정산 등 AI 응답이 더 이상 의미 없는 상황에서 생각 중 인디케이터를 즉시 숨김
+  hideAiIndicator?: boolean;
 }
 
 const Board = forwardRef<BoardRef, BoardProps>(function Board(
@@ -130,6 +133,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     problemSequence = '',
     onUndoRedoStateChange,
     puzzleCache,
+    hideAiIndicator = false,
   },
   ref,
 ) {
@@ -148,7 +152,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [localSequence, setLocalSequence] = useState(sequence);
 
-  const isAiThinkingVisible = useDelayedVisibility(mode === 'solve' && isDisabled);
+  const isAiThinkingVisible =
+    useDelayedVisibility(mode === 'solve' && isDisabled) && !hideAiIndicator;
 
   const [history, setHistory] = useState<string[]>([sequence]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -760,6 +765,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
     let moveIndex = 0;
     let i = 0;
+    let lastX = -1;
+    let lastY = -1;
     while (i < sequence.length) {
       const letter = sequence[i];
       const numberMatch = sequence.slice(i + 1).match(/^\d{1,2}/);
@@ -781,8 +788,15 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         newBoard[x][y] = { stone: turn ? 1 : 2, moveNumber: moveNumber };
         turn = !turn;
         moveIndex++;
+        lastX = x;
+        lastY = y;
       }
       i += 1 + number.length;
+    }
+
+    // 초기 시퀀스의 마지막 수에도 마지막 수 마커 표시 (수순 번호가 있는 돌은 유지)
+    if (lastX >= 0 && lastY >= 0 && newBoard[lastX][lastY].moveNumber === null) {
+      newBoard[lastX][lastY].moveNumber = -1;
     }
 
     setLocalSequence(sequence);

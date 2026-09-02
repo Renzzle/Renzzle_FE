@@ -24,13 +24,22 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
 
   const isHome = route.name === 'Home';
 
+  // 본문 Container가 gray/grayBG인 화면들. 헤더 배경을 본문과 통일하기 위한 목록으로,
+  // 새 화면을 추가할 때 본문이 grayBG라면 여기에도 함께 추가해야 한다.
   const grayBGRoutes = [
     'Signup',
     'FindPassword',
     'TrainingPuzzleSolve',
     'CommunityPuzzleSolve',
     'CreateCommunityPuzzle',
+    'AnswerCommunityPuzzle',
     'RankedPuzzleSolve',
+    'RankedPuzzleReview',
+    'PuzzleReview',
+    'TrainingPuzzleReview',
+    'TrainingPuzzleViewAnswer',
+    'CommunityPuzzleReview',
+    'CommunityPuzzleViewAnswer',
     'ChangeNickname',
     'ChangePassword',
   ];

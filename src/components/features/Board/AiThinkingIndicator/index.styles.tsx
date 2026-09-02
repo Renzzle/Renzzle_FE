@@ -18,11 +18,6 @@ export const ChipContainer = styled(View)`
   padding: 5px 12px;
   border-radius: 999px;
   background-color: rgba(44, 47, 52, 0.88); /* gray/gray800 기반 반투명 */
-  shadow-color: ${theme.color['gray/black']};
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.12;
-  shadow-radius: 5px;
-  elevation: 3;
 `;
 
 export const DotsContainer = styled(View)`

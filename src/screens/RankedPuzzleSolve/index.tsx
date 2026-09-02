@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import RankingResultButton from '../../components/features/RankingResultButton';
+import RankingCounter from '../../components/features/RankingCounter';
 import TimerWithProgressBar from '../../components/features/TimerWithProgressBar';
 import {
-  BoardFooterWrapper,
   BoardWrapper,
+  BottomActionsWrapper,
   Container,
-  HorizontalScrollContainer,
+  CounterSlot,
+  CurrentPuzzleWrapper,
+  HeaderWrapper,
   ProgressBarContainer,
-  RankingResultButtonWrapper,
+  StatusHeaderWrapper,
 } from './index.styles';
-import Board from '../../components/features/Board';
-import { finishRankingGame, startRankingGame, submitRankingGameResult } from '../../apis/rank';
-import { CustomModal } from '../../components/common';
+import Board, { BoardRef } from '../../components/features/Board';
+import {
+  finishRankingGame,
+  getMyRating,
+  startRankingGame,
+  submitRankingGameResult,
+} from '../../apis/rank';
+import { CustomModal, CustomText } from '../../components/common';
 import useModal from '../../hooks/useModal';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -41,14 +48,32 @@ const RankedPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
-  const scrollRef = useRef<ScrollView>(null);
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
-  const [outcome, setOutcome] = useState<GameOutcome>();
   const [puzzleData, setPuzzleData] = useState<PuzzleData>();
   const [bonusTrigger, setBonusTrigger] = useState(0);
+  const [shouldFinish, setShouldFinish] = useState(false);
+  const [isGameFinished, setIsGameFinished] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const isFinishingRef = useRef(false);
+  const boardRef = useRef<BoardRef>(null);
+  const startRatingRef = useRef<number | null>(null);
+
+  const successCount = results.filter((result) => result.variant === 'success').length;
+  const failureCount = results.length - successCount;
+  const currentPuzzleNumber = results.length + 1;
 
   useEffect(() => {
+    const fetchStartRating = async () => {
+      try {
+        const data = await getMyRating();
+        startRatingRef.current = data?.rating ?? null;
+      } catch (error) {
+        // 시작 레이팅을 못 받아도 게임 진행에는 지장 없음 (결과 화면에서 변동치만 미표시)
+        startRatingRef.current = null;
+      }
+    };
+
     const initializeGame = async () => {
       try {
         setIsLoading(true);
@@ -61,6 +86,7 @@ const RankedPuzzleSolve = () => {
       }
     };
 
+    fetchStartRating();
     initializeGame();
   }, []);
 
@@ -86,33 +112,57 @@ const RankedPuzzleSolve = () => {
     }
   };
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollToEnd({ animated: true });
+  const handleFinish = useCallback(async () => {
+    // 조기 종료 후 타이머가 0초에 도달해도 이중 정산되지 않도록 가드
+    if (isFinishingRef.current) {
+      return;
     }
-  }, [results]);
+    isFinishingRef.current = true;
 
-  const handleFinish = async () => {
+    // 진행 중인 AI 턴은 더 이상 의미 없으므로 취소하고, 정산 동안 조작을 잠근다
+    boardRef.current?.cancelAiTurn();
+    setIsFinishing(true);
+    setIsLoading(true);
+
     try {
-      const data = await finishRankingGame();
-      setOutcome(data);
+      const data: GameOutcome = await finishRankingGame();
+      setIsGameFinished(true);
       await updateUser();
-      activateModal('RANKING_PUZZLE_OUTRO', {
-        primaryAction: () => {
-          navigation.navigate('Home');
-        },
-        secondaryAction: () => {
-          // TODO: 복습 화면으로 이동
-          activateModal('FEATURE_IN_PROGRESS', {
-            primaryAction: () => {
-              navigation.goBack();
-            },
-          });
-        },
+
+      const ratingDelta =
+        startRatingRef.current !== null && data.rating !== undefined
+          ? data.rating - startRatingRef.current
+          : undefined;
+
+      navigation.replace('RankedGameResult', {
+        rating: data.rating,
+        reward: data.reward,
+        ratingDelta,
       });
     } catch (error) {
+      isFinishingRef.current = false;
+      setIsFinishing(false);
+      setIsLoading(false);
       showBottomToast('error', error as string);
     }
+  }, [navigation, updateUser]);
+
+  // 종료 확인 모달이 닫힌 뒤에 게임을 정산해야 결과 모달이 바로 닫히지 않는다
+  useEffect(() => {
+    if (!shouldFinish) {
+      return;
+    }
+    setShouldFinish(false);
+    handleFinish();
+  }, [shouldFinish, handleFinish]);
+
+  const handleEndGamePress = () => {
+    activateModal('RANKING_GAME_END_CONFIRM', {
+      primaryAction: () => {
+        setShouldFinish(true);
+      },
+      secondaryAction: () => {},
+    });
   };
 
   useFocusEffect(
@@ -148,60 +198,56 @@ const RankedPuzzleSolve = () => {
 
   return (
     <Container>
-      <ProgressBarContainer>
-        <TimerWithProgressBar
-          start={true}
-          paused={!!isLoading}
-          onFinish={handleFinish}
-          bonusTimeTrigger={bonusTrigger}
-        />
-      </ProgressBarContainer>
+      <HeaderWrapper>
+        <ProgressBarContainer>
+          <TimerWithProgressBar
+            start={true}
+            paused={!!isLoading || isGameFinished}
+            onFinish={handleFinish}
+            bonusTimeTrigger={bonusTrigger}
+          />
+        </ProgressBarContainer>
+
+        <StatusHeaderWrapper>
+          <CounterSlot align="left">
+            <RankingCounter variant="success" count={successCount} />
+          </CounterSlot>
+          <CurrentPuzzleWrapper>
+            <CustomText size={20} weight="bold" lineHeight="sm" color="gray/black">
+              #{currentPuzzleNumber}
+            </CustomText>
+            {!!puzzleData && <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />}
+          </CurrentPuzzleWrapper>
+          <CounterSlot align="right">
+            <RankingCounter variant="error" count={failureCount} />
+          </CounterSlot>
+        </StatusHeaderWrapper>
+      </HeaderWrapper>
 
       <BoardWrapper>
-        <HorizontalScrollContainer
-          ref={scrollRef}
-          horizontal={true}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}>
-          <RankingResultButtonWrapper>
-            {results.map((result, index) => (
-              <RankingResultButton
-                key={index}
-                variant={result.variant}
-                text={String(index + 1)}
-                disabled
-              />
-            ))}
-          </RankingResultButtonWrapper>
-        </HorizontalScrollContainer>
-
         {!!puzzleData && (
-          <>
-            <Board
-              mode="solve"
-              sequence={puzzleData.boardStatus}
-              setSequence={() => {}}
-              setIsWin={handleResult}
-              setIsLoading={setIsLoading}
-            />
-            <BoardFooterWrapper>
-              <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />
-              <PuzzleActionButton
-                mode="giveUp"
-                disabled={!!isLoading}
-                onPress={() => handleResult(false)}
-              />
-            </BoardFooterWrapper>
-          </>
+          <Board
+            ref={boardRef}
+            mode="solve"
+            sequence={puzzleData.boardStatus}
+            setSequence={() => {}}
+            setIsWin={handleResult}
+            setIsLoading={setIsLoading}
+            hideAiIndicator={isFinishing}
+          />
         )}
       </BoardWrapper>
+
+      <BottomActionsWrapper>
+        <PuzzleActionButton mode="endGame" disabled={!!isLoading} onPress={handleEndGamePress} />
+        <PuzzleActionButton mode="skip" disabled={!!isLoading} onPress={() => handleResult(false)} />
+      </BottomActionsWrapper>
 
       <CustomModal
         isVisible={isModalVisible}
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
-        gameOutcome={outcome}
       />
     </Container>
   );

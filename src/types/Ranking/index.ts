@@ -59,3 +59,10 @@ export interface GameOutcome {
   price?: number;
   puzzleCount?: number;
 }
+
+export interface RankArchive {
+  boardStatus: string;
+  winColor: 'BLACK' | 'WHITE';
+  answer: string;
+  isSolved: boolean;
+}
