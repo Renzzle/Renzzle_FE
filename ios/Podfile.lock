@@ -2193,13 +2193,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-<<<<<<< HEAD
-  - RNLocalize (3.7.0):
-=======
   - RNIap (13.0.4):
     - React-Core
-  - RNLocalize (3.4.1):
->>>>>>> 374e2e7 (chore: configure react-native-iap)
+  - RNLocalize (3.7.0):
     - React-Core
   - RNReanimated (3.19.5):
     - boost
@@ -2759,6 +2755,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 29e01d5ae94bdb5a0f6c11a4c438132545b4df80
   RNGestureHandler: 971c0e79a6a10390f90cd21901f8f890312ab28c
   RNGoogleMobileAds: d7b2e90876e2ac1b71e67990b3c34043d56861f7
+  RNIap: c904e8acc2b97f929ab1fb7909b7f62214a64267
   RNLocalize: 4372ecce8b0d483980847e04f6567ad342ca97d6
   RNReanimated: 3618ec386caf7222b78b33b00e1072e7f03d60e1
   RNScreens: 457facffa1793029ed62b167eda9746638d90130
