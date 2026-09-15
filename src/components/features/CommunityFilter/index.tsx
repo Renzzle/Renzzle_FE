@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { DEPTH } from '../../../types';
 
 export interface FilterState {
-  sort: 'LATEST' | 'LIKE';
+  sort: 'LATEST' | 'LIKE' | 'RECOMMEND';
   stone: { black: boolean; white: boolean };
   auth: { verified: boolean; unverified: boolean };
   depthRange: [number, number];
@@ -35,6 +35,7 @@ const CommunityFilter = ({ filter, onChangeFilter }: CommunityFilterProps) => {
   const SORT_OPTIONS = [
     { label: t('modal.filter.subtitle.sort.options.0'), value: 'LATEST' },
     { label: t('modal.filter.subtitle.sort.options.1'), value: 'LIKE' },
+    { label: t('modal.filter.subtitle.sort.options.2'), value: 'RECOMMEND' },
   ] as const;
 
   const [depthValues, setDepthValues] = useState(depthRange);

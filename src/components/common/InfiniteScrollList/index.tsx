@@ -1,6 +1,13 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { ActivityIndicator, FlatList, FlatListProps, RefreshControl, View } from 'react-native';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../Toast/toastMessage';
@@ -9,7 +16,8 @@ import { useTranslation } from 'react-i18next';
 export interface ApiCallParams {
   id?: number | null;
   size?: number;
-  sort?: 'LATEST' | 'LIKE';
+  sort?: 'LATEST' | 'LIKE' | 'RECOMMEND';
+  shuffleSeed?: number;
   stone?: 'BLACK' | 'WHITE';
   auth?: boolean;
   depthMin?: number;
@@ -26,6 +34,7 @@ interface InfiniteScrollListProps<T>
   keyExtractor: (item: T, index: number) => string;
   pageSize?: number;
   defaultParams?: Partial<ApiCallParams>;
+  getRefreshParams?: () => Partial<ApiCallParams>;
   onEndReachedThreshold?: number;
   ListEmptyComponent?: React.ReactElement | null;
 }
@@ -43,6 +52,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
       keyExtractor,
       pageSize = 10,
       defaultParams,
+      getRefreshParams,
       onEndReachedThreshold = 0.6,
       ListEmptyComponent,
       ...flatListProps
@@ -55,6 +65,13 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
     const [refreshing, setRefreshing] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [cursorId, setCursorId] = useState<number | null>(null);
+
+    // Params fixed at the last refresh and carried through cursor pagination
+    const refreshParamsRef = useRef<Partial<ApiCallParams>>({});
+    const getRefreshParamsRef = useRef(getRefreshParams);
+    useEffect(() => {
+      getRefreshParamsRef.current = getRefreshParams;
+    }, [getRefreshParams]);
 
     useImperativeHandle(ref, () => ({
       updateItem: (itemId: number, updater: (prevItem: any) => any) => {
@@ -81,6 +98,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
       try {
         const fetched = await apiCall({
           ...defaultParams,
+          ...refreshParamsRef.current,
           id: cursorId,
           size: pageSize,
         });
@@ -103,9 +121,12 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
       setRefreshing(true);
       setHasMore(true);
 
+      refreshParamsRef.current = getRefreshParamsRef.current?.() ?? {};
+
       try {
         const fetched = await apiCall({
           ...defaultParams,
+          ...refreshParamsRef.current,
           id: null,
           size: pageSize,
         });
