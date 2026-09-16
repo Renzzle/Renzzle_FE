@@ -32,6 +32,26 @@ const normalizeNoticeLanguage = (language: string): NoticeLanguage => {
   return languageMap[languageCode] ?? 'EN';
 };
 
+const getExpiredAtTime = (expiredAt: string): number | null => {
+  if (!expiredAt) {
+    return null;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(expiredAt)) {
+    return new Date(`${expiredAt}T23:59:59.999`).getTime();
+  }
+
+  const time = new Date(expiredAt.replace(' ', 'T')).getTime();
+
+  return Number.isNaN(time) ? null : time;
+};
+
+const isActiveNotice = (notice: NoticeItem, now = Date.now()) => {
+  const expiredAtTime = getExpiredAtTime(notice.expiredAt);
+
+  return expiredAtTime === null || now <= expiredAtTime;
+};
+
 const Notice = () => {
   const { t, i18n } = useTranslation();
   const [notices, setNotices] = useState<NoticeItem[]>([]);
@@ -49,7 +69,7 @@ const Notice = () => {
 
       try {
         const data = await getPublicNotices(noticeLanguage);
-        setNotices(data);
+        setNotices(data.filter((notice) => isActiveNotice(notice)));
       } catch (error) {
         showBottomToast('error', t('toast.noticeLoadFailed'));
       } finally {
