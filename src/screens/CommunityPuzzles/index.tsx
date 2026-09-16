@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ButtonWrapper,
   Container,
@@ -20,6 +20,9 @@ import CircleButton from '../../components/features/CircleButton';
 import useOptimisticCommunityUpdate from '../../hooks/useOptimisticCommunityUpdate';
 import useModal from '../../hooks/useModal';
 import CommunityFilter, { FilterState } from '../../components/features/CommunityFilter';
+
+// Seed for the RECOMMEND shuffle. Kept within int64 (backend type) and JS safe-integer range.
+const generateShuffleSeed = () => Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 
 const DEFAULT_FILTER: FilterState = {
   sort: 'LATEST',
@@ -117,6 +120,15 @@ const CommunityPuzzles = () => {
     return params;
   }, [appliedFilter, appliedQuery]);
 
+  // New seed on every refresh (pull-to-refresh / filter change); the list reuses it
+  // for cursor pagination so the shuffled order stays stable while scrolling down.
+  const getRefreshParams = useCallback<() => Partial<ApiCallParams>>(() => {
+    if (appliedFilter.sort !== 'RECOMMEND') {
+      return {};
+    }
+    return { shuffleSeed: generateShuffleSeed() };
+  }, [appliedFilter.sort]);
+
   return (
     <Container>
       <SearchWrapper>
@@ -142,6 +154,7 @@ const CommunityPuzzles = () => {
         ref={listRef}
         apiCall={getCommunityPuzzles}
         defaultParams={apiParams}
+        getRefreshParams={getRefreshParams}
         keyboardDismissMode="on-drag"
         renderItem={({ item }) => (
           <CommunityCard

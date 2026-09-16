@@ -85,7 +85,7 @@
       "subtitle": {
         "sort": {
           "title": "정렬",
-          "options": ["최신순", "인기순"]
+          "options": ["최신순", "인기순", "추천순"]
         },
         "win": "승리",
         "certification": "인증여부",
@@ -101,7 +101,7 @@
     },
     "communityPuzzleSuccess": {
       "title": "퍼즐 풀기 성공",
-      "message": "오목을 완성하였습니다!",
+      "message": "오목을 완성하였습니다!\n획득 재화: {{reward}}조각",
       "confirm": "나가기"
     },
     "rankingPuzzleSuccess": {

@@ -39,6 +39,18 @@ target 'Renzzle_FE' do
       # :ccache_enabled => true
     )
 
+    # --- Xcode 27 대응: 배포 타깃 15.0 미만은 빌드가 거부됨 ---
+    # 일부 Pod(RNSVG, Google-Mobile-Ads-SDK, RNDeviceInfo 등)의 리소스 번들 타깃이
+    # 9.0~12.x로 잡혀 있어 RN 최소 지원 버전으로 끌어올린다.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+        if current.nil? || Gem::Version.new(current) < Gem::Version.new(min_ios_version_supported)
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
+        end
+      end
+    end
+
     # --- fmt consteval 워크어라운드 (Xcode 26.4 / Apple Clang 21 대응) ---
     # https://github.com/fmtlib/fmt/issues/4740
     fmt_base_h = File.join(__dir__, 'Pods/fmt/include/fmt/base.h')

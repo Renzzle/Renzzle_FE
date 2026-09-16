@@ -25,6 +25,7 @@ import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-naviga
 import {
   CommunityPuzzle,
   CommunityPuzzlePatch,
+  GameOutcome,
   ReactionType,
   RootStackParamList,
   TrainingPuzzleReviewAction,
@@ -57,6 +58,7 @@ const CommunityPuzzleSolve = () => {
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [currentSequence, setCurrentSequence] = useState(puzzleDetail?.boardStatus ?? '');
   const [isLoading, setIsLoading] = useState(true);
+  const [outcome, setOutcome] = useState<GameOutcome>({ price: 100 });
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
   const boardRef = useRef<BoardRef>(null);
@@ -92,9 +94,11 @@ const CommunityPuzzleSolve = () => {
       return;
     }
     if (result) {
-      await solveCommunityPuzzle(puzzleDetail.id);
+      const data = await solveCommunityPuzzle(puzzleDetail.id);
 
       markSolved();
+
+      setOutcome((prev) => ({ ...prev, reward: data?.reward ?? 0 }));
 
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
         primaryAction: () => {
@@ -103,6 +107,7 @@ const CommunityPuzzleSolve = () => {
           });
         },
       });
+      await updateUser();
     } else {
       activateModal('COMMUNITY_PUZZLE_FAILURE', {
         primaryAction: async () => {
@@ -367,7 +372,7 @@ const CommunityPuzzleSolve = () => {
             </ReviewButton>
           ) : undefined
         }
-        gameOutcome={{ price: 100 }}
+        gameOutcome={outcome}
         isLoading={isLoading}
       />
     </Container>

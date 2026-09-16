@@ -85,7 +85,7 @@
       "subtitle": {
         "sort": {
           "title": "Sort",
-          "options": ["latest", "popular"]
+          "options": ["latest", "popular", "recommended"]
         },
         "win": "Win",
         "certification": "Certification Status",
@@ -101,7 +101,7 @@
     },
     "communityPuzzleSuccess": {
       "title": "Puzzle Solved!",
-      "message": "Five in a row completed!",
+      "message": "Five in a row completed!\nReward: {{reward}} Pieces",
       "confirm": "Exit"
     },
     "rankingPuzzleSuccess": {
