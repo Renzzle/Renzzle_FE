@@ -1,6 +1,6 @@
 import axios from 'axios';
 import apiClient from './interceptor';
-import { HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
+import { APP_KEY_HEADER, HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
 
 export const updateEmailAuthCode = async (email: string) => {
   try {
@@ -111,6 +111,7 @@ export const reissueToken = async (refreshToken: string) => {
       {
         headers: {
           [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
+          ...APP_KEY_HEADER,
         },
       },
     );
