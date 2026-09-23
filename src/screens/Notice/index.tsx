@@ -18,6 +18,7 @@ import { NoticeItem, NoticeLanguage } from '../../types';
 import theme from '../../styles/theme';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { getPublicNotices } from '../../apis/notice';
+import { formatDateToYYYYMMDD } from '../../utils/utils';
 
 const normalizeNoticeLanguage = (language: string): NoticeLanguage => {
   const languageCode = language.split('-')[0];
@@ -126,7 +127,7 @@ const Notice = () => {
               </NoticeContentWrapper>
               <DateWrapper>
                 <CustomText size={10} lineHeight="sm" color="gray/gray400">
-                  {item.createdAt}
+                  {formatDateToYYYYMMDD(item.createdAt)}
                 </CustomText>
               </DateWrapper>
             </>
