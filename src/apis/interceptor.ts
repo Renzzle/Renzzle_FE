@@ -1,5 +1,5 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import { HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
+import { APP_KEY_HEADER, HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
 import useAuthStore from '../store/useAuthStore';
 import { reissueToken } from './auth';
 import useNetworkStore from '../store/useNetworkStore';
@@ -8,6 +8,7 @@ export const apiClient = axios.create({
   baseURL: `${process.env.API_URL}`,
   headers: {
     [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
+    ...APP_KEY_HEADER,
   },
 });
 
