@@ -34,7 +34,10 @@ export type ModalCategoryType =
   | 'NICKNAME_CHANGE_PURCHASE'
   | 'USER_DELETE_CONFIRM'
   | 'FEATURE_IN_PROGRESS'
-  | 'NETWORK_ERROR';
+  | 'NETWORK_ERROR'
+  | 'PERSONAL_NOTICE'
+  | 'FORCE_UPDATE'
+  | 'SYSTEM_CHECK';
 
 const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
   'NETWORK_ERROR',
@@ -43,6 +46,8 @@ const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
   'RANKING_PUZZLE_SUCCESS',
   'TRAINING_PUZZLE_FAILURE',
   'COMMUNITY_PUZZLE_FAILURE',
+  'FORCE_UPDATE',
+  'SYSTEM_CHECK',
 ];
 
 export const MODAL_TEXTS = {
@@ -146,6 +151,21 @@ export const MODAL_TEXTS = {
     BODY: 'modal.networkError.message',
     FOOTER: 'modal.networkError.confirm',
   },
+  PERSONAL_NOTICE: {
+    TITLE: 'modal.personalNotice.title',
+    BODY: 'modal.personalNotice.message',
+    FOOTER: 'modal.personalNotice.confirm',
+  },
+  FORCE_UPDATE: {
+    TITLE: 'modal.forceUpdate.title',
+    BODY: 'modal.forceUpdate.message',
+    FOOTER: 'modal.forceUpdate.confirm',
+  },
+  SYSTEM_CHECK: {
+    TITLE: 'modal.systemCheck.title',
+    BODY: 'modal.systemCheck.message',
+    FOOTER: 'modal.systemCheck.confirm',
+  },
 };
 
 interface CustomModalProps {
@@ -155,6 +175,8 @@ interface CustomModalProps {
   onSecondaryAction?: () => void;
   gameOutcome?: GameOutcome;
   bodyText?: string;
+  primaryButtonText?: string;
+  hideFooter?: boolean;
   titleRight?: React.ReactNode;
   isLoading?: boolean;
   children?: React.ReactNode;
@@ -167,6 +189,9 @@ export const ModalCard = ({
   titleRight,
   isLoading,
   gameOutcome,
+  bodyText: bodyTextOverride,
+  primaryButtonText,
+  hideFooter,
   children,
 }: Omit<CustomModalProps, 'isVisible'>) => {
   const width = useDeviceWidth();
@@ -191,34 +216,34 @@ export const ModalCard = ({
   const body = (
     <ModalBodyContainer>
       <CustomText size={14} lineHeight="lg" color="gray/gray600">
-        {t(bodyText, {
-          rating: gameOutcome?.rating,
-          reward: gameOutcome?.reward,
-          price: gameOutcome?.price,
-          puzzleCount: gameOutcome?.puzzleCount,
-        })}
+        {bodyTextOverride ??
+          t(bodyText, {
+            rating: gameOutcome?.rating,
+            reward: gameOutcome?.reward,
+            price: gameOutcome?.price,
+            puzzleCount: gameOutcome?.puzzleCount,
+          })}
       </CustomText>
       {children}
     </ModalBodyContainer>
   );
 
-  const footer =
-    typeof footerTexts === 'string' ? (
-      <ModalBottomContainer>
-        <CustomButton category="primary" onPress={onPrimaryClose} disabled={isLoading}>
-          {t(footerTexts)}
-        </CustomButton>
-      </ModalBottomContainer>
-    ) : (
-      <ModalBottomContainer>
-        <CustomButton category="secondary" onPress={onSecondaryClose} disabled={isLoading}>
-          {t(footerTexts[0])}
-        </CustomButton>
-        <CustomButton category="primary" onPress={onPrimaryClose} disabled={isLoading}>
-          {t(footerTexts[1])}
-        </CustomButton>
-      </ModalBottomContainer>
-    );
+  const footer = hideFooter ? null : typeof footerTexts === 'string' ? (
+    <ModalBottomContainer>
+      <CustomButton category="primary" onPress={onPrimaryClose} disabled={isLoading}>
+        {t(primaryButtonText ?? footerTexts)}
+      </CustomButton>
+    </ModalBottomContainer>
+  ) : (
+    <ModalBottomContainer>
+      <CustomButton category="secondary" onPress={onSecondaryClose} disabled={isLoading}>
+        {t(footerTexts[0])}
+      </CustomButton>
+      <CustomButton category="primary" onPress={onPrimaryClose} disabled={isLoading}>
+        {t(primaryButtonText ?? footerTexts[1])}
+      </CustomButton>
+    </ModalBottomContainer>
+  );
 
   return (
     <ModalContainer screenWidth={width}>
