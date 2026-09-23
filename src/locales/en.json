@@ -204,6 +204,23 @@
       "title": "Network Error",
       "message": "Cannot connect to the server.\nCheck your internet connection.",
       "confirm": "Confirm"
+    },
+    "personalNotice": {
+      "title": "Notice",
+      "message": "You have new notifications.",
+      "confirm": "Confirm"
+    },
+    "forceUpdate": {
+      "title": "Update Required",
+      "message": "Please update to the latest version.",
+      "latestVersion": "Latest version",
+      "update": "Update",
+      "confirm": "Exit"
+    },
+    "systemCheck": {
+      "title": "System Maintenance",
+      "message": "The server is currently under maintenance.\nPlease try again later.",
+      "confirm": "Exit"
     }
   },
   "home": {

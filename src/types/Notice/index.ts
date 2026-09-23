@@ -6,3 +6,16 @@ export interface NoticeItem {
   createdAt: string;
   expiredAt: string;
 }
+
+export interface PersonalNoticeItem {
+  context: string;
+}
+
+export type PersonalNoticeDescription = 'context' | 'update' | 'system-check';
+
+export interface PersonalNoticeResponse {
+  description?: PersonalNoticeDescription;
+  descrpition?: PersonalNoticeDescription;
+  notice?: PersonalNoticeItem[];
+  version?: string;
+}

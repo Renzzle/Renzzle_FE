@@ -204,6 +204,23 @@
       "title": "네트워크 오류",
       "message": "서버와 연결할 수 없습니다.\n인터넷 연결 상태를 확인해주세요.",
       "confirm": "확인"
+    },
+    "personalNotice": {
+      "title": "알림",
+      "message": "새로운 알림이 있습니다.",
+      "confirm": "확인"
+    },
+    "forceUpdate": {
+      "title": "업데이트 안내",
+      "message": "새 버전으로 업데이트가 필요합니다.",
+      "latestVersion": "최신 버전",
+      "update": "업데이트",
+      "confirm": "종료"
+    },
+    "systemCheck": {
+      "title": "시스템 점검",
+      "message": "현재 서버 점검 중입니다.\n잠시 후 다시 이용해 주세요.",
+      "confirm": "종료"
     }
   },
   "home": {
