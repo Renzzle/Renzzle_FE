@@ -43,6 +43,7 @@ import { CustomModal } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
 import ChangeNickname from './src/screens/Settings/ChangeNickname/index.tsx';
 import ChangePassword from './src/screens/Settings/ChangePassword/index.tsx';
+import Tutorial from './src/screens/Tutorial/index.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -117,6 +118,11 @@ function App(): React.JSX.Element | null {
                     name="ChangePassword"
                     component={ChangePassword}
                     options={{ title: 'settings.changePassword' }}
+                  />
+                  <Stack.Screen
+                    name="Tutorial"
+                    component={Tutorial}
+                    options={{ headerShown: false }}
                   />
                   <Stack.Screen
                     name="TrainingPacks"

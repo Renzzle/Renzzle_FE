@@ -66,6 +66,7 @@ const Settings = () => {
   };
 
   const menuItems = [
+    { label: t('settings.gameGuide'), onPress: () => navigation.navigate('Tutorial') },
     { label: t('settings.language'), onPress: () => navigation.navigate('Language') },
     { label: t('settings.changeNickname'), onPress: () => navigation.navigate('ChangeNickname') },
     { label: t('settings.changePassword'), onPress: () => navigation.navigate('ChangePassword') },

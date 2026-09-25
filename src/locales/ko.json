@@ -46,6 +46,7 @@
     "settings": "설정"
   },
   "settings": {
+    "gameGuide": "게임 가이드",
     "language": "언어 설정",
     "changeNickname": "닉네임 변경",
     "changePassword": "비밀번호 변경",
@@ -192,6 +193,12 @@
       "confirm": "탈퇴하기",
       "cancel": "취소"
     },
+    "tutorialSkipConfirm": {
+      "title": "렌주룰을 자세히 알고 계신가요?",
+      "message": "렌주룰을 잘 안다면 건너뛰어도 괜찮아요.\n게임 가이드는 설정에서 다시 볼 수 있어요.",
+      "confirm": "잘 알고 있어요",
+      "cancel": "계속 볼게요"
+    },
     "featureInProgress": {
       "title": "준비 중",
       "message": "해당 기능은 현재 개발 중입니다.\n정식 출시에서 만나요!",
@@ -269,6 +276,96 @@
     "failed": "실패",
     "prev": "이전 문제",
     "next": "다음 문제"
+  },
+  "tutorial": {
+    "skip": "건너뛰기",
+    "prev": "이전",
+    "next": "다음",
+    "close": "닫기",
+    "startTraining": "트레이닝 퍼즐 시작",
+    "placeHint": "표시된 자리에 두어 보세요.",
+    "chapter": {
+      "intro": "앱 소개",
+      "basic": "렌주 기본",
+      "forbidden": "금수",
+      "exception": "예외 규칙",
+      "white": "백의 규칙",
+      "finish": "마무리"
+    },
+    "forbiddenSummary": {
+      "doubleThree": {
+        "label": "33",
+        "description": "3이 두 개 생기는 수"
+      },
+      "doubleFour": {
+        "label": "44",
+        "description": "4가 두 개 생기는 수"
+      },
+      "overline": {
+        "label": "장목",
+        "description": "6개 이상 이어지는 수"
+      }
+    },
+    "steps": {
+      "welcome": {
+        "title": "Renzzle에 오신 것을 환영해요",
+        "description": "렌주룰로 즐기는 오목 퍼즐 앱이에요.\n세 가지 모드로 퍼즐을 즐겨 보세요."
+      },
+      "place": {
+        "title": "돌 놓는 방법",
+        "description": "자리를 한 번 누르면 선택되고, 같은 자리를 다시 누르면 돌이 놓여요.\n표시된 자리에 돌을 놓아 보세요.",
+        "result": "잘했어요!"
+      },
+      "five": {
+        "title": "오목을 완성하면 승리",
+        "description": "가로, 세로, 대각선 어느 방향이든 돌 5개를 한 줄로 이으면 승리해요.\n흑으로 오목을 완성해 보세요.",
+        "result": "흑이 오목으로 승리했어요."
+      },
+      "forbiddenIntro": {
+        "title": "흑에게만 있는 규칙, 금수",
+        "description": "오목은 먼저 두는 흑이 유리해요.\n그래서 렌주룰은 흑이 두면 패배하는 자리인 금수를 정해 두었어요.\n금수에는 총 세 가지 경우가 있어요."
+      },
+      "doubleThree": {
+        "title": "33 (삼삼)",
+        "description": "한 수로 3이 두 개 생기는 자리예요.\n3은 한 수를 더 두면 열린 4가 되는 모양이에요."
+      },
+      "doubleFour": {
+        "title": "44 (사사)",
+        "description": "한 수로 4가 두 개 생기는 자리예요.\n한쪽이 막힌 4도 똑같이 세요."
+      },
+      "oneLineFour": {
+        "title": "한 줄에서 생기는 44",
+        "description": "같은 줄에서도 4가 두 개 생기면 44예요.\n이 자리에 두면 양쪽 빈칸 중 어디를 채워도 오목이 돼요."
+      },
+      "overline": {
+        "title": "장목 (6목 이상)",
+        "description": "돌 6개 이상이 한 줄로 이어지는 자리예요.\n흑은 오목을 만들어야만 승리해요."
+      },
+      "instantLoss": {
+        "title": "금수에 두면 즉시 패배",
+        "description": "Renzzle에서는 흑이 금수에 두면 경고 없이 바로 패배해요.\n표시된 33 자리에 두어 보세요.",
+        "result": "33 금수로 흑이 패배했어요."
+      },
+      "fourThree": {
+        "title": "43은 둘 수 있어요",
+        "description": "4와 3이 함께 생기는 43은 금수가 아니에요.\n흑이 이기는 대표적인 방법이에요.\n43을 만들어 보세요.",
+        "result": "43을 완성했어요!"
+      },
+      "fivePriority": {
+        "title": "오목이 금수보다 우선",
+        "description": "금수 모양이 함께 생겨도 오목이 만들어지면 흑이 승리해요.\n이 자리는 33이 생기지만 오목도 완성돼요.\n표시된 자리에 두어 보세요.",
+        "result": "오목이 우선이라 흑이 승리했어요."
+      },
+      "whiteFree": {
+        "title": "백에게는 금수가 없어요",
+        "description": "백은 33과 44를 자유롭게 둘 수 있어요.\n6목 이상을 만들어도 승리해요.\n백으로 6목을 만들어 보세요.",
+        "result": "백이 6목으로 승리했어요."
+      },
+      "finish": {
+        "title": "준비가 끝났어요",
+        "description": "트레이닝 퍼즐부터 차근차근 시작해 보세요.\n이 가이드는 설정 > 게임 가이드에서 다시 볼 수 있어요."
+      }
+    }
   },
   "alert": {
     "noData": "데이터가 없습니다."
