@@ -117,14 +117,9 @@ const TutorialBoard = ({
   };
 
   const renderOverlay = (position: string | null, isSelected: boolean) => {
-    if (!position) {
+    // 둔 돌의 금수 X 표시는 Cell이 직접 그린다
+    if (!position || placedStone?.position === position) {
       return null;
-    }
-
-    if (placedStone?.position === position) {
-      return placedStone.isForbidden ? (
-        <Icon name="CrossIcon" color="error/error_color" size={cellWidth * 0.9} />
-      ) : null;
     }
 
     if (forbidden.includes(position)) {
@@ -167,8 +162,9 @@ const TutorialBoard = ({
                   cellWidth={cellWidth}
                   stoneX={selected?.x}
                   stoneY={selected?.y}
-                  sequence={isPlacedStone && !placedStone?.isForbidden ? -1 : null}
+                  sequence={isPlacedStone ? -1 : null}
                   onPress={() => handleCellPress(x, y)}
+                  isForbidden={isPlacedStone && !!placedStone?.isForbidden}
                 />
                 {overlay && <CellOverlay pointerEvents="none">{overlay}</CellOverlay>}
               </CellWrapper>

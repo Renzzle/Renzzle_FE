@@ -112,7 +112,8 @@ Java_com_renzzle_1fe_CheckWinJNI_checkWin(JNIEnv *env, jobject obj, jstring java
         else return 1;
     } else if (board.getResult() == WHITE_WIN) {
         if (board.isBlackTurn()) return 1;
-        else return 0;
+        // 흑이 방금 둔 수로 백이 이겼다면 흑의 금수(33, 44, 장목)로 인한 패배 (2)
+        else return 2;
     } else {
         return 0;
     }

@@ -254,7 +254,8 @@ RCT_EXPORT_METHOD(checkWinWrapper:(NSString *)boardData
         if (board.getResult() == BLACK_WIN) {
             result = board.isBlackTurn() ? 0 : 1;
         } else if (board.getResult() == WHITE_WIN) {
-            result = board.isBlackTurn() ? 1 : 0;
+            // 흑이 방금 둔 수로 백이 이겼다면 흑의 금수(33, 44, 장목)로 인한 패배 (2)
+            result = board.isBlackTurn() ? 1 : 2;
         }
         
         resolve(@(result));
