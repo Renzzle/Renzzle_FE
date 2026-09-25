@@ -6,12 +6,14 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import i18n, { initI18n } from '../../locales/i18n';
 import { getAppData } from '../../apis/config';
 import useConfigStore from '../../store/useConfigStore';
+import useTutorialStore from '../../store/useTutorialStore';
 
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
   const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
   const { setUser } = useUserStore(); // Get setters from the user store
   const { setFeedbackUrl } = useConfigStore();
+  const restoreTutorialPending = useTutorialStore((state) => state.restoreTutorialPending);
 
   useEffect(() => {
     const loadAppData = async () => {
@@ -30,7 +32,7 @@ const useInitializeApp = (): boolean => {
 
     const initApp = async () => {
       try {
-        await Promise.all([initI18n(), loadAppData()]);
+        await Promise.all([initI18n(), loadAppData(), restoreTutorialPending()]);
         const credentials = await restoreCredentials();
         const { accessToken, refreshToken } = credentials;
 
@@ -53,7 +55,7 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl]);
+  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl, restoreTutorialPending]);
 
   return isLoading;
 };

@@ -46,6 +46,7 @@
     "settings": "Settings"
   },
   "settings": {
+    "gameGuide": "Game Guide",
     "language": "Language",
     "changeNickname": "Change Nickname",
     "changePassword": "Change Password",
@@ -192,6 +193,12 @@
       "confirm": "Delete",
       "cancel": "Cancel"
     },
+    "tutorialSkipConfirm": {
+      "title": "Do you know Renju rules well?",
+      "message": "If you know Renju rules well, feel free to skip.\nYou can open the Game Guide again in Settings.",
+      "confirm": "I know them",
+      "cancel": "Keep Going"
+    },
     "featureInProgress": {
       "title": "Coming Soon",
       "message": "This feature is currently under development.\nSee you at the official launch!",
@@ -269,6 +276,96 @@
     "failed": "Failed",
     "prev": "Previous",
     "next": "Next"
+  },
+  "tutorial": {
+    "skip": "Skip",
+    "prev": "Back",
+    "next": "Next",
+    "close": "Close",
+    "startTraining": "Start Training",
+    "placeHint": "Place your stone on the marked point.",
+    "chapter": {
+      "intro": "Getting Started",
+      "basic": "Renju Basics",
+      "forbidden": "Forbidden Moves",
+      "exception": "Exceptions",
+      "white": "White's Rules",
+      "finish": "Wrap-up"
+    },
+    "forbiddenSummary": {
+      "doubleThree": {
+        "label": "3-3",
+        "description": "Makes two threes"
+      },
+      "doubleFour": {
+        "label": "4-4",
+        "description": "Makes two fours"
+      },
+      "overline": {
+        "label": "Overline",
+        "description": "Connects six or more"
+      }
+    },
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Renzzle",
+        "description": "It's a Gomoku puzzle app played with Renju rules.\nEnjoy puzzles in three modes."
+      },
+      "place": {
+        "title": "Placing a Stone",
+        "description": "Tap a point to select it, then tap the same point again to place a stone.\nPlace a stone on the marked point.",
+        "result": "Nice!"
+      },
+      "five": {
+        "title": "Five in a Row Wins",
+        "description": "Line up five stones horizontally, vertically, or diagonally to win.\nMake five in a row with Black.",
+        "result": "Black wins with five in a row."
+      },
+      "forbiddenIntro": {
+        "title": "Forbidden Moves: Black Only",
+        "description": "Black has the advantage of moving first.\nSo under Renju rules, Black loses by playing on certain points, called forbidden moves.\nThere are three kinds."
+      },
+      "doubleThree": {
+        "title": "Double Three (3-3)",
+        "description": "A point where one move makes two threes.\nA three is a shape that becomes a straight four with one more stone."
+      },
+      "doubleFour": {
+        "title": "Double Four (4-4)",
+        "description": "A point where one move makes two fours.\nA four blocked on one side still counts."
+      },
+      "oneLineFour": {
+        "title": "Double Four in One Line",
+        "description": "Two fours in the same line also make a double four.\nAfter a stone here, filling either empty point makes five."
+      },
+      "overline": {
+        "title": "Overline (Six or More)",
+        "description": "A point that connects six or more stones in a row.\nBlack must make exactly five in a row to win."
+      },
+      "instantLoss": {
+        "title": "Forbidden Move = Instant Loss",
+        "description": "In Renzzle, Black loses immediately after a forbidden move, with no warning.\nPlace a stone on the marked 3-3 point.",
+        "result": "Black loses on a forbidden 3-3."
+      },
+      "fourThree": {
+        "title": "Four-Three Is Allowed",
+        "description": "A four-three makes a four and a three together, and it is not forbidden.\nIt's Black's classic way to win.\nMake a four-three.",
+        "result": "You made a four-three!"
+      },
+      "fivePriority": {
+        "title": "Five Beats Forbidden",
+        "description": "Black wins by making five in a row, even if the move also forms a forbidden shape.\nThis point makes a 3-3, but it also completes five.\nPlace a stone on the marked point.",
+        "result": "Five comes first, so Black wins."
+      },
+      "whiteFree": {
+        "title": "White Has No Restrictions",
+        "description": "White may play 3-3 and 4-4 freely.\nSix or more in a row also wins.\nMake six in a row with White.",
+        "result": "White wins with six in a row."
+      },
+      "finish": {
+        "title": "You're All Set",
+        "description": "Start step by step with Training puzzles.\nYou can open this guide again in Settings > Game Guide."
+      }
+    }
   },
   "alert": {
     "noData": "No data available."

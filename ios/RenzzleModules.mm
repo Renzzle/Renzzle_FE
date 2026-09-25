@@ -238,9 +238,17 @@ RCT_EXPORT_METHOD(cancelCalculate:(nonnull NSNumber *)requestId)
 @implementation CheckWinModule
 RCT_EXPORT_MODULE(CheckWinJNI);
 
+// 승패 판정은 금방 끝나고 취소할 일도 없으므로 전용 직렬 큐에서 처리한다.
+// RCTModuleMethod는 메서드마다 NSInvocation 하나를 재사용하기 때문에, 같은 메서드가 동시 실행 큐에서
+// 겹쳐 호출되면 인자가 서로 덮어써져 크래시(이중 해제, 잘못된 메모리 접근)가 난다
 - (dispatch_queue_t)methodQueue
 {
-    return RenzzleJNIQueue();
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("com.renzzle_fe.checkwin", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
 }
 
 RCT_EXPORT_METHOD(checkWinWrapper:(NSString *)boardData
@@ -254,7 +262,8 @@ RCT_EXPORT_METHOD(checkWinWrapper:(NSString *)boardData
         if (board.getResult() == BLACK_WIN) {
             result = board.isBlackTurn() ? 0 : 1;
         } else if (board.getResult() == WHITE_WIN) {
-            result = board.isBlackTurn() ? 1 : 0;
+            // 흑이 방금 둔 수로 백이 이겼다면 흑의 금수(33, 44, 장목)로 인한 패배 (2)
+            result = board.isBlackTurn() ? 1 : 2;
         }
         
         resolve(@(result));

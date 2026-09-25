@@ -38,25 +38,9 @@ export interface TrainingPuzzle {
   isSolved: boolean;
 }
 
-export interface LessonPuzzle {
-  id: number;
-  title: string;
-  boardStatus: string;
-  depth: number;
-  difficulty: 'HIGH' | 'MIDDLE' | 'LOW';
-  winColor: 'BLACK' | 'WHITE';
-  description: string;
-  isLocked: boolean;
-}
-
 export interface CommunityPuzzleListResponse {
   isSuccess: boolean;
   response: CommunityPuzzle[];
-}
-
-export interface LessonPuzzleListResponse {
-  isSuccess: boolean;
-  response: LessonPuzzle[];
 }
 
 export enum Difficulty {

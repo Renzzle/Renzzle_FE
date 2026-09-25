@@ -111,6 +111,13 @@ export const menuThemeMap = {
     iconName: 'SettingIcon',
     route: 'ChangePassword',
   },
+  tutorial: {
+    titleKey: 'settings.gameGuide',
+    background: 'sub_color/indigo/bg',
+    iconColor: 'main_color/blue_p',
+    iconName: 'BookOpenIcon',
+    route: 'Tutorial',
+  },
   signup: {
     titleKey: 'auth.signup',
     background: 'sub_color/indigo/bg',
