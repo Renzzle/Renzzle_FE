@@ -55,6 +55,9 @@
     "feedback": "Send Feedback",
     "deleteAccount": "Delete Account"
   },
+  "notice": {
+    "empty": "No notices available."
+  },
   "button": {
     "createPuzzle": "Create",
     "uploadPuzzle": "Upload",
@@ -201,6 +204,23 @@
       "title": "Network Error",
       "message": "Cannot connect to the server.\nCheck your internet connection.",
       "confirm": "Confirm"
+    },
+    "personalNotice": {
+      "title": "Notice",
+      "message": "You have new notifications.",
+      "confirm": "Confirm"
+    },
+    "forceUpdate": {
+      "title": "Update Required",
+      "message": "Please update to the latest version.",
+      "latestVersion": "Latest version",
+      "update": "Update",
+      "confirm": "Exit"
+    },
+    "systemCheck": {
+      "title": "System Maintenance",
+      "message": "The server is currently under maintenance.\nPlease try again later.",
+      "confirm": "Exit"
     }
   },
   "home": {
@@ -273,6 +293,73 @@
   "alert": {
     "noData": "No data available."
   },
+  "error": {
+    "internalServerError": "Internal server error occurred.",
+    "validationError": "Invalid request.",
+    "globalNotFound": "Resource not found.",
+    "methodNotAllowed": "Unsupported HTTP method.",
+    "unsupportedMediaType": "Unsupported media type.",
+
+    "emptyResultError": "No result found.",
+    "constraintViolationError": "Database constraint violated.",
+
+    "exceedEmailAuthRequest": "Too many email verification requests. Please try again later.",
+    "exceedEmailAuthAttempt": "Too many verification code attempts.",
+    "exceedLoginAttempt": "Too many login attempts.",
+    "invalidEmailAuthCode": "Invalid verification code.",
+    "invalidAuthVerityToken": "Invalid email verification token.",
+    "invalidEmail": "Invalid email.",
+    "invalidPassword": "Invalid password.",
+    "notBearerGrantType": "Authorization type must be Bearer.",
+    "adminAccessDenied": "Administrator privileges required.",
+    "duplicateEmail": "Email already registered.",
+    "duplicateNickname": "Nickname already taken.",
+    "duplicateDevice": "Device already registered.",
+
+    "expiredJwtToken": "Session expired. Please log in again.",
+    "malformedJwtToken": "Corrupted or malformed token.",
+    "unsupportedJwtToken": "Unsupported token format.",
+    "illegalToken": "Missing or malformed token.",
+    "cannotParseToken": "Failed to parse token.",
+
+    "cannotLoadUserInfo": "Cannot load user information.",
+    "levelNotFound": "Level not found.",
+    "cannotFindUser": "User not found.",
+    "invalidSubscriptionRequest": "Invalid subscription information.",
+    "insufficientCurrency": "Not enough pieces (currency).",
+    "unauthorizedAction": "Unauthorized user.",
+
+    "invalidPaymentRequest": "Invalid payment request.",
+    "unsupportedPaymentPlatform": "Unsupported payment platform.",
+    "storeVerificationFailed": "Store payment verification failed.",
+    "receiptTransactionMismatch": "Receipt transaction does not match the request.",
+    "unknownIapProduct": "Unregistered in-app purchase product.",
+    "alreadyProcessedReceipt": "Receipt already processed.",
+
+    "alreadySolvedPuzzle": "Puzzle already solved.",
+    "alreadyExistingTranslation": "Translation already exists for this language.",
+    "invalidSessionTtl": "Invalid session TTL.",
+    "isNotStarted": "Ranked game not started.",
+    "noBoardStatus": "Missing puzzle ID or board status.",
+    "invalidAnswerPosition": "Answer coordinate out of range (a-o, 1-15).",
+    "invalidRankPuzzleType": "Invalid ranked puzzle type.",
+    "communityPuzzleAccessDenied": "No permission for this community puzzle.",
+    "cannotFindCommunityPuzzle": "Community puzzle not found.",
+    "cannotFindTrainingPuzzle": "Training puzzle not found.",
+    "noSuchTrainingPack": "Training pack not found.",
+    "noSuchTrainingPacks": "No training pack for that difficulty.",
+    "cannotFindPuzzle": "Puzzle not found.",
+    "noSuchPackTranslation": "Pack translation not found.",
+    "noUserProgressForPack": "No progress for this pack.",
+    "cannotFindRankPuzzle": "Ranked puzzle not found.",
+    "emptySessionData": "Session data not found.",
+    "latestPuzzleNotFound": "No previous ranked puzzle.",
+    "trendPuzzleDuplicated": "Duplicate trend puzzle.",
+    "exceedDailyPuzzleUpload": "Daily puzzle upload limit reached. Please try again tomorrow.",
+    "sessionAlreadyEnded": "Session already ended.",
+    "sessionGenerationFailed": "Failed to generate session ID.",
+    "cannotFindAnnouncement": "Announcement not found."
+  },
   "toast": {
     "languageChanged": "Language changed",
 
@@ -307,6 +394,7 @@
 
     "missingRequiredFields": "Required fields are missing. Returning to the beginning.",
 
-    "trainingPackLoadFailed": "Failed to load training pack: "
+    "trainingPackLoadFailed": "Failed to load training pack: ",
+    "noticeLoadFailed": "Failed to load notices."
   }
 }

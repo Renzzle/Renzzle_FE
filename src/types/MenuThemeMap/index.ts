@@ -81,7 +81,7 @@ export const menuThemeMap = {
     background: 'sub_color/blue/bg',
     iconColor: 'sub_color/blue/p',
     iconName: 'NoticeIcon',
-    route: 'Home',
+    route: 'Notice',
   },
   settings: {
     titleKey: 'common.settings',
@@ -143,6 +143,7 @@ export const headerMenuTypeMap = {
   MyPuzzles: 'myPuzzle',
   LikedPuzzles: 'likes',
   Ranking: 'ranking',
+  Notice: 'notice',
   Settings: 'settings',
   Language: 'language',
   ChangeNickname: 'changeNickname',

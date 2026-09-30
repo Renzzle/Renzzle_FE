@@ -8,6 +8,7 @@ import { ColorType } from '../../../styles/theme';
 import { View } from 'react-native';
 import PuzzleStats from '../PuzzleStats';
 import PuzzleAttributes from '../PuzzleAttributes';
+import { formatDateToYYYYMMDD } from '../../../utils/utils';
 
 interface CommunityCardProps {
   title: string;
@@ -42,7 +43,7 @@ const CommunityCard = ({
 }: CommunityCardProps) => {
   const { t } = useTranslation();
 
-  const datePart = date.split('T')[0];
+  const formattedDate = formatDateToYYYYMMDD(date);
 
   const metaInfoItems: { text: string | number; iconName: IconName; iconColor?: ColorType }[] = [];
   const statsItems: { text: string | number; iconName: IconName }[] = [];
@@ -101,7 +102,7 @@ const CommunityCard = ({
           </TitleWrapper>
           <PuzzleAttributes depth={depth} winColor={winColor} isVerified={isVerified} />
           <CustomText size={8} lineHeight="sm" color="gray/gray500">
-            {datePart}
+            {formattedDate}
           </CustomText>
         </View>
 
