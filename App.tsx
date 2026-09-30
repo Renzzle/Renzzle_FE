@@ -47,6 +47,7 @@ import Notice from './src/screens/Notice/index.tsx';
 import DeviceInfo from 'react-native-device-info';
 import { getPersonalNotice } from './src/apis/notice.ts';
 import { NoticeLanguage, PersonalNoticeItem } from './src/types/index.ts';
+import { useUserStore } from './src/store/useUserStore.ts';
 
 const Stack = createNativeStackNavigator();
 const IOS_APP_STORE_ID = '6793042991';
@@ -85,6 +86,7 @@ function App(): React.JSX.Element | null {
   const { accessToken } = useAuthStore();
   const isLoading = useInitializeApp();
   const { isNetworkError, setNetworkError } = useNetworkStore();
+  const updateUser = useUserStore((state) => state.updateUser);
   const [personalNoticeModal, setPersonalNoticeModal] =
     React.useState<PersonalNoticeModalState>(null);
   const hasRequestedPersonalNotice = React.useRef(false);
@@ -119,6 +121,14 @@ function App(): React.JSX.Element | null {
           return;
         }
 
+        if (description === 'context') {
+          await updateUser();
+
+          if (!isMounted) {
+            return;
+          }
+        }
+
         if (description === 'context' && response.notice?.length) {
           const [notice, ...remainingNotices] = response.notice;
 
@@ -151,7 +161,7 @@ function App(): React.JSX.Element | null {
     return () => {
       isMounted = false;
     };
-  }, [accessToken, isLoading]);
+  }, [accessToken, isLoading, updateUser]);
 
   const handleCloseNetworkError = () => {
     setNetworkError(false);
