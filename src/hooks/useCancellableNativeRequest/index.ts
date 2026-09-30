@@ -4,8 +4,11 @@ interface UseCancellableNativeRequestParams {
   cancelRequest?: (requestId: number) => void;
 }
 
+// 네이티브 모듈은 취소된 요청 ID를 앱 전체에서 기억한다. 화면(보드)마다 ID를 1부터 다시 세면
+// 이전 화면에서 취소만 되고 남은 ID와 겹쳐 새 요청이 곧바로 취소 처리되므로, ID는 앱 전체에서 증가시킨다
+let lastRequestId = 0;
+
 const useCancellableNativeRequest = ({ cancelRequest }: UseCancellableNativeRequestParams) => {
-  const requestIdRef = useRef(0);
   const activeRequestIdRef = useRef<number | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -33,10 +36,10 @@ const useCancellableNativeRequest = ({ cancelRequest }: UseCancellableNativeRequ
   const startRequest = useCallback(() => {
     cancelActiveRequest();
 
-    requestIdRef.current += 1;
-    activeRequestIdRef.current = requestIdRef.current;
+    lastRequestId += 1;
+    activeRequestIdRef.current = lastRequestId;
 
-    return requestIdRef.current;
+    return lastRequestId;
   }, [cancelActiveRequest]);
 
   const scheduleRequest = useCallback(

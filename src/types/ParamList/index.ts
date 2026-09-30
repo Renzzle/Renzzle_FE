@@ -55,5 +55,11 @@ export type RootStackParamList = {
     archive: RankArchive[];
     initialIndex: number;
   };
+  Tutorial:
+    | {
+        // 회원가입 직후 자동으로 열린 경우 (건너뛰기 확인 후에만 나갈 수 있음)
+        isFirstRun?: boolean;
+      }
+    | undefined;
   OtherScreen: undefined;
 };

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   ArticleTitle,
@@ -24,6 +24,7 @@ import CommunityCard from '../../components/features/CommunityCard';
 import useModal from '../../hooks/useModal';
 import { BackHandler, Platform, ToastAndroid } from 'react-native';
 import i18n from '../../locales/i18n';
+import useTutorialStore from '../../store/useTutorialStore';
 
 const Home = () => {
   const backHandlerPressedOnce = useRef(false);
@@ -38,6 +39,7 @@ const Home = () => {
   } = useModal();
   const [recommendPack, setRecommendPack] = useState<TrainingPack | null>(null);
   const [trendPuzzles, setTrendPuzzles] = useState<CommunityPuzzle[] | null>(null);
+  const isTutorialPending = useTutorialStore((state) => state.isTutorialPending);
 
   const mainMenus: MenuType[] = ['trainingPuzzle', 'communityPuzzle', 'rankingPuzzle'];
   const subMenus: MenuType[] = ['ranking', 'myPuzzle', 'likes', 'notice', 'settings'];
@@ -80,6 +82,13 @@ const Home = () => {
       fetchTrendPuzzles();
     }, []),
   );
+
+  // 회원가입 직후라면 튜토리얼을 띄운다 (끝내거나 건너뛰면 플래그가 해제됨)
+  useEffect(() => {
+    if (isTutorialPending) {
+      navigation.navigate('Tutorial', { isFirstRun: true });
+    }
+  }, [isTutorialPending, navigation]);
 
   useFocusEffect(
     useCallback(() => {

@@ -57,7 +57,7 @@ export const coordinatesToPosition = (x: number, y: number): string | null => {
   return `${convertToLowercaseAlphabet(y)}${convertToReverseNumber(x)}`;
 };
 
-export const positionToValue = (position: string): number | null => {
+export const positionToCoordinates = (position: string): { x: number; y: number } | null => {
   const match = position.match(/^([a-o])(1[0-5]|[1-9])$/);
 
   if (!match) {
@@ -67,7 +67,17 @@ export const positionToValue = (position: string): number | null => {
   const y = convertLowercaseAlphabetToNumber(match[1]);
   const x = convertToReverseNumber(parseInt(match[2], 10));
 
-  return coordinatesToValue(x, y);
+  return { x, y };
+};
+
+export const positionToValue = (position: string): number | null => {
+  const coordinates = positionToCoordinates(position);
+
+  if (!coordinates) {
+    return null;
+  }
+
+  return coordinatesToValue(coordinates.x, coordinates.y);
 };
 
 export interface Move {
