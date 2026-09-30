@@ -3,6 +3,7 @@ import { HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
 import useAuthStore from '../store/useAuthStore';
 import { reissueToken } from './auth';
 import useNetworkStore from '../store/useNetworkStore';
+import { getApiErrorMessage } from './errorMessage';
 
 export const apiClient = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -116,8 +117,9 @@ apiClient.interceptors.response.use(
         }
       }
     }
-    console.log(error.response?.data?.errorResponse);
-    return Promise.reject(error.response?.data?.errorResponse?.message ?? error);
+    const errorResponse = error.response?.data?.errorResponse;
+    console.log(errorResponse);
+    return Promise.reject(errorResponse ? getApiErrorMessage(errorResponse) : error);
   },
 );
 
