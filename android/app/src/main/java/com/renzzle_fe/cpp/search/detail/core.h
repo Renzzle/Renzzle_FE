@@ -126,6 +126,21 @@ bool Search::tryResolveQuickWin(Evaluator& evaluator, bool isMax, int depth, Mov
     return true;
 }
 
+// null window on the LOSE boundary: proves a losing root move LOSE regardless of order
+bool Search::tryResolveLosingRootMove(int depth, bool isMax, Value& resolvedValue) {
+    const Value loseAlpha(MIN_VALUE, Value::Type::UNKNOWN);
+    Value loseBeta = loseAlpha;
+    loseBeta += 1;
+
+    Value value = abp(depth - 1, !isMax, loseAlpha, loseBeta, nullptr);
+    if (!searchActive() || !value.isLose()) {
+        return false;
+    }
+
+    resolvedValue = value;
+    return true;
+}
+
 Search::ChildSearchResult Search::searchChildPVS(int depth, bool isMax, size_t moveIndex, Value alpha, Value beta,
     Value bestVal, MoveList* pv, bool requireExactBest) {
     ChildSearchResult result;
@@ -371,7 +386,12 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
             : evaluateLeafNode(isMax, depth);
     }
 
-    sortChildNodes(moves, isMax, ttEntry);
+    // DEFENSIVE root defends when the opponent threatens; elsewhere Max attacks
+    const bool defensiveRoot = options.mode == Mode::DEFENSIVE && isRootNode;
+    const bool defending = defensiveRoot
+        ? (evaluator.isOppoMateExist() || evaluator.isOppoFourThreeExist())
+        : !isMax;
+    sortChildNodes(moves, isMax, defending, ttEntry);
 
     // sentinel sits outside [MIN_VALUE, MAX_VALUE] so any real child (incl. LOSE/WIN)
     // wins the first comparison — without this, LOSE-only nodes leave bestMove unset.
@@ -389,6 +409,8 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
         ? TranspositionTable::decodeMove(ttEntry->bestMove)
         : Pos();
 
+    // elimination needs all but one move proven LOSE; stop checking after a 2nd survivor
+    int rootSurvivorCount = 1;
     bool searchedAny = false;
     bool causedCutoff = false;
     bool searchedAll = true;
@@ -412,8 +434,18 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
         const size_t nodeCountBeforeMove = isRootNode ? monitor.getVisitCnt() : 0;
         const double elapsedBeforeMove = isRootNode ? monitor.getElapsedTime() : 0.0;
 
-        ChildSearchResult childResult =
-            searchChildPVS(depth, isMax, i, alpha, beta, bestVal, pv, isRootNode);
+        ChildSearchResult childResult;
+        bool provenLose = false;
+        if (defensiveRoot && defending && i > 0 && rootSurvivorCount < 2
+            && bestVal.isOnGoing() && bestVal.getType() != Value::Type::UNKNOWN) {
+            provenLose = tryResolveLosingRootMove(depth, isMax, childResult.value);
+            if (!provenLose) {
+                ++rootSurvivorCount;
+            }
+        }
+        if (!provenLose) {
+            childResult = searchChildPVS(depth, isMax, i, alpha, beta, bestVal, pv, isRootNode);
+        }
 
         board.undo();
         if (!searchActive()) {
@@ -485,16 +517,11 @@ CandidateList Search::getCandidates(Evaluator& evaluator, bool isMax) {
     if (options.mode == Mode::DEFENSIVE) {
         const bool atRoot = (board.getPath().size() == rootBoard.getPath().size());
 
-        if (evaluator.isOppoMateExist()) {
-            evaluator.getThreatDefend(moves);
-            CandidateList fours;
-            evaluator.getFours(fours);
-            appendUniqueMoves(moves, fours);
-        } else if (evaluator.isOppoFourThreeExist()) {
-            evaluator.getFourThreeDefend(moves);
-            CandidateList fours;
-            evaluator.getFours(fours);
-            appendUniqueMoves(moves, fours);
+        if (evaluator.isOppoMateExist() || evaluator.isOppoFourThreeExist()) {
+            // a move still has to be chosen when nothing refutes or the threat is fake
+            if (!getThreatRefutations(moves) || moves.empty()) {
+                getPatternThreatDefend(evaluator, moves);
+            }
         } else {
             if (atRoot) {
                 evaluator.getCandidates(moves);
@@ -515,20 +542,62 @@ CandidateList Search::getCandidates(Evaluator& evaluator, bool isMax) {
             CandidateList makers;
             evaluator.getFourThreeMakers(makers);
             appendUniqueMoves(moves, makers);
-        } else if (evaluator.isOppoMateExist()) {
-            evaluator.getThreatDefend(moves);
-            CandidateList fours;
-            evaluator.getFours(fours);
-            appendUniqueMoves(moves, fours);
-        } else if (evaluator.isOppoFourThreeExist()) {
-            evaluator.getFourThreeDefend(moves);
-            CandidateList fours;
-            evaluator.getFours(fours);
-            appendUniqueMoves(moves, fours);
+        } else if (evaluator.isOppoMateExist() || evaluator.isOppoFourThreeExist()) {
+            // no replayable line leaves moves empty: the threat is not real
+            if (getThreatRefutations(moves) && moves.empty()) {
+                // every move loses to the line; search the usual set to prove it
+                getPatternThreatDefend(evaluator, moves);
+            }
         }
     }
 
     return moves;
+}
+
+// Moves that break the opponent's quickest win behind an open three or 4-3, so no real
+// defense is left out; false if that win does not replay.
+bool Search::getThreatRefutations(CandidateList& moves) {
+    const uint64_t key = getTTKey(board);
+    ThreatDefenseEntry& cached = threatDefenseCache[key & (THREAT_DEFENSE_CACHE_SIZE - 1)];
+    if (cached.valid && cached.key == key) {
+        moves.clear();
+        for (uint8_t i = 0; i < cached.count; ++i) {
+            moves.push_back(Pos(cached.moves[i] >> 4, cached.moves[i] & 0x0F));
+        }
+        return cached.hasLine;
+    }
+
+    // open threes come straight from line patterns; 4-3s are played out
+    bool hasLine = collectOpenFourDefense(board, moves);
+    if (!hasLine) {
+        MoveList line;
+        hasLine = findThreatLine(board, line);
+        if (hasLine) {
+            collectVCFRefutations(board, line, moves);
+        }
+    }
+    if (moves.size() <= cached.moves.size()) {
+        cached.key = key;
+        cached.valid = true;
+        cached.hasLine = hasLine;
+        cached.count = static_cast<uint8_t>(moves.size());
+        for (size_t i = 0; i < moves.size(); ++i) {
+            cached.moves[i] = static_cast<uint8_t>((moves[i].getX() << 4) | moves[i].getY());
+        }
+    }
+    return hasLine;
+}
+
+// Pattern-based defenses (blocks guessed from the threat's shape) plus own fours.
+void Search::getPatternThreatDefend(Evaluator& evaluator, CandidateList& moves) {
+    if (evaluator.isOppoMateExist()) {
+        evaluator.getThreatDefend(moves);
+    } else {
+        evaluator.getFourThreeDefend(moves);
+    }
+    CandidateList fours;
+    evaluator.getFours(fours);
+    appendUniqueMoves(moves, fours);
 }
 
 void Search::appendUniqueMoves(CandidateList& moves, const CandidateList& extraMoves) const {
@@ -544,7 +613,7 @@ void Search::appendUniqueMoves(CandidateList& moves, const CandidateList& extraM
     }
 }
 
-void Search::sortChildNodes(CandidateList& moves, bool isMax, const TTEntry* entry) {
+void Search::sortChildNodes(CandidateList& moves, bool isMax, bool defending, const TTEntry* entry) {
     if (moves.size() < 2) {
         return;
     }
@@ -600,11 +669,12 @@ void Search::sortChildNodes(CandidateList& moves, bool isMax, const TTEntry* ent
     MoveOrderInfo infos[BOARD_SIZE * BOARD_SIZE];
     size_t infoCount = 0;
 
-    // Attacker (isMax) prefers self-attack score; defender wants to block opponent's most
+    // Attacker prefers self-attack score; defender wants to block opponent's most
     // threatening spot, so uses opponent's score. Matches the evaluator's previous sort intent.
+    // Ties keep the first-searched move, so this order also breaks equal-result ties.
     const Piece sideToMovePiece = sideToMoveIsBlack ? BLACK : WHITE;
     const Piece opposingPiece   = sideToMoveIsBlack ? WHITE : BLACK;
-    const Piece scorePiece = isMax ? sideToMovePiece : opposingPiece;
+    const Piece scorePiece = defending ? opposingPiece : sideToMovePiece;
     const bool shouldProbeChildren = (entry != nullptr || hasHistorySignal);
     for (size_t mi = 0; mi < moves.size(); ++mi) {
         const Pos& move = moves[mi];

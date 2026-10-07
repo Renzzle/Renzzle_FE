@@ -79,6 +79,7 @@
 		6F007AE82FC5703D00384F15 /* tt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tt.h; sourceTree = "<group>"; };
 		6F007AE92FC5708C00384F15 /* transposition_table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transposition_table.h; sourceTree = "<group>"; };
 		6F007AEA2FC5709B00384F15 /* vcf_candidate_finder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vcf_candidate_finder.h; sourceTree = "<group>"; };
+		6F007AEB2FC570A500384F15 /* vcf_replay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vcf_replay.h; sourceTree = "<group>"; };
 		6FDD2D212CB90E2F005BD15A /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
 		6FDD2D222CB90E2F005BD15A /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
 		6FDD2D232CB90E2F005BD15A /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
@@ -294,6 +295,7 @@
 			isa = PBXGroup;
 			children = (
 				6F007AEA2FC5709B00384F15 /* vcf_candidate_finder.h */,
+				6F007AEB2FC570A500384F15 /* vcf_replay.h */,
 				6F007AE92FC5708C00384F15 /* transposition_table.h */,
 				6F007AE22FC5700900384F15 /* detail */,
 				6FE3887E2FA0B19800896508 /* search.h */,
