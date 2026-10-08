@@ -48,10 +48,13 @@ import DeviceInfo from 'react-native-device-info';
 import { getPersonalNotice } from './src/apis/notice.ts';
 import { NoticeLanguage, PersonalNoticeItem } from './src/types/index.ts';
 import { useUserStore } from './src/store/useUserStore.ts';
+import useConfigStore from './src/store/useConfigStore.ts';
 
 const Stack = createNativeStackNavigator();
 const IOS_APP_STORE_ID = '6793042991';
-const IOS_APP_STORE_URL = `itms-apps://apps.apple.com/app/id${IOS_APP_STORE_ID}`;
+const IOS_APP_STORE_FALLBACK_URL = `itms-apps://apps.apple.com/app/id${IOS_APP_STORE_ID}`;
+const ANDROID_PLAY_STORE_PACKAGE_NAME = 'com.renzzle_fe';
+const ANDROID_PLAY_STORE_FALLBACK_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PLAY_STORE_PACKAGE_NAME}`;
 
 type PersonalNoticeModalState =
   | {
@@ -82,11 +85,26 @@ const normalizeNoticeLanguage = (language: string): NoticeLanguage => {
   return 'EN';
 };
 
+const openStoreUrl = (storeUrls: {
+  iosStoreUrl: string | null;
+  androidStoreUrl: string | null;
+}) => {
+  const storeUrl =
+    Platform.OS === 'ios'
+      ? storeUrls.iosStoreUrl ?? IOS_APP_STORE_FALLBACK_URL
+      : storeUrls.androidStoreUrl ?? ANDROID_PLAY_STORE_FALLBACK_URL;
+
+  Linking.openURL(storeUrl).catch((error) => {
+    console.log(`${Platform.OS === 'ios' ? 'App Store' : 'Play Store'} 열기 실패:`, error);
+  });
+};
+
 function App(): React.JSX.Element | null {
   const { accessToken } = useAuthStore();
   const isLoading = useInitializeApp();
   const { isNetworkError, setNetworkError } = useNetworkStore();
   const updateUser = useUserStore((state) => state.updateUser);
+  const { iosStoreUrl, androidStoreUrl } = useConfigStore();
   const [personalNoticeModal, setPersonalNoticeModal] =
     React.useState<PersonalNoticeModalState>(null);
   const hasRequestedPersonalNotice = React.useRef(false);
@@ -169,14 +187,7 @@ function App(): React.JSX.Element | null {
 
   const handleClosePersonalNotice = () => {
     if (personalNoticeModal?.category === 'FORCE_UPDATE') {
-      if (Platform.OS === 'ios') {
-        Linking.openURL(IOS_APP_STORE_URL).catch((error) => {
-          console.log('App Store 열기 실패:', error);
-        });
-        return;
-      }
-
-      BackHandler.exitApp();
+      openStoreUrl({ iosStoreUrl, androidStoreUrl });
       return;
     }
 
@@ -213,7 +224,7 @@ function App(): React.JSX.Element | null {
         `\n${i18n.t('modal.forceUpdate.latestVersion')}: ${personalNoticeModal.version}`
       : undefined;
   const personalNoticePrimaryButtonText =
-    Platform.OS === 'ios' && personalNoticeModal?.category === 'FORCE_UPDATE'
+    personalNoticeModal?.category === 'FORCE_UPDATE'
       ? 'modal.forceUpdate.update'
       : undefined;
   const shouldHidePersonalNoticeFooter =

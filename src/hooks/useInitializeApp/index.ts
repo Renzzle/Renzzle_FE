@@ -4,25 +4,31 @@ import useAuthStore from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import i18n, { initI18n } from '../../locales/i18n';
-import { getAppData } from '../../apis/config';
+import { AppDataItem, getAppData } from '../../apis/config';
 import useConfigStore from '../../store/useConfigStore';
+
+const findAppDataValue = (appData: AppDataItem[], tag: string) =>
+  appData.find((item) => item.tag === tag)?.value;
 
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
   const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
   const { setUser } = useUserStore(); // Get setters from the user store
-  const { setFeedbackUrl } = useConfigStore();
+  const { setFeedbackUrl, setStoreUrls } = useConfigStore();
 
   useEffect(() => {
     const loadAppData = async () => {
       try {
-        const config = await getAppData();
-        const feedbackUrl = config.response.find(
-          (i: { tag: string }) => i.tag === 'feedback_url',
-        )?.value;
+        const appData = await getAppData();
+        const feedbackUrl = findAppDataValue(appData, 'feedback_url');
+        const iosStoreUrl = findAppDataValue(appData, 'ios_store_url');
+        const androidStoreUrl = findAppDataValue(appData, 'android_store_url');
+
         if (feedbackUrl) {
           setFeedbackUrl(feedbackUrl);
         }
+
+        setStoreUrls({ iosStoreUrl, androidStoreUrl });
       } catch (e) {
         console.log('설정 로드 실패:', e);
       }
@@ -53,7 +59,7 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl]);
+  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl, setStoreUrls]);
 
   return isLoading;
 };
