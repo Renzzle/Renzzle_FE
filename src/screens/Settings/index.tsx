@@ -23,7 +23,7 @@ const Settings = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { t } = useTranslation();
   const user = useUserStore((state) => state.user);
-  const { feedbackUrl } = useConfigStore();
+  const { feedbackUrl, privacyPolicyUrl, termsOfUseUrl } = useConfigStore();
   const { clearTokens } = useAuthStore();
   const {
     isModalVisible,
@@ -35,8 +35,7 @@ const Settings = () => {
 
   const handleRemoveAds = () => {};
 
-  const handleFeedback = async () => {
-    const url = feedbackUrl ?? EXTERNAL_URLS.DEFAULT_FEEDBACK;
+  const openExternalUrl = async (url: string, errorMessage: string) => {
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (!canOpen) {
@@ -45,9 +44,13 @@ const Settings = () => {
 
       await Linking.openURL(url);
     } catch (e) {
-      console.log('피드백 열기 실패:', e);
+      console.log(errorMessage, e);
       showBottomToast('error', t('toast.cannotOpenPage'));
     }
+  };
+
+  const handleFeedback = () => {
+    openExternalUrl(feedbackUrl ?? EXTERNAL_URLS.DEFAULT_FEEDBACK, '피드백 열기 실패:');
   };
 
   const handleDelete = async () => {
@@ -72,11 +75,16 @@ const Settings = () => {
     { label: t('settings.removeAds'), onPress: () => handleRemoveAds },
     {
       label: t('settings.privacyPolicy'),
-      onPress: () => Linking.openURL(EXTERNAL_URLS.PRIVACY_POLICY),
+      onPress: () =>
+        openExternalUrl(
+          privacyPolicyUrl ?? EXTERNAL_URLS.PRIVACY_POLICY,
+          '개인정보처리방침 열기 실패:',
+        ),
     },
     {
       label: t('settings.termsOfService'),
-      onPress: () => Linking.openURL(EXTERNAL_URLS.TERMS_OF_USE),
+      onPress: () =>
+        openExternalUrl(termsOfUseUrl ?? EXTERNAL_URLS.TERMS_OF_USE, '이용약관 열기 실패:'),
     },
     { label: t('settings.feedback'), onPress: handleFeedback },
     { label: t('settings.deleteAccount'), onPress: handleUserDelete },

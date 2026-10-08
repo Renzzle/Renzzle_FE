@@ -14,7 +14,7 @@ const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
   const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
   const { setUser } = useUserStore(); // Get setters from the user store
-  const { setFeedbackUrl, setStoreUrls } = useConfigStore();
+  const { setFeedbackUrl, setStoreUrls, setPolicyUrls } = useConfigStore();
 
   useEffect(() => {
     const loadAppData = async () => {
@@ -23,12 +23,15 @@ const useInitializeApp = (): boolean => {
         const feedbackUrl = findAppDataValue(appData, 'feedback_url');
         const iosStoreUrl = findAppDataValue(appData, 'ios_store_url');
         const androidStoreUrl = findAppDataValue(appData, 'android_store_url');
+        const privacyPolicyUrl = findAppDataValue(appData, 'privacy_policy_url');
+        const termsOfUseUrl = findAppDataValue(appData, 'terms_of_use_url');
 
         if (feedbackUrl) {
           setFeedbackUrl(feedbackUrl);
         }
 
         setStoreUrls({ iosStoreUrl, androidStoreUrl });
+        setPolicyUrls({ privacyPolicyUrl, termsOfUseUrl });
       } catch (e) {
         console.log('설정 로드 실패:', e);
       }
@@ -59,7 +62,15 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl, setStoreUrls]);
+  }, [
+    restoreCredentials,
+    setTokens,
+    clearTokens,
+    setUser,
+    setFeedbackUrl,
+    setStoreUrls,
+    setPolicyUrls,
+  ]);
 
   return isLoading;
 };
