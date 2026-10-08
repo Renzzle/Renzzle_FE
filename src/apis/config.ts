@@ -7,7 +7,7 @@ export interface AppDataItem {
 
 export const getAppData = async (): Promise<AppDataItem[]> => {
   try {
-    const response = await apiClient.get('/api/app-data');
+    const response = await apiClient.get('/api/app-info');
 
     return response.data.response ?? [];
   } catch (error) {

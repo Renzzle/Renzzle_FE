@@ -373,6 +373,7 @@
     "appStartError": "An error occurred while starting the application.",
 
     "purchaseComplete": "Purchase completed.",
+    "priceInfoUnavailable": "Price information could not be loaded. Please try again later.",
 
     "verificationError": "An error occurred during verification.",
     "duplicatePuzzle": "This puzzle already exists. Create a new one.",

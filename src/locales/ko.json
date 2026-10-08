@@ -373,6 +373,7 @@
     "appStartError": "어플리케이션 시작 오류 발생",
 
     "purchaseComplete": "구매가 완료되었습니다.",
+    "priceInfoUnavailable": "가격 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
 
     "verificationError": "검증 중 오류가 발생했습니다.",
     "duplicatePuzzle": "이미 있는 퍼즐이에요. 새로 만들어 주세요.",
