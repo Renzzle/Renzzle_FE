@@ -1,10 +1,15 @@
 import apiClient from './interceptor';
 
-export const getAppData = async () => {
-  try {
-    const response = await apiClient.get('/api/app-data');
+export interface AppDataItem {
+  tag: string;
+  value: string;
+}
 
-    return response.data.response;
+export const getAppData = async (): Promise<AppDataItem[]> => {
+  try {
+    const response = await apiClient.get('/api/app-info');
+
+    return response.data.response ?? [];
   } catch (error) {
     throw error;
   }

@@ -39,6 +39,7 @@ import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
 import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
 import ReviewButton from '../../components/features/ReviewButton';
+import useConfigStore from '../../store/useConfigStore';
 
 const CommunityPuzzleSolve = () => {
   const { t } = useTranslation();
@@ -53,12 +54,14 @@ const CommunityPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const hintPrice = useConfigStore((state) => state.hintPrice);
+  const communityReward = useConfigStore((state) => state.communityReward);
   const { fromScreen = 'CommunityPuzzles' } = route.params;
   const { navigateToCommunityPuzzleReview } = usePuzzleReviewNavigation();
   const [puzzleDetail, setPuzzleDetail] = useState<CommunityPuzzle | null>(route.params.puzzle);
   const [currentSequence, setCurrentSequence] = useState(puzzleDetail?.boardStatus ?? '');
   const [isLoading, setIsLoading] = useState(true);
-  const [outcome, setOutcome] = useState<GameOutcome>({ price: 100 });
+  const [outcome, setOutcome] = useState<GameOutcome>();
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
   const boardRef = useRef<BoardRef>(null);
@@ -98,7 +101,7 @@ const CommunityPuzzleSolve = () => {
 
       markSolved();
 
-      setOutcome((prev) => ({ ...prev, reward: data?.reward ?? 0 }));
+      setOutcome((prev) => ({ ...prev, reward: data?.reward ?? communityReward ?? 0 }));
 
       activateModal('COMMUNITY_PUZZLE_SUCCESS', {
         primaryAction: () => {
@@ -207,6 +210,11 @@ const CommunityPuzzleSolve = () => {
       return;
     }
 
+    if (hintPrice === null) {
+      showBottomToast('error', t('toast.priceInfoUnavailable'));
+      return;
+    }
+
     const openAnswer = async () => {
       setIsLoading(true);
       try {
@@ -225,6 +233,7 @@ const CommunityPuzzleSolve = () => {
       }
     };
 
+    setOutcome({ ...(outcome ?? {}), price: hintPrice });
     activateModal('PUZZLE_REVIEW_PURCHASE', {
       primaryAction: openAnswer,
     });
@@ -372,7 +381,7 @@ const CommunityPuzzleSolve = () => {
             </ReviewButton>
           ) : undefined
         }
-        gameOutcome={outcome}
+        gameOutcome={{ ...(outcome ?? {}), ...(hintPrice !== null ? { price: hintPrice } : {}) }}
         isLoading={isLoading}
       />
     </Container>

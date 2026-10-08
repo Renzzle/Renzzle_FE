@@ -55,6 +55,9 @@
     "feedback": "개발자에게 피드백하기",
     "deleteAccount": "탈퇴하기"
   },
+  "notice": {
+    "empty": "공지사항이 없습니다."
+  },
   "button": {
     "createPuzzle": "출제",
     "uploadPuzzle": "업로드",
@@ -201,6 +204,23 @@
       "title": "네트워크 오류",
       "message": "서버와 연결할 수 없습니다.\n인터넷 연결 상태를 확인해주세요.",
       "confirm": "확인"
+    },
+    "personalNotice": {
+      "title": "알림",
+      "message": "새로운 알림이 있습니다.",
+      "confirm": "확인"
+    },
+    "forceUpdate": {
+      "title": "업데이트 안내",
+      "message": "새 버전으로 업데이트가 필요합니다.",
+      "latestVersion": "최신 버전",
+      "update": "업데이트",
+      "confirm": "종료"
+    },
+    "systemCheck": {
+      "title": "시스템 점검",
+      "message": "현재 서버 점검 중입니다.\n잠시 후 다시 이용해 주세요.",
+      "confirm": "종료"
     }
   },
   "home": {
@@ -273,6 +293,73 @@
   "alert": {
     "noData": "데이터가 없습니다."
   },
+  "error": {
+    "internalServerError": "서버 내부 오류가 발생했습니다.",
+    "validationError": "잘못된 요청입니다.",
+    "globalNotFound": "리소스를 찾을 수 없습니다.",
+    "methodNotAllowed": "지원하지 않는 HTTP 메서드입니다.",
+    "unsupportedMediaType": "지원하지 않는 미디어 타입입니다.",
+
+    "emptyResultError": "결과를 찾을 수 없습니다.",
+    "constraintViolationError": "데이터베이스 제약 조건을 위반했습니다.",
+
+    "exceedEmailAuthRequest": "이메일 인증 요청 횟수를 초과했습니다. 잠시 후 다시 시도해 주세요.",
+    "exceedEmailAuthAttempt": "인증 코드 입력 시도 횟수를 초과했습니다.",
+    "exceedLoginAttempt": "로그인 시도 횟수를 초과했습니다.",
+    "invalidEmailAuthCode": "유효하지 않은 인증 코드입니다.",
+    "invalidAuthVerityToken": "유효하지 않은 이메일 인증 토큰입니다.",
+    "invalidEmail": "유효하지 않은 이메일 형식입니다.",
+    "invalidPassword": "잘못된 비밀번호입니다.",
+    "notBearerGrantType": "잘못된 권한 부여 타입입니다.",
+    "adminAccessDenied": "관리자 권한이 필요합니다.",
+    "duplicateEmail": "이미 가입된 이메일입니다.",
+    "duplicateNickname": "이미 사용 중인 닉네임입니다.",
+    "duplicateDevice": "이미 등록된 기기입니다.",
+
+    "expiredJwtToken": "인증이 만료되었습니다. 다시 로그인해 주세요.",
+    "malformedJwtToken": "잘못된 인증 정보입니다.",
+    "unsupportedJwtToken": "지원하지 않는 인증 형식입니다.",
+    "illegalToken": "인증 정보가 누락되었거나 형식이 잘못되었습니다.",
+    "cannotParseToken": "인증 정보를 확인할 수 없습니다.",
+
+    "cannotLoadUserInfo": "사용자 정보를 불러올 수 없습니다.",
+    "levelNotFound": "레벨 정보를 찾을 수 없습니다.",
+    "cannotFindUser": "사용자를 찾을 수 없습니다.",
+    "invalidSubscriptionRequest": "유효하지 않은 구독 정보입니다.",
+    "insufficientCurrency": "조각이 부족합니다.",
+    "unauthorizedAction": "권한이 없는 접근입니다.",
+
+    "invalidPaymentRequest": "잘못된 결제 요청입니다.",
+    "unsupportedPaymentPlatform": "지원하지 않는 결제 플랫폼입니다.",
+    "storeVerificationFailed": "스토어 결제 검증에 실패했습니다.",
+    "receiptTransactionMismatch": "결제 영수증 정보가 요청과 일치하지 않습니다.",
+    "unknownIapProduct": "등록되지 않은 상품입니다.",
+    "alreadyProcessedReceipt": "이미 처리된 결제 영수증입니다.",
+
+    "alreadySolvedPuzzle": "이미 푼 퍼즐입니다.",
+    "alreadyExistingTranslation": "해당 언어의 번역이 이미 존재합니다.",
+    "invalidSessionTtl": "유효하지 않은 세션 시간입니다.",
+    "isNotStarted": "랭킹 퍼즐이 시작되지 않았습니다.",
+    "noBoardStatus": "퍼즐 정보나 보드 상태가 누락되었습니다.",
+    "invalidAnswerPosition": "정답 좌표가 보드 범위를 벗어났습니다.",
+    "invalidRankPuzzleType": "유효하지 않은 랭크 퍼즐 타입입니다.",
+    "communityPuzzleAccessDenied": "이 커뮤니티 퍼즐에 대한 접근 권한이 없습니다.",
+    "cannotFindCommunityPuzzle": "커뮤니티 퍼즐을 찾을 수 없습니다.",
+    "cannotFindTrainingPuzzle": "트레이닝 퍼즐을 찾을 수 없습니다.",
+    "noSuchTrainingPack": "트레이닝 팩을 찾을 수 없습니다.",
+    "noSuchTrainingPacks": "해당 난이도의 트레이닝 팩이 없습니다.",
+    "cannotFindPuzzle": "퍼즐을 찾을 수 없습니다.",
+    "noSuchPackTranslation": "팩 번역 정보를 찾을 수 없습니다.",
+    "noUserProgressForPack": "이 팩에 대한 진행 기록이 없습니다.",
+    "cannotFindRankPuzzle": "랭크 퍼즐을 찾을 수 없습니다.",
+    "emptySessionData": "세션 데이터를 찾을 수 없습니다.",
+    "latestPuzzleNotFound": "이전 랭크 퍼즐을 찾을 수 없습니다.",
+    "trendPuzzleDuplicated": "중복된 트렌드 퍼즐입니다.",
+    "exceedDailyPuzzleUpload": "일일 퍼즐 업로드 한도를 초과했습니다. 내일 다시 시도해 주세요.",
+    "sessionAlreadyEnded": "게임이 이미 종료되었습니다.",
+    "sessionGenerationFailed": "게임 생성에 실패했습니다.",
+    "cannotFindAnnouncement": "공지사항을 찾을 수 없습니다."
+  },
   "toast": {
     "languageChanged": "언어가 변경되었습니다.",
 
@@ -286,6 +373,7 @@
     "appStartError": "어플리케이션 시작 오류 발생",
 
     "purchaseComplete": "구매가 완료되었습니다.",
+    "priceInfoUnavailable": "가격 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
 
     "verificationError": "검증 중 오류가 발생했습니다.",
     "duplicatePuzzle": "이미 있는 퍼즐이에요. 새로 만들어 주세요.",
@@ -307,6 +395,7 @@
 
     "missingRequiredFields": "필수 항목이 누락되었습니다. 처음으로 돌아갑니다.",
 
-    "trainingPackLoadFailed": "문제 팩 불러오기 실패: "
+    "trainingPackLoadFailed": "문제 팩 불러오기 실패: ",
+    "noticeLoadFailed": "공지사항을 불러오지 못했습니다."
   }
 }

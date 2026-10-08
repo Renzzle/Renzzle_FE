@@ -7,6 +7,32 @@ const initialState = {
   refreshToken: undefined,
 };
 
+const getTokenDebugInfo = (token?: string | null) => {
+  if (typeof token !== 'string') {
+    return {
+      present: false,
+      type: typeof token,
+    };
+  }
+
+  const trimmedToken = token.trim();
+  const jwt = trimmedToken.startsWith('Bearer ')
+    ? trimmedToken.slice('Bearer '.length)
+    : trimmedToken;
+  const segments = jwt ? jwt.split('.') : [];
+
+  return {
+    present: token.length > 0,
+    rawLength: token.length,
+    trimmedLength: trimmedToken.length,
+    hasOuterWhitespace: token !== trimmedToken,
+    startsWithBearer: trimmedToken.startsWith('Bearer '),
+    jwtSegmentCount: segments.length,
+    jwtSegmentLengths: segments.map((segment) => segment.length),
+    hasEmptyJwtSegment: segments.some((segment) => segment.length === 0),
+  };
+};
+
 type AuthStateType = {
   accessToken?: string;
   refreshToken?: string;
@@ -54,6 +80,7 @@ const useAuthStore = create<AuthStateType>((set) => ({
 
   async clearTokens() {
     try {
+      console.log('[AuthDebug][clearTokens]');
       await EncryptedStorage.removeItem('tokens');
       set(initialState);
 
