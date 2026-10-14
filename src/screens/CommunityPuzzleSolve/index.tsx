@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BoardReactionWrapper,
   BoardStatsWrapper,
@@ -305,6 +305,13 @@ const CommunityPuzzleSolve = () => {
     getDetail();
   }, [route.params.puzzle.id]);
 
+  // 렌더마다 새 객체를 넘기면 Board가 미리 받아둔 다음 수 후보를 버리고 다시 받는다
+  const puzzleCache = useMemo(
+    () =>
+      puzzleDetail ? { puzzleType: 'COMMUNITY' as const, puzzleId: puzzleDetail.id } : undefined,
+    [puzzleDetail?.id],
+  );
+
   if (!puzzleDetail) {
     return (
       <Container>
@@ -349,7 +356,7 @@ const CommunityPuzzleSolve = () => {
           sequence={puzzleDetail.boardStatus}
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
-          puzzleCache={{ puzzleType: 'COMMUNITY', puzzleId: puzzleDetail.id }}
+          puzzleCache={puzzleCache}
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle
