@@ -302,6 +302,9 @@
     "passwordChanged": "비밀번호가 변경되었습니다.",
     "passwordChangeFailed": "비밀번호 변경에 실패했습니다.",
 
+    "sessionExpired": "로그인이 만료되었습니다. 다시 로그인해 주세요.",
+    "verificationExpired": "이메일 인증 시간이 지났습니다. 처음부터 다시 인증해 주세요.",
+
     "enterEmail": "이메일을 입력해주세요.",
     "enterPassword": "비밀번호를 입력해주세요.",
 

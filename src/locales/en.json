@@ -302,6 +302,9 @@
     "passwordChanged": "Password changed.",
     "passwordChangeFailed": "Failed to change password.",
 
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "verificationExpired": "Email verification has expired. Please verify your email again.",
+
     "enterEmail": "Enter your email.",
     "enterPassword": "Enter your password.",
 

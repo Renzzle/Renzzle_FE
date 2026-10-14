@@ -8,6 +8,7 @@ import {
 import useAuthStore from '../store/useAuthStore';
 import { reissueToken } from './auth';
 import useNetworkStore from '../store/useNetworkStore';
+import i18n from '../locales/i18n';
 
 declare module 'axios' {
   interface AxiosRequestConfig {
@@ -18,6 +19,12 @@ declare module 'axios' {
 
 // 응답을 받지 못한 경우: 연결 실패, 연결 중단, 시간 초과
 const NO_RESPONSE_ERROR_CODES = ['ERR_NETWORK', 'ECONNABORTED', 'ETIMEDOUT'];
+
+// 로그인 토큰이 잘못되어 다시 로그인해야 하는 경우
+const INVALID_SESSION_ERROR_CODES = ['J4011', 'J4012', 'J4013', 'J4014'];
+
+const isNoResponseError = (error: any) =>
+  error?.message === 'Network Error' || NO_RESPONSE_ERROR_CODES.includes(error?.code);
 
 export const apiClient = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -44,7 +51,7 @@ apiClient.interceptors.request.use(
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value?: any) => void; reject: (reason?: any) => void }> = [];
 
-const processQueue = (error: Error | null, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error); // Fail queued requests if reissue fails
@@ -58,7 +65,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.message === 'Network Error' || NO_RESPONSE_ERROR_CODES.includes(error.code)) {
+    if (isNoResponseError(error)) {
       console.log('서버 응답 없음 감지:', error.code);
 
       if (!error.config?.skipNetworkErrorModal) {
@@ -70,8 +77,22 @@ apiClient.interceptors.response.use(
 
     if (axios.isAxiosError(error)) {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+      // 가입·비밀번호 재설정은 로그인 토큰 없이 이메일 인증 토큰만 보낸다
+      const isAuthenticatedRequest = !!originalRequest?.headers?.[HTTP_HEADERS.AUTHORIZATION];
 
       const errorCode = error.response?.data?.errorResponse?.code;
+
+      // 로그인 토큰 없이 받은 J4010은 이메일 인증 토큰(5분)이 만료된 것이므로 재발급하지 않는다
+      if (errorCode === 'J4010' && !isAuthenticatedRequest) {
+        return Promise.reject(i18n.t('toast.verificationExpired'));
+      }
+
+      if (isAuthenticatedRequest && INVALID_SESSION_ERROR_CODES.includes(errorCode)) {
+        console.log('잘못된 로그인 토큰, 로그아웃:', errorCode);
+        await useAuthStore.getState().clearTokens();
+        return Promise.reject(i18n.t('toast.sessionExpired'));
+      }
+
       if (errorCode === 'J4010' && !originalRequest._retry) {
         console.log('Access Token 만료!!');
         if (isRefreshing) {
@@ -98,8 +119,9 @@ apiClient.interceptors.response.use(
           console.log('No refresh token available, signing out.');
           await clearTokens();
           isRefreshing = false;
-          processQueue(new Error('No refresh token available for reissue.')); // Fail all queued requests as no refresh token
-          return Promise.reject(error);
+          const sessionExpired = i18n.t('toast.sessionExpired');
+          processQueue(sessionExpired); // Fail all queued requests as no refresh token
+          return Promise.reject(sessionExpired);
         }
 
         try {
@@ -122,10 +144,27 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest); // Retry the original request with the new token
         } catch (refreshError) {
           console.log('토큰 재발급 실패:', refreshError);
+
+          // 응답을 받지 못했거나 서버 오류라면 토큰은 그대로 두고, 다음 요청 때 다시 재발급한다
+          const isTemporaryFailure =
+            isNoResponseError(refreshError) ||
+            (axios.isAxiosError(refreshError) && (refreshError.response?.status ?? 0) >= 500);
+
+          if (isTemporaryFailure) {
+            if (isNoResponseError(refreshError) && !originalRequest.skipNetworkErrorModal) {
+              useNetworkStore.getState().setNetworkError(true);
+            }
+            processQueue(refreshError); // Fail all queued requests
+            isRefreshing = false;
+            return Promise.reject(refreshError);
+          }
+
+          // 서버가 재발급을 거절했으므로 다시 로그인해야 한다
           await clearTokens();
-          processQueue(refreshError as Error); // Fail all queued requests
+          const sessionExpired = i18n.t('toast.sessionExpired');
+          processQueue(sessionExpired); // Fail all queued requests
           isRefreshing = false;
-          return Promise.reject(refreshError);
+          return Promise.reject(sessionExpired);
         } finally {
           // Even though we manage `isRefreshing` on reissue success/failure,
           // it's important to ensure it is reset when queue is empty
