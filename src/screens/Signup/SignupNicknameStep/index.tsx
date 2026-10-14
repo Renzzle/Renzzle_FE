@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 interface SignupNicknameStepProps {
   nickname: string;
   setNickname: (nickname: string) => void;
-  onComplete: () => void;
+  onComplete: () => Promise<void>;
 }
 
 const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknameStepProps) => {
@@ -20,7 +20,8 @@ const SignupNicknameStep = ({ nickname, setNickname, onComplete }: SignupNicknam
       const response = await checkNicknameDuplicate(nickname);
 
       if (!response?.response) {
-        onComplete();
+        // 가입·로그인이 끝날 때까지 버튼을 잠가 두 번 가입되지 않게 한다
+        await onComplete();
       } else {
         showBottomToast('error', t('toast.nicknameAlreadyInUse'));
       }
