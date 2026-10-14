@@ -38,6 +38,7 @@
   },
   "common": {
     "appName": "Renzzle",
+    "connecting": "Connecting...",
     "ranking": "Ranking",
     "myPuzzle": "My",
     "likes": "Likes",

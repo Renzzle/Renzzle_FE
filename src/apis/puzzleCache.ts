@@ -36,6 +36,7 @@ export const getPuzzleCacheNextMoves = async ({
       },
       timeout: NEXT_MOVES_TIMEOUT_MS,
       skipNetworkErrorModal: true,
+      skipLoadingIndicator: true,
     });
 
     return response.data.response ?? [];
@@ -59,7 +60,7 @@ export const savePuzzleCache = async ({
         currentBoardState,
         answerPuzzle,
       },
-      { skipNetworkErrorModal: true },
+      { skipNetworkErrorModal: true, skipLoadingIndicator: true },
     );
 
     return response.data;

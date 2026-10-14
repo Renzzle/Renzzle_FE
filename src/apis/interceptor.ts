@@ -9,6 +9,11 @@ declare module 'axios' {
   interface AxiosRequestConfig {
     // 실패해도 대신할 방법이 있는 요청은 네트워크 오류 모달을 띄우지 않는다
     skipNetworkErrorModal?: boolean;
+    // 사용자가 기다리지 않는 요청은 "연결 중" 안내를 띄우지 않는다
+    skipLoadingIndicator?: boolean;
+    // 토큰 재발급 후 다시 보낸 요청도 처음 보낸 시각부터 센다
+    requestStartedAt?: number;
+    slowRequestTracker?: SlowRequestTracker;
   }
 }
 
@@ -20,6 +25,40 @@ const INVALID_SESSION_ERROR_CODES = ['J4011', 'J4012', 'J4013', 'J4014'];
 
 export const isNoResponseError = (error: any) =>
   error?.message === 'Network Error' || NO_RESPONSE_ERROR_CODES.includes(error?.code);
+
+const SLOW_REQUEST_DELAY_MS = 2 * 1000;
+
+// 처음 보낸 지 2초가 지나도 응답이 없으면 "연결 중" 안내에 센다
+class SlowRequestTracker {
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private isCounted = false;
+
+  constructor(startedAt: number) {
+    const delay = startedAt + SLOW_REQUEST_DELAY_MS - Date.now();
+    if (delay <= 0) {
+      this.count();
+    } else {
+      this.timer = setTimeout(() => this.count(), delay);
+    }
+  }
+
+  private count() {
+    this.timer = null;
+    this.isCounted = true;
+    useNetworkStore.getState().addSlowRequest();
+  }
+
+  finish() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+    if (this.isCounted) {
+      this.isCounted = false;
+      useNetworkStore.getState().removeSlowRequest();
+    }
+  }
+}
 
 export const apiClient = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -35,6 +74,10 @@ apiClient.interceptors.request.use(
     const { accessToken } = useAuthStore.getState();
     if (accessToken) {
       config.headers[HTTP_HEADERS.AUTHORIZATION] = `Bearer ${accessToken}`;
+    }
+    if (!config.skipLoadingIndicator) {
+      config.requestStartedAt ??= Date.now();
+      config.slowRequestTracker = new SlowRequestTracker(config.requestStartedAt);
     }
     return config;
   },
@@ -58,8 +101,13 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    response.config.slowRequestTracker?.finish();
+    return response;
+  },
   async (error) => {
+    error.config?.slowRequestTracker?.finish();
+
     if (isNoResponseError(error)) {
       console.log('서버 응답 없음 감지:', error.code);
 
@@ -119,6 +167,10 @@ apiClient.interceptors.response.use(
           return Promise.reject(sessionExpired);
         }
 
+        const reissueTracker = originalRequest.skipLoadingIndicator
+          ? undefined
+          : new SlowRequestTracker(originalRequest.requestStartedAt ?? Date.now());
+
         try {
           console.log('J4010: Access Token 만료!! 토큰 재발급 시도 중...');
           const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await reissueToken(
@@ -161,6 +213,7 @@ apiClient.interceptors.response.use(
           isRefreshing = false;
           return Promise.reject(sessionExpired);
         } finally {
+          reissueTracker?.finish();
           // Even though we manage `isRefreshing` on reissue success/failure,
           // it's important to ensure it is reset when queue is empty
           if (failedQueue.length === 0) {

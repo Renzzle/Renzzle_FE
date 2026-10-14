@@ -39,7 +39,7 @@ import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
 import theme from './src/styles/theme.ts';
 import useNetworkStore from './src/store/useNetworkStore.ts';
-import { CustomModal } from './src/components/common/index.ts';
+import { CustomModal, SlowRequestIndicator } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
 import ChangeNickname from './src/screens/Settings/ChangeNickname/index.tsx';
 import ChangePassword from './src/screens/Settings/ChangePassword/index.tsx';
@@ -205,6 +205,8 @@ function App(): React.JSX.Element | null {
                 </>
               )}
             </Stack.Navigator>
+
+            <SlowRequestIndicator />
 
             <CustomModal
               isVisible={isNetworkError}

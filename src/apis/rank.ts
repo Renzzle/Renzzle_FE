@@ -22,7 +22,7 @@ export const getCommunityRanking = async () => {
 
 export const getMyRating = async () => {
   try {
-    const response = await apiClient.get('/api/rank/rating/my');
+    const response = await apiClient.get('/api/rank/rating/my', { skipLoadingIndicator: true });
 
     return response.data.response;
   } catch (error) {

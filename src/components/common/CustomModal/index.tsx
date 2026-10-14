@@ -13,6 +13,7 @@ import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import { GameOutcome } from '../../../types';
+import { SlowRequestNotice } from '../SlowRequestIndicator';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
@@ -272,6 +273,7 @@ const CustomModal = ({
                 onSecondaryAction={onSecondaryAction}
                 {...props}>
                 {children}
+                {category !== 'NETWORK_ERROR' && <SlowRequestNotice />}
               </ModalCard>
             </View>
           </TouchableWithoutFeedback>

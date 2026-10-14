@@ -38,6 +38,7 @@
   },
   "common": {
     "appName": "Renzzle",
+    "connecting": "연결 중...",
     "ranking": "랭킹",
     "myPuzzle": "내 퍼즐",
     "likes": "좋아요",
