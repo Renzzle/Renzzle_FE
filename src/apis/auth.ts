@@ -1,11 +1,6 @@
 import axios from 'axios';
 import apiClient from './interceptor';
-import {
-  APP_KEY_HEADER,
-  HTTP_HEADERS,
-  HTTP_HEADERS_VALUES,
-  REQUEST_TIMEOUT_MS,
-} from './constants';
+import { APP_KEY_HEADER, HTTP_HEADERS, HTTP_HEADERS_VALUES, REQUEST_TIMEOUT_MS } from './constants';
 
 export const updateEmailAuthCode = async (email: string) => {
   try {

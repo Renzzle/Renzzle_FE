@@ -1,10 +1,5 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import {
-  APP_KEY_HEADER,
-  HTTP_HEADERS,
-  HTTP_HEADERS_VALUES,
-  REQUEST_TIMEOUT_MS,
-} from './constants';
+import { APP_KEY_HEADER, HTTP_HEADERS, HTTP_HEADERS_VALUES, REQUEST_TIMEOUT_MS } from './constants';
 import useAuthStore from '../store/useAuthStore';
 import { reissueToken } from './auth';
 import useNetworkStore from '../store/useNetworkStore';
