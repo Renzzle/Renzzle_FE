@@ -163,6 +163,14 @@
       "confirm": "Finish",
       "cancel": "Keep Playing"
     },
+    "rankingRequestFailed": {
+      "title": "Connection Error",
+      "message": "Couldn't reach the server.\nIf you leave, you may not get the rewards for this game.",
+      "disconnected": "Check your internet connection and try again.",
+      "serverError": "Please try again in a moment.",
+      "confirm": "Retry",
+      "cancel": "Leave"
+    },
     "communityFilter": {
       "title": "Filter",
       "confirm": "Apply",

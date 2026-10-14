@@ -163,6 +163,14 @@
       "confirm": "종료하기",
       "cancel": "계속하기"
     },
+    "rankingRequestFailed": {
+      "title": "통신 오류",
+      "message": "서버와 통신하지 못했어요.\n나가면 이번 게임의 보상을 받지 못할 수 있어요.",
+      "disconnected": "인터넷 연결을 확인한 뒤 다시 시도해 주세요.",
+      "serverError": "잠시 후 다시 시도해 주세요.",
+      "confirm": "다시 시도",
+      "cancel": "나가기"
+    },
     "communityFilter": {
       "title": "필터",
       "confirm": "적용",

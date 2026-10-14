@@ -18,7 +18,7 @@ const NO_RESPONSE_ERROR_CODES = ['ERR_NETWORK', 'ECONNABORTED', 'ETIMEDOUT'];
 // 로그인 토큰이 잘못되어 다시 로그인해야 하는 경우
 const INVALID_SESSION_ERROR_CODES = ['J4011', 'J4012', 'J4013', 'J4014'];
 
-const isNoResponseError = (error: any) =>
+export const isNoResponseError = (error: any) =>
   error?.message === 'Network Error' || NO_RESPONSE_ERROR_CODES.includes(error?.code);
 
 export const apiClient = axios.create({
