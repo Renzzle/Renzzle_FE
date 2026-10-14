@@ -247,7 +247,7 @@
     "title": "Ranking",
     "rating": "Rating",
     "best": "Best Puzzlers",
-    "ratingDescription": "This is the rating score obtained from ranking puzzles. Up to the top 100 are displayed, and rankings are updated every hour.",
+    "ratingDescription": "This is the rating score obtained from ranking puzzles. Up to the top 100 are displayed, and rankings are updated every 5 minutes.",
     "bestDescription": "Users who have actively influenced the Renzzle community over the past year through creating, solving, and popular puzzles. Up to the top 100 are displayed.",
     "score": "{{score}} pts",
     "rank": "Rank {{rank}}",
