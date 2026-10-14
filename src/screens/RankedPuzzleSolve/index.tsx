@@ -102,7 +102,8 @@ const RankedPuzzleSolve = () => {
     }
 
     try {
-      const data = await submitRankingGameResult(result);
+      // 응답을 못 받고 다시 보낸 결과를 서버가 이중 반영하지 않도록 지금 퍼즐의 보드를 함께 보낸다
+      const data = await submitRankingGameResult(result, puzzleData?.boardStatus);
       setPuzzleData(data);
       setResults((prev) => [...prev, { variant: result ? 'success' : 'error' }]);
     } catch (error) {

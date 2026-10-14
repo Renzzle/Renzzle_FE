@@ -40,9 +40,9 @@ export const startRankingGame = async () => {
   }
 };
 
-export const submitRankingGameResult = async (isSolved: boolean) => {
+export const submitRankingGameResult = async (isSolved: boolean, boardStatus?: string) => {
   try {
-    const response = await apiClient.post('api/rank/game/result', { isSolved });
+    const response = await apiClient.post('api/rank/game/result', { isSolved, boardStatus });
 
     return response.data.response;
   } catch (error) {
