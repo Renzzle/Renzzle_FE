@@ -39,6 +39,8 @@
   "common": {
     "appName": "Renzzle",
     "connecting": "Connecting...",
+    "loadMoreFailed": "Couldn't load more.",
+    "retry": "Retry",
     "ranking": "Ranking",
     "myPuzzle": "My",
     "likes": "Likes",

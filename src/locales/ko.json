@@ -39,6 +39,8 @@
   "common": {
     "appName": "Renzzle",
     "connecting": "연결 중...",
+    "loadMoreFailed": "목록을 더 불러오지 못했어요.",
+    "retry": "다시 시도",
     "ranking": "랭킹",
     "myPuzzle": "내 퍼즐",
     "likes": "좋아요",

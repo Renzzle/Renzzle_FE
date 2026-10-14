@@ -8,10 +8,18 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { ActivityIndicator, FlatList, FlatListProps, RefreshControl, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  FlatListProps,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import theme from '../../../styles/theme';
 import { showBottomToast } from '../Toast/toastMessage';
 import { useTranslation } from 'react-i18next';
+import CustomText from '../CustomText';
 
 export interface ApiCallParams {
   id?: number | null;
@@ -65,6 +73,12 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
     const [refreshing, setRefreshing] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [cursorId, setCursorId] = useState<number | null>(null);
+    // 다음 페이지를 못 불러오면 끝에 닿을 때마다 다시 요청하지 않고, 사용자가 다시 시도할 때까지 멈춘다
+    const [hasPageError, setHasPageError] = useState(false);
+    const hasPageErrorRef = useRef(false);
+    const isFetchingPageRef = useRef(false);
+    // 새로고침할 때마다 올려서, 그 전에 보낸 요청의 늦은 응답은 버린다
+    const generationRef = useRef(0);
 
     // Params fixed at the last refresh and carried through cursor pagination
     const refreshParamsRef = useRef<Partial<ApiCallParams>>({});
@@ -90,10 +104,12 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
     }));
 
     const fetchData = useCallback(async () => {
-      if (loading || !hasMore || refreshing) {
+      if (isFetchingPageRef.current || hasPageErrorRef.current || !hasMore || refreshing) {
         return;
       }
 
+      const generation = generationRef.current;
+      isFetchingPageRef.current = true;
       setLoading(true);
       try {
         const fetched = await apiCall({
@@ -103,6 +119,10 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           size: pageSize,
         });
 
+        if (generation !== generationRef.current) {
+          return;
+        }
+
         setData((prev) => [...prev, ...fetched]);
         setHasMore(fetched.length === pageSize);
 
@@ -111,13 +131,31 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           setCursorId(lastItem.id ?? null);
         }
       } catch (err) {
-        showBottomToast('error', t('toast.listLoadError'));
+        if (generation === generationRef.current) {
+          hasPageErrorRef.current = true;
+          setHasPageError(true);
+          showBottomToast('error', t('toast.listLoadError'));
+        }
       } finally {
-        setLoading(false);
+        if (generation === generationRef.current) {
+          isFetchingPageRef.current = false;
+          setLoading(false);
+        }
       }
-    }, [apiCall, loading, hasMore, refreshing, cursorId, defaultParams, pageSize, t]);
+    }, [apiCall, hasMore, refreshing, cursorId, defaultParams, pageSize, t]);
+
+    const retryPage = () => {
+      hasPageErrorRef.current = false;
+      setHasPageError(false);
+      fetchData();
+    };
 
     const onRefresh = useCallback(async () => {
+      const generation = ++generationRef.current;
+      isFetchingPageRef.current = false;
+      hasPageErrorRef.current = false;
+      setLoading(false);
+      setHasPageError(false);
       setRefreshing(true);
       setHasMore(true);
 
@@ -130,6 +168,10 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           id: null,
           size: pageSize,
         });
+
+        if (generation !== generationRef.current) {
+          return;
+        }
 
         setData(fetched); // 덮어쓰기
 
@@ -144,9 +186,13 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           setHasMore(false);
         }
       } catch (error) {
-        showBottomToast('error', t('toast.refreshError'));
+        if (generation === generationRef.current) {
+          showBottomToast('error', t('toast.refreshError'));
+        }
       } finally {
-        setRefreshing(false);
+        if (generation === generationRef.current) {
+          setRefreshing(false);
+        }
       }
     }, [apiCall, defaultParams, pageSize, t]);
 
@@ -158,12 +204,28 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
       onRefresh();
     }, [defaultParams, onRefresh]);
 
-    const renderFooter = () =>
-      loading ? (
+    const renderFooter = () => {
+      if (hasPageError) {
+        return (
+          <TouchableOpacity
+            onPress={retryPage}
+            style={{ alignItems: 'center', gap: 4, paddingVertical: 16 }}>
+            <CustomText size={12} lineHeight="sm" color="gray/gray500">
+              {t('common.loadMoreFailed')}
+            </CustomText>
+            <CustomText size={12} weight="bold" lineHeight="sm" color="main_color/blue_p">
+              {t('common.retry')}
+            </CustomText>
+          </TouchableOpacity>
+        );
+      }
+
+      return loading ? (
         <ActivityIndicator color={theme.color['gray/gray300']} style={{ marginVertical: 16 }} />
       ) : (
         <View style={{ marginBottom: 15 }} />
       );
+    };
 
     return (
       <FlatList
