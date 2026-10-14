@@ -22,3 +22,6 @@ export const HTTP_HEADERS_VALUES = {
 export const APP_KEY_HEADER = process.env.APP_KEY
   ? { [HTTP_HEADERS.APP_KEY]: process.env.APP_KEY }
   : {};
+
+// RN은 응답을 무한정 기다리므로, 서버가 이 시간 안에 응답하지 않으면 실패로 처리한다
+export const REQUEST_TIMEOUT_MS = 15 * 1000;

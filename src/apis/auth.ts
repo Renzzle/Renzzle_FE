@@ -1,6 +1,11 @@
 import axios from 'axios';
 import apiClient from './interceptor';
-import { APP_KEY_HEADER, HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
+import {
+  APP_KEY_HEADER,
+  HTTP_HEADERS,
+  HTTP_HEADERS_VALUES,
+  REQUEST_TIMEOUT_MS,
+} from './constants';
 
 export const updateEmailAuthCode = async (email: string) => {
   try {
@@ -109,6 +114,8 @@ export const reissueToken = async (refreshToken: string) => {
       `${process.env.API_URL}/api/auth/reissueToken`,
       { refreshToken },
       {
+        // 재발급이 멈추면 재발급을 기다리는 요청도 전부 멈추므로 시간 제한을 둔다
+        timeout: REQUEST_TIMEOUT_MS,
         headers: {
           [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
           ...APP_KEY_HEADER,

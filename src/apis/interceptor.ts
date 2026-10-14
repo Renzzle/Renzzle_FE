@@ -1,11 +1,27 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import { APP_KEY_HEADER, HTTP_HEADERS, HTTP_HEADERS_VALUES } from './constants';
+import {
+  APP_KEY_HEADER,
+  HTTP_HEADERS,
+  HTTP_HEADERS_VALUES,
+  REQUEST_TIMEOUT_MS,
+} from './constants';
 import useAuthStore from '../store/useAuthStore';
 import { reissueToken } from './auth';
 import useNetworkStore from '../store/useNetworkStore';
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    // 실패해도 대신할 방법이 있는 요청은 네트워크 오류 모달을 띄우지 않는다
+    skipNetworkErrorModal?: boolean;
+  }
+}
+
+// 응답을 받지 못한 경우: 연결 실패, 연결 중단, 시간 초과
+const NO_RESPONSE_ERROR_CODES = ['ERR_NETWORK', 'ECONNABORTED', 'ETIMEDOUT'];
+
 export const apiClient = axios.create({
   baseURL: `${process.env.API_URL}`,
+  timeout: REQUEST_TIMEOUT_MS,
   headers: {
     [HTTP_HEADERS.CONTENT_TYPE]: HTTP_HEADERS_VALUES.JSON,
     ...APP_KEY_HEADER,
@@ -42,10 +58,12 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
-      console.log('네트워크 연결 끊김 감지');
+    if (error.message === 'Network Error' || NO_RESPONSE_ERROR_CODES.includes(error.code)) {
+      console.log('서버 응답 없음 감지:', error.code);
 
-      useNetworkStore.getState().setNetworkError(true);
+      if (!error.config?.skipNetworkErrorModal) {
+        useNetworkStore.getState().setNetworkError(true);
+      }
 
       return Promise.reject(error);
     }
