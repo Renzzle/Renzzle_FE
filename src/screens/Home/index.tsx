@@ -22,6 +22,7 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PackCard from '../../components/features/PackCard';
 import CommunityCard from '../../components/features/CommunityCard';
 import useModal from '../../hooks/useModal';
+import { useUserStore } from '../../store/useUserStore';
 import { BackHandler, Platform, ToastAndroid } from 'react-native';
 import i18n from '../../locales/i18n';
 
@@ -78,6 +79,10 @@ const Home = () => {
     useCallback(() => {
       fetchRecommendPack();
       fetchTrendPuzzles();
+      // 앱을 열 때 등 사용자 정보를 못 불러왔다면 다시 불러온다
+      if (!useUserStore.getState().user) {
+        useUserStore.getState().updateUser();
+      }
     }, []),
   );
 
