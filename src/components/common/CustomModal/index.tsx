@@ -33,6 +33,7 @@ export type ModalCategoryType =
   | 'PUZZLE_REVIEW_PURCHASE'
   | 'NICKNAME_CHANGE_PURCHASE'
   | 'USER_DELETE_CONFIRM'
+  | 'TUTORIAL_SKIP_CONFIRM'
   | 'FEATURE_IN_PROGRESS'
   | 'NETWORK_ERROR';
 
@@ -135,6 +136,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.userDeleteConfirm.title',
     BODY: 'modal.userDeleteConfirm.message',
     FOOTER: ['modal.userDeleteConfirm.cancel', 'modal.userDeleteConfirm.confirm'],
+  },
+  TUTORIAL_SKIP_CONFIRM: {
+    TITLE: 'modal.tutorialSkipConfirm.title',
+    BODY: 'modal.tutorialSkipConfirm.message',
+    FOOTER: ['modal.tutorialSkipConfirm.cancel', 'modal.tutorialSkipConfirm.confirm'],
   },
   FEATURE_IN_PROGRESS: {
     TITLE: 'modal.featureInProgress.title',

@@ -48,7 +48,12 @@ const PuzzleReview = () => {
 
   const boardRef = useRef<BoardRef>(null);
 
-  const [currentSequence, setCurrentSequence] = useState(route.params.problemSequence);
+  // 검토는 끝난 상황(마지막 수)부터 보여주고, 정답보기는 한 수씩 따라갈 수 있도록 문제 상황부터 보여준다
+  const isViewAnswer =
+    route.name === 'TrainingPuzzleViewAnswer' || route.name === 'CommunityPuzzleViewAnswer';
+  const [currentSequence, setCurrentSequence] = useState(
+    isViewAnswer ? route.params.problemSequence : route.params.mainSequence,
+  );
   const {
     problemSequence,
     mainSequence,

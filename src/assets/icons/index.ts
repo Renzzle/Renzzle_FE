@@ -3,6 +3,7 @@ import ArchiveIcon from './ico-archive.svg';
 import AuthenticatedUserIcon from './ico-authenticated-user.svg';
 import AuthenticatedIcon from './ico-authenticated.svg';
 import BestUserIcon from './ico-best-user.svg';
+import BookOpenIcon from './ico-book-open.svg';
 import BookShelfIcon from './ico-book-shelf.svg';
 import CheckIcon from './ico-check.svg';
 import CheckboxBlankIcon from './ico-checkbox-blank.svg';
@@ -17,6 +18,7 @@ import CommunityIcon from './ico-community.svg';
 import ConfusedActiveIcon from './ico-confused-active.svg';
 import ConfusedInactiveIcon from './ico-confused-inactive.svg';
 import CorrectIcon from './ico-correct.svg';
+import CrossIcon from './ico-cross.svg';
 import DepthIcon from './ico-depth.svg';
 import ErrorIcon from './ico-error.svg';
 import FilterIcon from './ico-filter.svg';
@@ -72,6 +74,7 @@ const Icons = {
   AuthenticatedUserIcon,
   AuthenticatedIcon,
   BestUserIcon,
+  BookOpenIcon,
   BookShelfIcon,
   CheckIcon,
   CheckboxBlankIcon,
@@ -86,6 +89,7 @@ const Icons = {
   ConfusedActiveIcon,
   ConfusedInactiveIcon,
   CorrectIcon,
+  CrossIcon,
   DepthIcon,
   ErrorIcon,
   FilterIcon,
