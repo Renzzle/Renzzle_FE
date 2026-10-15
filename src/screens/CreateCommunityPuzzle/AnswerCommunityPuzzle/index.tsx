@@ -207,7 +207,7 @@ const AnswerCommunityPuzzle = () => {
         showBottomToast('error', t('modal.puzzleUploadFailed.title'));
       }
     } catch (error) {
-      showBottomToast('error', t('toast.duplicatePuzzle'));
+      showBottomToast('error', error as string);
     } finally {
       setIsVerifyDisabled(false);
       setIsUploadDisabled(false);
