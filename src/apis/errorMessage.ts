@@ -66,6 +66,7 @@ const ERROR_CODE_TO_I18N_KEY: Record<string, string> = {
   P4047: 'error.emptySessionData',
   P4048: 'error.latestPuzzleNotFound',
   P4090: 'error.trendPuzzleDuplicated',
+  P4093: 'toast.duplicatePuzzle',
   P429: 'error.exceedDailyPuzzleUpload',
   P4100: 'error.sessionAlreadyEnded',
   P5000: 'error.sessionGenerationFailed',
