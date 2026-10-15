@@ -35,6 +35,9 @@ local.properties
 *.jks
 *.pem
 
+# VS Code
+.vscode/settings.json
+
 # node.js
 #
 node_modules/
