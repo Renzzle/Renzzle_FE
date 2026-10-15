@@ -23,3 +23,7 @@ target_include_directories(native-lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/search
         ${CMAKE_CURRENT_SOURCE_DIR}/engine
 )
+
+# 엔진 탐색 속도를 위해 빌드 종류(Debug/Release)와 관계없이 -O3로 최적화한다
+# (iOS는 Xcode에서 RenzzleModules.mm에 같은 옵션을 준다)
+target_compile_options(native-lib PRIVATE -O3)

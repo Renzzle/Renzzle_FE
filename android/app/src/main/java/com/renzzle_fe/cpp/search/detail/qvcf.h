@@ -1,15 +1,35 @@
 #pragma once
 
-bool Search::isRootAttackerTurn(Board& targetBoard) {
-    return targetBoard.isBlackTurn() == rootBoard.isBlackTurn();
+// leaf probes look for the root side's VCF and may cash in 4-3 / 3-3 shortcuts
+Search::QVCFContext Search::makeLeafQVCFContext() {
+    QVCFContext context;
+    context.attacker = rootBoard.isBlackTurn() ? BLACK : WHITE;
+    context.keySalt = QVCF_TT_KEY;
+    context.table = &tt;
+    return context;
 }
 
-Result Search::getRootWinResult() {
-    return rootBoard.isBlackTurn() ? BLACK_WIN : WHITE_WIN;
+// threat probes: either side, a key space per attacker, their own table
+Search::QVCFContext Search::makeThreatQVCFContext(Piece attacker) {
+    QVCFContext context;
+    context.attacker = attacker;
+    context.keySalt = attacker == BLACK ? QVCF_THREAT_TT_KEY_BLACK : QVCF_THREAT_TT_KEY_WHITE;
+    context.foursOnly = true;
+    context.table = &threatTT;
+    context.nodeLimit = THREAT_QVCF_NODE_LIMIT;
+    return context;
 }
 
-uint64_t Search::getQVCFTTKey(Board& targetBoard) const {
-    return getTTKey(targetBoard) ^ QVCF_TT_KEY;
+bool Search::isQVCFAttackerTurn(Board& targetBoard, const QVCFContext& context) const {
+    return (targetBoard.isBlackTurn() ? BLACK : WHITE) == context.attacker;
+}
+
+Result Search::getQVCFWinResult(const QVCFContext& context) const {
+    return context.attacker == BLACK ? BLACK_WIN : WHITE_WIN;
+}
+
+uint64_t Search::getQVCFTTKey(Board& targetBoard, const QVCFContext& context) const {
+    return getTTKey(targetBoard) ^ context.keySalt;
 }
 
 bool Search::enterQVCFNode(QVCFContext& context) {
@@ -44,10 +64,15 @@ void Search::moveQVCFTTBestFirst(CandidateList& moves, const Pos& bestMove) cons
     }
 }
 
-bool Search::probeQVCFTT(Board& targetBoard, int remainingPly, Value& value, Pos& bestMove) const {
+bool Search::probeQVCFTT(Board& targetBoard, const QVCFContext& context, int remainingPly,
+    Value& value, Pos& bestMove) const {
+    return probeQVCFTT(getQVCFTTKey(targetBoard, context), context, remainingPly, value, bestMove);
+}
+
+bool Search::probeQVCFTT(uint64_t key, const QVCFContext& context, int remainingPly,
+    Value& value, Pos& bestMove) const {
     TTEntry entryStorage;
-    const uint64_t key = getQVCFTTKey(targetBoard);
-    if (!tt.probeCopy(key, &entryStorage)) {
+    if (!context.table->probeCopy(key, &entryStorage)) {
         return false;
     }
 
@@ -75,9 +100,10 @@ bool Search::probeQVCFTT(Board& targetBoard, int remainingPly, Value& value, Pos
     return false;
 }
 
-void Search::storeQVCFWin(Board& targetBoard, Value value, int remainingPly, const Pos& bestMove) {
-    tt.store(
-        getQVCFTTKey(targetBoard),
+void Search::storeQVCFWin(Board& targetBoard, const QVCFContext& context, Value value,
+    int remainingPly, const Pos& bestMove) {
+    context.table->store(
+        getQVCFTTKey(targetBoard, context),
         encodeTTScore(value),
         getTTDepth(remainingPly),
         TTFlag::EXACT,
@@ -85,9 +111,9 @@ void Search::storeQVCFWin(Board& targetBoard, Value value, int remainingPly, con
     );
 }
 
-void Search::storeQVCFFail(Board& targetBoard, int remainingPly) {
-    tt.store(
-        getQVCFTTKey(targetBoard),
+void Search::storeQVCFFail(Board& targetBoard, const QVCFContext& context, int remainingPly) {
+    context.table->store(
+        getQVCFTTKey(targetBoard, context),
         0,
         getTTDepth(remainingPly),
         TTFlag::UPPER_BOUND,
@@ -95,38 +121,12 @@ void Search::storeQVCFFail(Board& targetBoard, int remainingPly) {
     );
 }
 
-void Search::appendQVCFTTPV(Board tempBoard, MoveList& pv, int remainingPly) const {
-    for (int ply = 0; ply < remainingPly; ++ply) {
-        TTEntry entryStorage;
-        const uint64_t key = getQVCFTTKey(tempBoard);
-        if (!tt.probeCopy(key, &entryStorage)) {
-            break;
-        }
-        if (entryStorage.getFlag() != TTFlag::EXACT || entryStorage.score == 0) {
-            break;
-        }
-        if (entryStorage.bestMove == TranspositionTable::INVALID_MOVE) {
-            break;
-        }
-
-        const Pos move = TranspositionTable::decodeMove(entryStorage.bestMove);
-        if (move.isDefault() || !tempBoard.move(move)) {
-            break;
-        }
-
-        pv.push_back(move);
-        if (tempBoard.getResult() != ONGOING) {
-            break;
-        }
-    }
-}
-
 bool Search::tryResolveLeafVCF(MoveList* pv, Value& resolvedValue) {
     if (!options.leafVCFEnabled || state.qvcfDisabledAfterWin || options.leafVCFMaxPly <= 0) {
         return false;
     }
 
-    QVCFContext context;
+    QVCFContext context = makeLeafQVCFContext();
 
     MoveList vcfPV;
     Value value = qvcfSearch(options.leafVCFMaxPly, context, pv != nullptr ? &vcfPV : nullptr);
@@ -150,8 +150,41 @@ bool Search::tryResolveLeafVCF(MoveList* pv, Value& resolvedValue) {
     return true;
 }
 
+// The opponent's replayable fours-only VCF after a pass (UNSETTLED_THREAT: out of nodes or
+// the line does not replay).
+Search::ThreatKind Search::findVCFThreatLine(MoveList& line) {
+    const Piece attacker = board.isBlackTurn() ? WHITE : BLACK;
+    if (!board.pass()) {
+        return NO_THREAT;
+    }
+
+    QVCFContext context = makeThreatQVCFContext(attacker);
+    Value value = qvcfAttack(options.leafVCFMaxPly, context, &line);
+    ThreatKind kind = NO_THREAT;
+    if (value.isWin()) {
+        kind = searchActive() && replayVCFWins(board, line) ? VCF_THREAT : UNSETTLED_THREAT;
+    } else if (context.stopped) {
+        kind = UNSETTLED_THREAT;
+    }
+    board.undo();
+    return kind;
+}
+
+// The child's result without playing `move`: a fail past the ply limit, or its TT answer.
+// These moves never end the game, so the child would do nothing else first.
+bool Search::answerQVCFChild(const Pos& move, int childPly, const QVCFContext& context,
+    bool needLine, Value& value) {
+    if (childPly <= 0) {
+        value = Value();
+        return true;
+    }
+    Pos bestMove;
+    return probeQVCFTT(getChildTTKey(move) ^ context.keySalt, context, childPly, value, bestMove)
+        && (!needLine || !value.isWin());
+}
+
 Value Search::qvcfSearch(int remainingPly, QVCFContext& context, MoveList* pv) {
-    return isRootAttackerTurn(board)
+    return isQVCFAttackerTurn(board, context)
         ? qvcfAttack(remainingPly, context, pv)
         : qvcfDefend(remainingPly, context, pv);
 }
@@ -162,7 +195,7 @@ Value Search::qvcfAttack(int remainingPly, QVCFContext& context, MoveList* pv) {
     }
 
     const Result result = board.getResult();
-    if (result == getRootWinResult()) {
+    if (result == getQVCFWinResult(context)) {
         return Value(Value::Result::WIN, 0);
     }
     if (result != ONGOING || remainingPly <= 0) {
@@ -171,10 +204,9 @@ Value Search::qvcfAttack(int remainingPly, QVCFContext& context, MoveList* pv) {
 
     Value cachedValue;
     Pos cachedBestMove;
-    if (probeQVCFTT(board, remainingPly, cachedValue, cachedBestMove)) {
-        if (cachedValue.isWin() && pv != nullptr) {
-            appendQVCFTTPV(board, *pv, remainingPly);
-        }
+    // a TT win may have lost its line's entries: re-search when the line is needed
+    if (probeQVCFTT(board, context, remainingPly, cachedValue, cachedBestMove)
+        && (pv == nullptr || !cachedValue.isWin())) {
         return cachedValue;
     }
 
@@ -185,15 +217,17 @@ Value Search::qvcfAttack(int remainingPly, QVCFContext& context, MoveList* pv) {
     Evaluator evaluator(board);
     Pos quickMove;
     Value quickValue = evaluator.quickWinCheck(&quickMove);
-    if (quickValue.isWin() && quickValue.getResultDepth() <= remainingPly) {
+    // WIN(5) is a 4-3 / 3-3 shortcut; fours-only probes expand it into real fours instead
+    const bool quickWinAllowed = !context.foursOnly || quickValue.getResultDepth() <= 3;
+    if (quickValue.isWin() && quickValue.getResultDepth() <= remainingPly && quickWinAllowed) {
         if (pv != nullptr && !quickMove.isDefault()) {
             pv->push_back(quickMove);
         }
-        storeQVCFWin(board, quickValue, remainingPly, quickMove);
+        storeQVCFWin(board, context, quickValue, remainingPly, quickMove);
         return quickValue;
     }
     if (quickValue.isLose()) {
-        storeQVCFFail(board, remainingPly);
+        storeQVCFFail(board, context, remainingPly);
         return Value();
     }
 
@@ -201,19 +235,26 @@ Value Search::qvcfAttack(int remainingPly, QVCFContext& context, MoveList* pv) {
     evaluator.getFours(moves);
     moveQVCFTTBestFirst(moves, cachedBestMove);
     if (moves.empty()) {
-        storeQVCFFail(board, remainingPly);
+        storeQVCFFail(board, context, remainingPly);
         return Value();
     }
 
-    for (const Pos& move : moves) {
-        if (!board.move(move)) {
-            continue;
+    // children are probed before being played, so prefetch them all
+    if (remainingPly > 1) {
+        for (const Pos& move : moves) {
+            context.table->prefetch(getChildTTKey(move) ^ context.keySalt);
         }
-        tt.prefetch(getQVCFTTKey(board));
-
+    }
+    for (const Pos& move : moves) {
         MoveList childPV;
-        Value childValue = qvcfDefend(remainingPly - 1, context, pv != nullptr ? &childPV : nullptr);
-        board.undo();
+        Value childValue;
+        if (!answerQVCFChild(move, remainingPly - 1, context, pv != nullptr, childValue)) {
+            if (!board.move(move)) {
+                continue;
+            }
+            childValue = qvcfDefend(remainingPly - 1, context, pv != nullptr ? &childPV : nullptr);
+            board.undo();
+        }
 
         if (!searchActive() || context.stopped) {
             return Value();
@@ -227,12 +268,12 @@ Value Search::qvcfAttack(int remainingPly, QVCFContext& context, MoveList* pv) {
             pv->push_back(move);
             pv->insert(pv->end(), childPV.begin(), childPV.end());
         }
-        storeQVCFWin(board, childValue, remainingPly, move);
+        storeQVCFWin(board, context, childValue, remainingPly, move);
         return childValue;
     }
 
     if (!context.stopped) {
-        storeQVCFFail(board, remainingPly);
+        storeQVCFFail(board, context, remainingPly);
     }
     return Value();
 }
@@ -243,7 +284,7 @@ Value Search::qvcfDefend(int remainingPly, QVCFContext& context, MoveList* pv) {
     }
 
     const Result result = board.getResult();
-    if (result == getRootWinResult()) {
+    if (result == getQVCFWinResult(context)) {
         return Value(Value::Result::WIN, 0);
     }
     if (result != ONGOING || remainingPly <= 0) {
@@ -252,10 +293,9 @@ Value Search::qvcfDefend(int remainingPly, QVCFContext& context, MoveList* pv) {
 
     Value cachedValue;
     Pos cachedBestMove;
-    if (probeQVCFTT(board, remainingPly, cachedValue, cachedBestMove)) {
-        if (cachedValue.isWin() && pv != nullptr) {
-            appendQVCFTTPV(board, *pv, remainingPly);
-        }
+    // as in qvcfAttack
+    if (probeQVCFTT(board, context, remainingPly, cachedValue, cachedBestMove)
+        && (pv == nullptr || !cachedValue.isWin())) {
         return cachedValue;
     }
 
@@ -272,43 +312,43 @@ Value Search::qvcfDefend(int remainingPly, QVCFContext& context, MoveList* pv) {
             if (pv != nullptr && !quickMove.isDefault()) {
                 pv->push_back(quickMove);
             }
-            storeQVCFWin(board, quickValue, remainingPly, quickMove);
+            storeQVCFWin(board, context, quickValue, remainingPly, quickMove);
             return quickValue;
         }
     }
     if (quickValue.isWin()) {
-        storeQVCFFail(board, remainingPly);
+        storeQVCFFail(board, context, remainingPly);
         return Value();
     }
-    const Piece rootPiece = rootBoard.isBlackTurn() ? BLACK : WHITE;
-    if (!board.hasCompositePattern(rootPiece, WINNING)) {
-        storeQVCFFail(board, remainingPly);
+    if (!board.hasCompositePattern(context.attacker, WINNING)) {
+        storeQVCFFail(board, context, remainingPly);
         return Value();
     }
 
     const Pos defendMove = evaluator.getOppoWinningDefend();
     if (defendMove.isDefault()) {
         Value value(Value::Result::WIN, 0);
-        storeQVCFWin(board, value, remainingPly, Pos());
+        storeQVCFWin(board, context, value, remainingPly, Pos());
         return value;
     }
-
-    if (!board.move(defendMove)) {
-        Value value(Value::Result::WIN, 0);
-        storeQVCFWin(board, value, remainingPly, Pos());
-        return value;
-    }
-    tt.prefetch(getQVCFTTKey(board));
 
     MoveList childPV;
-    Value childValue = qvcfAttack(remainingPly - 1, context, pv != nullptr ? &childPV : nullptr);
-    board.undo();
+    Value childValue;
+    if (!answerQVCFChild(defendMove, remainingPly - 1, context, pv != nullptr, childValue)) {
+        if (!board.move(defendMove)) {
+            Value value(Value::Result::WIN, 0);
+            storeQVCFWin(board, context, value, remainingPly, Pos());
+            return value;
+        }
+        childValue = qvcfAttack(remainingPly - 1, context, pv != nullptr ? &childPV : nullptr);
+        board.undo();
+    }
 
     if (!searchActive() || context.stopped) {
         return Value();
     }
     if (!childValue.isWin()) {
-        storeQVCFFail(board, remainingPly);
+        storeQVCFFail(board, context, remainingPly);
         return Value();
     }
 
@@ -317,6 +357,6 @@ Value Search::qvcfDefend(int remainingPly, QVCFContext& context, MoveList* pv) {
         pv->push_back(defendMove);
         pv->insert(pv->end(), childPV.begin(), childPV.end());
     }
-    storeQVCFWin(board, childValue, remainingPly, defendMove);
+    storeQVCFWin(board, context, childValue, remainingPly, defendMove);
     return childValue;
 }
