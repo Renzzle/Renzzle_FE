@@ -4,27 +4,47 @@ import useAuthStore from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import i18n, { initI18n } from '../../locales/i18n';
-import { getAppData } from '../../apis/config';
+import { AppDataItem, getAppData } from '../../apis/config';
 import useConfigStore from '../../store/useConfigStore';
 import useTutorialStore from '../../store/useTutorialStore';
 
+const findAppDataValue = (appData: AppDataItem[], tag: string) =>
+  appData.find((item) => item.tag === tag)?.value;
+
+const findAppDataNumber = (appData: AppDataItem[], tag: string) => {
+  const value = Number(findAppDataValue(appData, tag));
+  return Number.isFinite(value) ? value : undefined;
+};
+
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
-  const { restoreCredentials, setTokens, clearTokens } = useAuthStore();
-  const { setUser } = useUserStore(); // Get setters from the user store
-  const { setFeedbackUrl } = useConfigStore();
+  const { restoreCredentials, clearTokens } = useAuthStore();
+  const { setFeedbackUrl, setStoreUrls, setPolicyUrls, setRewardConfig, setPriceConfig } =
+    useConfigStore();
   const restoreTutorialPending = useTutorialStore((state) => state.restoreTutorialPending);
 
   useEffect(() => {
     const loadAppData = async () => {
       try {
-        const config = await getAppData();
-        const feedbackUrl = config.response.find(
-          (i: { tag: string }) => i.tag === 'feedback_url',
-        )?.value;
+        const appData = await getAppData();
+        const feedbackUrl = findAppDataValue(appData, 'feedback_url');
+        const iosStoreUrl = findAppDataValue(appData, 'ios_store_url');
+        const androidStoreUrl = findAppDataValue(appData, 'android_store_url');
+        const privacyPolicyUrl = findAppDataValue(appData, 'privacy_policy_url');
+        const termsOfUseUrl = findAppDataValue(appData, 'terms_of_use_url');
+        const attendanceReward = findAppDataNumber(appData, 'attendance_reward');
+        const changeNicknamePrice = findAppDataNumber(appData, 'change_nickname_price');
+        const communityReward = findAppDataNumber(appData, 'community_reward');
+        const hintPrice = findAppDataNumber(appData, 'hint_price');
+        const rankReward = findAppDataNumber(appData, 'rank_reward');
+        const trainingReward = findAppDataNumber(appData, 'training_reward');
         if (feedbackUrl) {
           setFeedbackUrl(feedbackUrl);
         }
+        setStoreUrls({ iosStoreUrl, androidStoreUrl });
+        setPolicyUrls({ privacyPolicyUrl, termsOfUseUrl });
+        setRewardConfig({ attendanceReward, communityReward, rankReward, trainingReward });
+        setPriceConfig({ changeNicknamePrice, hintPrice });
       } catch (e) {
         console.log('설정 로드 실패:', e);
       }
@@ -32,13 +52,20 @@ const useInitializeApp = (): boolean => {
 
     const initApp = async () => {
       try {
-        await Promise.all([initI18n(), loadAppData(), restoreTutorialPending()]);
-        const credentials = await restoreCredentials();
+        const [, credentials] = await Promise.all([
+          initI18n(),
+          restoreCredentials(),
+          restoreTutorialPending(),
+        ]);
         const { accessToken, refreshToken } = credentials;
 
         if (accessToken || refreshToken) {
           try {
             await useUserStore.getState().updateUser();
+
+            if (useUserStore.getState().user) {
+              await loadAppData();
+            }
           } catch (error) {
             console.log('자동 로그인 실패:', error);
             await clearTokens();
@@ -55,7 +82,16 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [restoreCredentials, setTokens, clearTokens, setUser, setFeedbackUrl, restoreTutorialPending]);
+  }, [
+    restoreCredentials,
+    clearTokens,
+    setFeedbackUrl,
+    setStoreUrls,
+    setPolicyUrls,
+    setRewardConfig,
+    setPriceConfig,
+    restoreTutorialPending,
+  ]);
 
   return isLoading;
 };

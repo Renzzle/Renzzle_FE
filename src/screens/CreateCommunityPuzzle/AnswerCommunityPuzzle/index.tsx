@@ -302,7 +302,6 @@ const AnswerCommunityPuzzle = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
-        gameOutcome={{ price: 100 }}
       />
     </Container>
   );

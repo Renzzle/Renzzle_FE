@@ -10,6 +10,7 @@ import { useUserStore } from '../../../store/useUserStore';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import useConfigStore from '../../../store/useConfigStore';
 
 const ChangeNickname = () => {
   const { t } = useTranslation();
@@ -22,10 +23,16 @@ const ChangeNickname = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const changeNicknamePrice = useConfigStore((state) => state.changeNicknamePrice);
   const [nickname, setNickname] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
+    if (changeNicknamePrice === null) {
+      showBottomToast('error', t('toast.priceInfoUnavailable'));
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -71,7 +78,7 @@ const ChangeNickname = () => {
         category={modalCategory}
         onPrimaryAction={closePrimarily}
         onSecondaryAction={closeSecondarily}
-        gameOutcome={{ price: 2500 }}
+        gameOutcome={{ ...(changeNicknamePrice !== null ? { price: changeNicknamePrice } : {}) }}
         isLoading={isLoading}
       />
     </Container>

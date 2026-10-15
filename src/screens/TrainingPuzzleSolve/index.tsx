@@ -22,6 +22,7 @@ import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
 import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
 import ReviewButton from '../../components/features/ReviewButton';
+import useConfigStore from '../../store/useConfigStore';
 
 const TrainingPuzzleSolve = () => {
   const { t } = useTranslation();
@@ -46,6 +47,8 @@ const TrainingPuzzleSolve = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [outcome, setOutcome] = useState<GameOutcome>();
   const { updateUser } = useUserStore();
+  const hintPrice = useConfigStore((state) => state.hintPrice);
+  const trainingReward = useConfigStore((state) => state.trainingReward);
   const [boardKey, setBoardKey] = useState(0);
 
   const isPuzzleResultModal =
@@ -98,11 +101,7 @@ const TrainingPuzzleSolve = () => {
 
       markSolved(puzzleDetail);
 
-      if (data.reward) {
-        setOutcome({ reward: data.reward });
-      } else {
-        setOutcome({ reward: 0 });
-      }
+      setOutcome({ reward: data.reward ?? trainingReward ?? 0 });
 
       // If there are more puzzles left in the pack
       if (puzzles.length > currentPuzzleNumber) {
@@ -147,6 +146,11 @@ const TrainingPuzzleSolve = () => {
       return;
     }
 
+    if (hintPrice === null) {
+      showBottomToast('error', t('toast.priceInfoUnavailable'));
+      return;
+    }
+
     const openAnswer = async () => {
       setIsLoading(true);
       try {
@@ -165,7 +169,7 @@ const TrainingPuzzleSolve = () => {
       }
     };
 
-    setOutcome({ ...outcome, price: 100 });
+    setOutcome({ ...(outcome ?? {}), price: hintPrice });
     activateModal('PUZZLE_REVIEW_PURCHASE', {
       primaryAction: openAnswer,
     });
