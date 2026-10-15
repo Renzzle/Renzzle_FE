@@ -22,14 +22,14 @@ import { useTranslation } from 'react-i18next';
 const RankedPuzzleReview = () => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, 'RankedPuzzleReview'>>();
-  const { archive, initialIndex } = route.params;
+  const { archive, initialIndex, playedSequences } = route.params;
 
   const boardRef = useRef<BoardRef>(null);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const currentPuzzle = archive[currentIndex];
-  // 각 문제는 끝난 상황(마지막 수)부터 보여준다 (건너뛴 문제 등 answer가 없을 수 있다)
-  const getFinalSequence = (index: number) => archive[index].boardStatus + (archive[index].answer ?? '');
-  const [currentSequence, setCurrentSequence] = useState(getFinalSequence(currentIndex));
+  const getPlayedSequence = (index: number) =>
+    playedSequences[archive[index].boardStatus] ?? archive[index].boardStatus;
+  const [currentSequence, setCurrentSequence] = useState(archive[currentIndex].boardStatus);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
@@ -41,7 +41,7 @@ const RankedPuzzleReview = () => {
       return;
     }
     setCurrentIndex(nextIndex);
-    setCurrentSequence(getFinalSequence(nextIndex));
+    setCurrentSequence(archive[nextIndex].boardStatus);
     setCanUndo(false);
     setCanRedo(false);
   };
@@ -87,7 +87,7 @@ const RankedPuzzleReview = () => {
           makeMode="review"
           sequence={currentSequence}
           setSequence={setCurrentSequence}
-          mainSequence={getFinalSequence(currentIndex)}
+          mainSequence={getPlayedSequence(currentIndex)}
           problemSequence={currentPuzzle.boardStatus}
           onUndoRedoStateChange={(undo, redo) => {
             setCanUndo(undo);

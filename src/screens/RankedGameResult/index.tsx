@@ -34,7 +34,7 @@ const RankedGameResult = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'RankedGameResult'>>();
-  const { rating, reward, ratingDelta } = route.params ?? {};
+  const { rating, reward, ratingDelta, playedSequences = {} } = route.params ?? {};
   const {
     isModalVisible,
     activateModal,
@@ -67,7 +67,7 @@ const RankedGameResult = () => {
     if (!archive || archive.length === 0) {
       return;
     }
-    navigation.navigate('RankedPuzzleReview', { archive, initialIndex: index });
+    navigation.navigate('RankedPuzzleReview', { archive, initialIndex: index, playedSequences });
   };
 
   const handleRetry = () => {

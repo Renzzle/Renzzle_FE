@@ -50,10 +50,12 @@ export type RootStackParamList = {
     rating?: number;
     reward?: number;
     ratingDelta?: number;
+    playedSequences: Record<string, string>;
   };
   RankedPuzzleReview: {
     archive: RankArchive[];
     initialIndex: number;
+    playedSequences: Record<string, string>;
   };
   Tutorial:
     | {

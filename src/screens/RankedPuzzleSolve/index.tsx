@@ -78,6 +78,7 @@ const RankedPuzzleSolve = () => {
   const canLeaveRef = useRef(false);
   const boardRef = useRef<BoardRef>(null);
   const startRatingRef = useRef<number | null>(null);
+  const playedSequencesRef = useRef<Record<string, string>>({});
 
   const successCount = results.filter((result) => result.variant === 'success').length;
   const failureCount = results.length - successCount;
@@ -195,6 +196,7 @@ const RankedPuzzleSolve = () => {
         rating: data.rating,
         reward: data.reward,
         ratingDelta,
+        playedSequences: playedSequencesRef.current,
       });
     },
     [navigation, updateUser],
@@ -325,7 +327,9 @@ const RankedPuzzleSolve = () => {
             ref={boardRef}
             mode="solve"
             sequence={puzzleData.boardStatus}
-            setSequence={() => {}}
+            setSequence={(sequence) => {
+              playedSequencesRef.current[puzzleData.boardStatus] = sequence;
+            }}
             setIsWin={handleResult}
             setIsLoading={setIsLoading}
             hideAiIndicator={isFinishing}

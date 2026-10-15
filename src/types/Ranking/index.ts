@@ -63,6 +63,5 @@ export interface GameOutcome {
 export interface RankArchive {
   boardStatus: string;
   winColor: 'BLACK' | 'WHITE';
-  answer: string;
   isSolved: boolean;
 }
