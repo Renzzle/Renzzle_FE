@@ -250,7 +250,7 @@ function App(): React.JSX.Element | null {
               screenOptions={{
                 header: renderCustomHeader,
                 // Android 기본 전환은 새 화면이 10%만 밀려 들어와, 폴드폰처럼 넓은 화면에서 왼쪽에 이전 화면이 비친다
-                animation: 'slide_from_right',
+                animation: 'ios_from_right',
               }}>
               {accessToken ? (
                 <>
