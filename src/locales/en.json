@@ -128,9 +128,6 @@
       "confirm": "Exit",
       "cancel": "Retry"
     },
-    "rankingPuzzleFailure": {
-      "message": "Failed to complete five in a row."
-    },
     "validationComplete": {
       "title": "Verification Success",
       "message": "Check the verified sequence and upload. If the sequence changes by clicking on the board, it will change to an uncertified state.",
@@ -307,6 +304,14 @@
     "failed": "Failed",
     "prev": "Previous",
     "next": "Next"
+  },
+  "rankedFeedback": {
+    "five": "Five in a row",
+    "opponentFive": "Opponent's five",
+    "forbidden": "Forbidden move",
+    "solved": "Solved",
+    "failed": "Failed",
+    "bonusTime": "+{{seconds}}s"
   },
   "tutorial": {
     "skip": "Skip",

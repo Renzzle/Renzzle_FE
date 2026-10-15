@@ -6,7 +6,7 @@ import { CustomText, Icon } from '../../common';
 import theme from '../../../styles/theme';
 
 const TOTAL_DURATION = 3 * 60 * 1000; // 3 min
-const BONUS_TIME = 10 * 1000; // 10 sec
+export const BONUS_TIME = 10 * 1000; // 10 sec
 
 interface TimerWithProgressBarProps {
   start: boolean;

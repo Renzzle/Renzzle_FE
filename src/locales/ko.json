@@ -128,9 +128,6 @@
       "confirm": "나가기",
       "cancel": "재도전"
     },
-    "rankingPuzzleFailure": {
-      "message": "오목을 완성하지 못했습니다."
-    },
     "validationComplete": {
       "title": "검증이 성공하였습니다.",
       "message": "검증한 수순을 확인하고 업로드하세요. 보드를 클릭하여 수순이 변경될 시 미인증 상태로 변경됩니다.",
@@ -307,6 +304,14 @@
     "failed": "실패",
     "prev": "이전 문제",
     "next": "다음 문제"
+  },
+  "rankedFeedback": {
+    "five": "오목 완성",
+    "opponentFive": "상대 오목",
+    "forbidden": "금수 패배",
+    "solved": "성공",
+    "failed": "실패",
+    "bonusTime": "+{{seconds}}초"
   },
   "tutorial": {
     "skip": "건너뛰기",

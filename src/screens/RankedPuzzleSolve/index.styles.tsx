@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
 
@@ -41,6 +41,16 @@ export const BoardWrapper = styled(View)`
   flex: 1;
   justify-content: center;
   align-items: center;
+`;
+
+// 결과 연출 중에 화면 어디를 눌러도 바로 다음 문제로 넘어가게 한다
+export const FeedbackSkipArea = styled(Pressable)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
 `;
 
 export const BottomActionsWrapper = styled(View)`

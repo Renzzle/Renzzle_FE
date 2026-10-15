@@ -43,8 +43,12 @@ import {
 import useCancellableNativeRequest from '../../../hooks/useCancellableNativeRequest';
 import useDelayedVisibility from '../../../hooks/useDelayedVisibility';
 import AiThinkingIndicator from './AiThinkingIndicator';
+import ResultHighlight, { BoardPoint } from './ResultHighlight';
 
 export type StoneType = 0 | 1 | 2; // 0: Empty, 1: Black, 2: White
+
+// 풀이가 끝난 이유: 어느 쪽이든 오목 완성, 또는 흑의 금수
+export type GameEndReason = 'five' | 'forbidden';
 
 type PuzzleAiBenchmarkMode = 'LOCAL_ONLY' | 'CACHE';
 type PuzzleAiAnswerSource = 'local-only' | 'cache-hit' | 'cache-miss' | 'cache-fallback';
@@ -65,6 +69,49 @@ const VALID_SEQUENCE_PATTERN = /^(?:[a-o](?:1[0-5]|[1-9]))*$/;
 const getLastMoveCoordinates = (sequence: string) => {
   const lastMove = sequence.match(/[a-o](?:1[0-5]|[1-9])$/);
   return lastMove ? positionToCoordinates(lastMove[0]) : null;
+};
+
+const LINE_DIRECTIONS = [
+  [0, 1],
+  [1, 0],
+  [1, 1],
+  [1, -1],
+];
+
+// 마지막 수를 지나며 같은 색 돌이 다섯 개 이상 이어진 줄을 찾는다
+const findFiveLine = (sequence: string): BoardPoint[] | null => {
+  const stones = new Map<string, number>();
+  let last: BoardPoint | null = null;
+  let moveIndex = 0;
+  for (const move of sequence.match(/[a-o](?:1[0-5]|[1-9])/g) ?? []) {
+    const coordinates = positionToCoordinates(move);
+    if (coordinates) {
+      stones.set(`${coordinates.x}-${coordinates.y}`, moveIndex % 2);
+      last = coordinates;
+      moveIndex++;
+    }
+  }
+  if (!last) {
+    return null;
+  }
+
+  const color = stones.get(`${last.x}-${last.y}`);
+  for (const [dx, dy] of LINE_DIRECTIONS) {
+    const line: BoardPoint[] = [last];
+    for (const sign of [-1, 1]) {
+      let x = last.x + dx * sign;
+      let y = last.y + dy * sign;
+      while (stones.get(`${x}-${y}`) === color) {
+        line.push({ x, y });
+        x += dx * sign;
+        y += dy * sign;
+      }
+    }
+    if (line.length >= 5) {
+      return line.sort((a, b) => a.x - b.x || a.y - b.y);
+    }
+  }
+  return null;
 };
 
 const getPuzzleAiMode = (): PuzzleAiBenchmarkMode => {
@@ -119,7 +166,7 @@ interface BoardProps {
   makeMode?: 'create' | 'review';
   sequence: string;
   setSequence: (sequence: string) => void;
-  setIsWin?: (isWin: boolean | null) => void;
+  setIsWin?: (isWin: boolean | null, reason?: GameEndReason) => void;
   setIsLoading?: (isLoading: boolean) => void;
 
   // 'review' mode
@@ -136,6 +183,9 @@ interface BoardProps {
 
   // 게임 정산 등 AI 응답이 더 이상 의미 없는 상황에서 생각 중 인디케이터를 즉시 숨김
   hideAiIndicator?: boolean;
+
+  // 풀이가 끝나면 판 테두리 색과 오목 다섯 돌로 결과를 보여준다
+  showResultHighlight?: boolean;
 }
 
 const Board = forwardRef<BoardRef, BoardProps>(function Board(
@@ -151,6 +201,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     onUndoRedoStateChange,
     puzzleCache,
     hideAiIndicator = false,
+    showResultHighlight = false,
   },
   ref,
 ) {
@@ -172,6 +223,9 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const [forbiddenMove, setForbiddenMove] = useState<{ x: number; y: number } | null>(null);
   // 오목 완성이나 금수로 게임이 끝나 더 둘 수 없는 상태
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameResult, setGameResult] = useState<{ isWin: boolean; line: BoardPoint[] | null } | null>(
+    null,
+  );
   const isReviewMode = mode === 'make' && makeMode === 'review';
 
   const isAiThinkingVisible =
@@ -605,6 +659,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
             logAiBenchmark('terminal');
             finishAiRequest(requestId);
             setIsGameOver(true);
+            setGameResult({ isWin: false, line: null });
             setIsWin?.(false);
             setIsLoading?.(false);
             setIsDisabled(false);
@@ -615,6 +670,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
             logAiBenchmark('terminal');
             finishAiRequest(requestId);
             setIsGameOver(true);
+            setGameResult({ isWin: true, line: null });
             setIsWin?.(true);
             setIsLoading?.(false);
             setIsDisabled(false);
@@ -644,8 +700,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           if (aiResult === 'win') {
             logAiBenchmark('ai-win');
             finishAiRequest(requestId);
+            // 상대가 오목을 완성한 돌도 판에 두어야 어디서 졌는지 보인다
+            updateBoard(x, y, aiIsBlackTurn);
             setIsGameOver(true);
-            setIsWin?.(false);
+            setGameResult({ isWin: false, line: findFiveLine(newSequence) });
+            setIsWin?.(false, 'five');
             setIsLoading?.(false);
             setIsDisabled(false);
             return;
@@ -714,19 +773,20 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       }
 
       // 미리 판정한 결과는 착수 터치를 처리하는 중에 바로 나오므로, 결과(모달)는 터치 처리가 끝난 다음 프레임에 알린다
-      const reportResult = (isWin: boolean) => {
+      const reportResult = (isWin: boolean, reason: GameEndReason) => {
         requestAnimationFrame(() => {
           if (isMountedRef.current) {
-            setIsWin?.(isWin);
+            setIsWin?.(isWin, reason);
           }
         });
       };
 
       if (userResult === 'win') {
         setIsGameOver(true);
+        setGameResult({ isWin: true, line: findFiveLine(newSequence) });
         setIsLoading?.(false);
         setIsDisabled(false);
-        reportResult(true);
+        reportResult(true, 'five');
         return;
       }
 
@@ -734,9 +794,10 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         // 흑이 금수(33, 44, 장목)에 두면 즉시 패배한다. 둔 돌에 X를 표시하고 AI 차례 없이 패배로 처리한다
         setForbiddenMove({ x: stoneX, y: stoneY });
         setIsGameOver(true);
+        setGameResult({ isWin: false, line: null });
         setIsLoading?.(false);
         setIsDisabled(false);
-        reportResult(false);
+        reportResult(false, 'forbidden');
         return;
       }
 
@@ -944,6 +1005,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     if (mode === 'solve') {
       setForbiddenMove(null);
       setIsGameOver(false);
+      setGameResult(null);
       checkWinCacheRef.current.clear();
     }
   }, [mode, problemSequence, sequence, t]);
@@ -990,6 +1052,14 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           ))}
         </StoneRow>
       ))}
+      {showResultHighlight && gameResult && (
+        <ResultHighlight
+          boardWidth={boardWidth}
+          cellWidth={cellWidth}
+          isWin={gameResult.isWin}
+          line={gameResult.line}
+        />
+      )}
       {mode === 'solve' && <AiThinkingIndicator visible={isAiThinkingVisible} />}
     </BoardBackground>
   );

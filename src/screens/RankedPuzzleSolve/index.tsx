@@ -1,17 +1,20 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import RankingCounter from '../../components/features/RankingCounter';
-import TimerWithProgressBar from '../../components/features/TimerWithProgressBar';
+import { Animated, Easing, useWindowDimensions, View } from 'react-native';
+import RankingCounter, { RankingCounterRef } from '../../components/features/RankingCounter';
+import TimerWithProgressBar, { BONUS_TIME } from '../../components/features/TimerWithProgressBar';
 import {
   BoardWrapper,
   BottomActionsWrapper,
   Container,
   CounterSlot,
   CurrentPuzzleWrapper,
+  FeedbackSkipArea,
   HeaderWrapper,
   ProgressBarContainer,
   StatusHeaderWrapper,
 } from './index.styles';
-import Board, { BoardRef } from '../../components/features/Board';
+import Board, { BoardRef, GameEndReason } from '../../components/features/Board';
+import FlyingBadge, { FlyingBadgeRef } from '../../components/features/FlyingBadge';
 import {
   finishRankingGame,
   getMyRating,
@@ -38,7 +41,22 @@ interface PuzzleData {
 
 type FailedRequest = { type: 'result'; isSolved: boolean; boardStatus: string } | { type: 'end' };
 
+type PuzzleEndReason = GameEndReason | 'skip';
+
 const RETRY_DELAY_MS = 1000;
+// 다섯 돌 강조가 먼저 보이도록 결과 배지를 조금 늦게 띄운다
+const BADGE_DELAY_MS = 220;
+const SLIDE_OUT_MS = 160;
+const SLIDE_IN_MS = 220;
+
+const measureInWindow = (view: Pick<View, 'measureInWindow'> | null) =>
+  new Promise<{ x: number; y: number; width: number; height: number } | null>((resolve) => {
+    if (!view) {
+      resolve(null);
+      return;
+    }
+    view.measureInWindow((x, y, width, height) => resolve({ x, y, width, height }));
+  });
 
 // 실패하면 한 번 더 보낸다
 const retryOnce = async <T,>(request: () => Promise<T>): Promise<T> => {
@@ -61,9 +79,13 @@ const RankedPuzzleSolve = () => {
     category: modalCategory,
   } = useModal();
   const { updateUser } = useUserStore();
+  const { width: screenWidth } = useWindowDimensions();
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [results, setResults] = useState<GameResult[]>([]);
   const [puzzleData, setPuzzleData] = useState<PuzzleData>();
+  // 결과는 배지가 카운터에 닿을 때 세므로, 문제 번호는 다음 문제가 뜰 때 따로 올린다
+  const [puzzleNumber, setPuzzleNumber] = useState(1);
+  const [isFeedbackPlaying, setIsFeedbackPlaying] = useState(false);
   const [bonusTrigger, setBonusTrigger] = useState(0);
   const [shouldFinish, setShouldFinish] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
@@ -79,10 +101,19 @@ const RankedPuzzleSolve = () => {
   const boardRef = useRef<BoardRef>(null);
   const startRatingRef = useRef<number | null>(null);
   const playedSequencesRef = useRef<Record<string, string>>({});
+  const containerRef = useRef<View>(null);
+  const timerRef = useRef<View>(null);
+  const successCounterRef = useRef<RankingCounterRef>(null);
+  const failureCounterRef = useRef<RankingCounterRef>(null);
+  const boardAreaRef = useRef<View>(null);
+  const resultBadgeRef = useRef<FlyingBadgeRef>(null);
+  const bonusBadgeRef = useRef<FlyingBadgeRef>(null);
+  const isFeedbackSkippedRef = useRef(false);
+  const skipFeedbackDelayRef = useRef<(() => void) | null>(null);
+  const boardSlide = useRef(new Animated.Value(0)).current;
 
   const successCount = results.filter((result) => result.variant === 'success').length;
   const failureCount = results.length - successCount;
-  const currentPuzzleNumber = results.length + 1;
 
   // 정산 없이 게임 화면을 나간다
   const leaveGame = useCallback(() => {
@@ -133,24 +164,140 @@ const RankedPuzzleSolve = () => {
     initializeGame();
   }, [navigation]);
 
-  // 서버에 결과가 반영된 뒤 다음 퍼즐로 넘어간다
-  const applyResult = (data: PuzzleData, isSolved: boolean) => {
+  // 서버에 결과가 반영되면 끝난 판을 왼쪽으로 빼고 다음 퍼즐을 오른쪽에서 들여온다
+  const applyResult = (data: PuzzleData) => {
     // 그사이 정산이 시작됐다면 다음 퍼즐을 띄우지 않는다
     if (isFinishingRef.current) {
       return;
     }
 
-    if (isSolved) {
-      setBonusTrigger((prev) => prev + 1);
-    }
-    setPuzzleData(data);
-    setIsPuzzleOver(false);
-    setResults((prev) => [...prev, { variant: isSolved ? 'success' : 'error' }]);
-    isSubmittingRef.current = false;
-    setIsSubmitting(false);
+    Animated.timing(boardSlide, {
+      toValue: -1,
+      duration: SLIDE_OUT_MS,
+      easing: Easing.in(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => {
+      if (isFinishingRef.current) {
+        boardSlide.setValue(0);
+        return;
+      }
+
+      boardSlide.setValue(1);
+      setPuzzleData(data);
+      setPuzzleNumber((prev) => prev + 1);
+      setIsPuzzleOver(false);
+      Animated.timing(boardSlide, {
+        toValue: 0,
+        duration: SLIDE_IN_MS,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start(() => {
+        isSubmittingRef.current = false;
+        setIsSubmitting(false);
+      });
+    });
   };
 
-  const handleResult = async (result: boolean | null) => {
+  const getResultLabel = (isSolved: boolean, reason?: GameEndReason) => {
+    if (reason === 'five') {
+      return t(isSolved ? 'rankedFeedback.five' : 'rankedFeedback.opponentFive');
+    }
+    if (reason === 'forbidden') {
+      return t('rankedFeedback.forbidden');
+    }
+    return t(isSolved ? 'rankedFeedback.solved' : 'rankedFeedback.failed');
+  };
+
+  // 결과 배지를 카운터로, 성공이면 보너스 시간 배지를 타이머로 날린다
+  const flyResultBadges = async (
+    isSolved: boolean,
+    reason: GameEndReason | undefined,
+    onArrive: () => void,
+  ) => {
+    const [origin, board, counter, timer] = await Promise.all([
+      measureInWindow(containerRef.current),
+      measureInWindow(boardAreaRef.current),
+      measureInWindow((isSolved ? successCounterRef : failureCounterRef).current),
+      measureInWindow(timerRef.current),
+    ]);
+    if (!origin || !board || !counter || !timer || isFeedbackSkippedRef.current) {
+      return;
+    }
+
+    const toLocal = (x: number, y: number) => ({ x: x - origin.x, y: y - origin.y });
+    const boardCenter = toLocal(board.x + board.width / 2, board.y + board.height / 2);
+    const flights = [
+      resultBadgeRef.current?.play({
+        variant: isSolved ? 'success' : 'error',
+        label: getResultLabel(isSolved, reason),
+        from: boardCenter,
+        to: toLocal(counter.x + counter.width / 2, counter.y + counter.height / 2),
+        endScale: 0.4,
+        onArrive,
+      }),
+    ];
+    if (isSolved) {
+      flights.push(
+        bonusBadgeRef.current?.play({
+          variant: 'bonus',
+          label: t('rankedFeedback.bonusTime', { seconds: BONUS_TIME / 1000 }),
+          // 결과 배지가 날아가기 시작할 때 같은 자리에서 튀어나와 타이머로 간다
+          from: boardCenter,
+          emergeOnFlight: true,
+          // 남은 시간 글자는 진행 바 아래에 있다
+          to: toLocal(timer.x + timer.width / 2, timer.y + timer.height - 10),
+          endScale: 0.6,
+        }),
+      );
+    }
+    await Promise.all(flights);
+  };
+
+  // 끝난 판을 잠깐 보여주며 결과 배지를 날리고, 배지가 카운터에 닿을 때 결과를 카운터와 타이머에 반영한다
+  const playResultFeedback = async (isSolved: boolean, reason?: PuzzleEndReason) => {
+    let isCounted = false;
+    const countResult = () => {
+      if (isCounted) {
+        return;
+      }
+      isCounted = true;
+      // 다시 그리기를 기다리지 않고 카운터부터 튀게 한다
+      (isSolved ? successCounterRef : failureCounterRef).current?.bump();
+      setResults((prev) => [...prev, { variant: isSolved ? 'success' : 'error' }]);
+      if (isSolved) {
+        setBonusTrigger((prev) => prev + 1);
+      }
+    };
+
+    if (reason !== 'skip') {
+      isFeedbackSkippedRef.current = false;
+      setIsFeedbackPlaying(true);
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, BADGE_DELAY_MS);
+        skipFeedbackDelayRef.current = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+      });
+      skipFeedbackDelayRef.current = null;
+      if (!isFeedbackSkippedRef.current) {
+        await flyResultBadges(isSolved, reason, countResult);
+      }
+      setIsFeedbackPlaying(false);
+    }
+
+    countResult();
+  };
+
+  // 연출 중에 화면을 누르면 바로 다음 문제로 넘어간다
+  const skipResultFeedback = () => {
+    isFeedbackSkippedRef.current = true;
+    skipFeedbackDelayRef.current?.();
+    resultBadgeRef.current?.finish();
+    bonusBadgeRef.current?.finish();
+  };
+
+  const handleResult = async (result: boolean | null, reason?: PuzzleEndReason) => {
     // 결과를 보내는 중이거나 정산 중이면 무시한다 (넘기기 연타 등)
     if (result === null || !puzzleData || isSubmittingRef.current || isFinishingRef.current) {
       return;
@@ -161,17 +308,15 @@ const RankedPuzzleSolve = () => {
     setIsSubmitting(true);
     setIsPuzzleOver(true);
 
-    if (result) {
-      showBottomToast('success', t('modal.rankingPuzzleSuccess.message'));
-    } else {
-      showBottomToast('error', t('modal.rankingPuzzleFailure.message'));
-    }
-
+    // 결과 연출과 서버 전송을 함께 진행하고, 둘 다 끝나면 다음 퍼즐로 넘어간다
+    const feedback = playResultFeedback(result, reason);
     try {
       // 응답을 못 받고 다시 보낸 결과를 서버가 이중 반영하지 않도록 지금 퍼즐의 보드를 함께 보낸다
       const data = await retryOnce(() => submitRankingGameResult(result, boardStatus));
-      applyResult(data, result);
+      await feedback;
+      applyResult(data);
     } catch (error) {
+      await feedback;
       if (!isFinishingRef.current) {
         setFailure({
           request: { type: 'result', isSolved: result, boardStatus },
@@ -235,7 +380,7 @@ const RankedPuzzleSolve = () => {
       if (request.type === 'result') {
         const data = await submitRankingGameResult(request.isSolved, request.boardStatus);
         setFailure(null);
-        applyResult(data, request.isSolved);
+        applyResult(data);
       } else {
         const data: GameOutcome = await finishRankingGame();
         setFailure(null);
@@ -291,10 +436,23 @@ const RankedPuzzleSolve = () => {
     });
   });
 
+  const boardSlideStyle = {
+    opacity: boardSlide.interpolate({ inputRange: [-1, 0, 1], outputRange: [0.3, 1, 0.3] }),
+    transform: [
+      {
+        translateX: boardSlide.interpolate({
+          inputRange: [-1, 1],
+          outputRange: [-screenWidth, screenWidth],
+        }),
+      },
+      { scale: boardSlide.interpolate({ inputRange: [-1, 0, 1], outputRange: [0.94, 1, 0.94] }) },
+    ],
+  };
+
   return (
-    <Container>
+    <Container ref={containerRef}>
       <HeaderWrapper>
-        <ProgressBarContainer>
+        <ProgressBarContainer ref={timerRef} collapsable={false}>
           <TimerWithProgressBar
             start={true}
             paused={!!isLoading || isGameFinished || isFinishing || isSubmitting}
@@ -305,36 +463,39 @@ const RankedPuzzleSolve = () => {
 
         <StatusHeaderWrapper>
           <CounterSlot align="left">
-            <RankingCounter variant="success" count={successCount} />
+            <RankingCounter ref={successCounterRef} variant="success" count={successCount} />
           </CounterSlot>
           <CurrentPuzzleWrapper>
             <CustomText size={20} weight="bold" lineHeight="sm" color="gray/black">
-              #{currentPuzzleNumber}
+              #{puzzleNumber}
             </CustomText>
             {!!puzzleData && <PuzzleAttributes depth={null} winColor={puzzleData.winColor} />}
           </CurrentPuzzleWrapper>
           <CounterSlot align="right">
-            <RankingCounter variant="error" count={failureCount} />
+            <RankingCounter ref={failureCounterRef} variant="error" count={failureCount} />
           </CounterSlot>
         </StatusHeaderWrapper>
       </HeaderWrapper>
 
       <BoardWrapper pointerEvents={isSubmitting || isPuzzleOver || isFinishing ? 'none' : 'auto'}>
-        {!!puzzleData && (
-          <Board
-            // 퍼즐마다 새로 만들어, 이전 퍼즐의 AI 계산이나 선택한 칸이 넘어오지 않게 한다
-            key={currentPuzzleNumber}
-            ref={boardRef}
-            mode="solve"
-            sequence={puzzleData.boardStatus}
-            setSequence={(sequence) => {
-              playedSequencesRef.current[puzzleData.boardStatus] = sequence;
-            }}
-            setIsWin={handleResult}
-            setIsLoading={setIsLoading}
-            hideAiIndicator={isFinishing}
-          />
-        )}
+        <Animated.View ref={boardAreaRef} style={boardSlideStyle}>
+          {!!puzzleData && (
+            <Board
+              // 퍼즐마다 새로 만들어, 이전 퍼즐의 AI 계산이나 선택한 칸이 넘어오지 않게 한다
+              key={puzzleNumber}
+              ref={boardRef}
+              mode="solve"
+              sequence={puzzleData.boardStatus}
+              setSequence={(sequence) => {
+                playedSequencesRef.current[puzzleData.boardStatus] = sequence;
+              }}
+              setIsWin={handleResult}
+              setIsLoading={setIsLoading}
+              hideAiIndicator={isFinishing}
+              showResultHighlight
+            />
+          )}
+        </Animated.View>
       </BoardWrapper>
 
       <BottomActionsWrapper>
@@ -346,9 +507,13 @@ const RankedPuzzleSolve = () => {
         <PuzzleActionButton
           mode="skip"
           disabled={!!isLoading || isSubmitting || isFinishing}
-          onPress={() => handleResult(false)}
+          onPress={() => handleResult(false, 'skip')}
         />
       </BottomActionsWrapper>
+
+      {isFeedbackPlaying && <FeedbackSkipArea onPress={skipResultFeedback} />}
+      <FlyingBadge ref={resultBadgeRef} />
+      <FlyingBadge ref={bonusBadgeRef} />
 
       <CustomModal
         isVisible={isModalVisible}
