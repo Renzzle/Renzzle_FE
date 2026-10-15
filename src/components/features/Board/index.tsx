@@ -184,8 +184,10 @@ interface BoardProps {
   // 게임 정산 등 AI 응답이 더 이상 의미 없는 상황에서 생각 중 인디케이터를 즉시 숨김
   hideAiIndicator?: boolean;
 
-  // 풀이가 끝나면 판 테두리 색과 오목 다섯 돌로 결과를 보여준다
+  // 풀이가 끝나면 오목 다섯 돌을 강조한다
   showResultHighlight?: boolean;
+  // 결과 강조와 함께 판 테두리를 결과 색으로 물들인다
+  showResultFrame?: boolean;
 }
 
 const Board = forwardRef<BoardRef, BoardProps>(function Board(
@@ -202,6 +204,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     puzzleCache,
     hideAiIndicator = false,
     showResultHighlight = false,
+    showResultFrame = false,
   },
   ref,
 ) {
@@ -1058,6 +1061,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           cellWidth={cellWidth}
           isWin={gameResult.isWin}
           line={gameResult.line}
+          showFrame={showResultFrame}
         />
       )}
       {mode === 'solve' && <AiThinkingIndicator visible={isAiThinkingVisible} />}

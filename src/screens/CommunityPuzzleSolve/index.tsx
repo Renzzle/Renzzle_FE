@@ -38,6 +38,7 @@ import { useUserStore } from '../../store/useUserStore';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
 import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
+import useResultViewDelay from '../../hooks/useResultViewDelay';
 import ReviewButton from '../../components/features/ReviewButton';
 import useConfigStore from '../../store/useConfigStore';
 
@@ -83,6 +84,7 @@ const CommunityPuzzleSolve = () => {
     currentSequence.length > puzzleDetail.boardStatus.length;
 
   const { showAdIfReady } = usePuzzleAd();
+  const resultViewDelay = useResultViewDelay();
 
   const markSolved = () => {
     setPuzzleDetail((prev) => {
@@ -98,21 +100,26 @@ const CommunityPuzzleSolve = () => {
       return;
     }
     if (result) {
-      const data = await solveCommunityPuzzle(puzzleDetail.id);
+      const [data, isViewed] = await Promise.all([
+        solveCommunityPuzzle(puzzleDetail.id),
+        resultViewDelay.wait(),
+      ]);
 
       markSolved();
 
       setOutcome((prev) => ({ ...prev, reward: data?.reward ?? communityReward ?? 0 }));
 
-      activateModal('COMMUNITY_PUZZLE_SUCCESS', {
-        primaryAction: () => {
-          showAdIfReady(() => {
-            navigation.goBack();
-          });
-        },
-      });
+      if (isViewed) {
+        activateModal('COMMUNITY_PUZZLE_SUCCESS', {
+          primaryAction: () => {
+            showAdIfReady(() => {
+              navigation.goBack();
+            });
+          },
+        });
+      }
       await updateUser();
-    } else {
+    } else if (await resultViewDelay.wait()) {
       activateModal('COMMUNITY_PUZZLE_FAILURE', {
         primaryAction: async () => {
           navigation.goBack();
@@ -193,6 +200,7 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    resultViewDelay.cancel();
     boardRef.current?.cancelAiTurn();
     if (puzzleDetail) {
       setCurrentSequence(puzzleDetail.boardStatus);
@@ -232,7 +240,8 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleShowAnswer = () => {
-    if (!puzzleDetail?.id) {
+    // 결과 모달을 띄우려는 중이면 정답 구매 모달과 겹치지 않게 무시한다
+    if (!puzzleDetail?.id || resultViewDelay.isWaiting()) {
       return;
     }
 
@@ -392,6 +401,7 @@ const CommunityPuzzleSolve = () => {
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
           puzzleCache={puzzleCache}
+          showResultHighlight
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle

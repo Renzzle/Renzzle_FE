@@ -493,6 +493,7 @@ const RankedPuzzleSolve = () => {
               setIsLoading={setIsLoading}
               hideAiIndicator={isFinishing}
               showResultHighlight
+              showResultFrame
             />
           )}
         </Animated.View>

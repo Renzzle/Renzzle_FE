@@ -17,9 +17,16 @@ interface ResultHighlightProps {
   cellWidth: number;
   isWin: boolean;
   line: BoardPoint[] | null;
+  showFrame: boolean;
 }
 
-const ResultHighlight = ({ boardWidth, cellWidth, isWin, line }: ResultHighlightProps) => {
+const ResultHighlight = ({
+  boardWidth,
+  cellWidth,
+  isWin,
+  line,
+  showFrame,
+}: ResultHighlightProps) => {
   const color = theme.color[isWin ? 'main_color/blue_p' : 'main_color/yellow_s'];
   const frameOpacity = useRef(new Animated.Value(0)).current;
   const strikeProgress = useRef(new Animated.Value(0)).current;
@@ -109,7 +116,7 @@ const ResultHighlight = ({ boardWidth, cellWidth, isWin, line }: ResultHighlight
 
   return (
     <HighlightLayer pointerEvents="none">
-      <ResultFrame color={color} style={{ opacity: frameOpacity }} />
+      {showFrame && <ResultFrame color={color} style={{ opacity: frameOpacity }} />}
       {renderLine()}
     </HighlightLayer>
   );

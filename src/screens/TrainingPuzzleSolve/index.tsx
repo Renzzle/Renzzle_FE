@@ -21,6 +21,7 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
 import usePuzzleReviewNavigation from '../../hooks/usePuzzleReviewNavigation';
+import useResultViewDelay from '../../hooks/useResultViewDelay';
 import ReviewButton from '../../components/features/ReviewButton';
 import useConfigStore from '../../store/useConfigStore';
 
@@ -71,6 +72,7 @@ const TrainingPuzzleSolve = () => {
       : undefined;
 
   const { showAdIfReady } = usePuzzleAd();
+  const resultViewDelay = useResultViewDelay();
 
   const updatedItemsRef = useRef<Map<number, TrainingPuzzle>>(new Map());
   const boardRef = useRef<BoardRef>(null);
@@ -97,31 +99,35 @@ const TrainingPuzzleSolve = () => {
       return;
     }
     if (result) {
-      const data = await solveTrainingPuzzle(puzzleDetail.id);
+      const [data, isViewed] = await Promise.all([
+        solveTrainingPuzzle(puzzleDetail.id),
+        resultViewDelay.wait(),
+      ]);
 
       markSolved(puzzleDetail);
 
       setOutcome({ reward: data.reward ?? trainingReward ?? 0 });
 
-      // If there are more puzzles left in the pack
-      if (puzzles.length > currentPuzzleNumber) {
-        activateModal('TRAINING_PUZZLE_SUCCESS', {
-          primaryAction: async () => {
-            handleNextPuzzle();
-          },
-          secondaryAction: () => {
-            navigation.goBack();
-          },
-        });
-        await updateUser();
-      } else {
-        // If this is the final puzzle in the pack
-        activateModal('TRAINING_PACK_COMPLETE', {
-          primaryAction: () => showAdIfReady(() => navigation.goBack()),
-        });
-        await updateUser();
+      if (isViewed) {
+        // If there are more puzzles left in the pack
+        if (puzzles.length > currentPuzzleNumber) {
+          activateModal('TRAINING_PUZZLE_SUCCESS', {
+            primaryAction: async () => {
+              handleNextPuzzle();
+            },
+            secondaryAction: () => {
+              navigation.goBack();
+            },
+          });
+        } else {
+          // If this is the final puzzle in the pack
+          activateModal('TRAINING_PACK_COMPLETE', {
+            primaryAction: () => showAdIfReady(() => navigation.goBack()),
+          });
+        }
       }
-    } else {
+      await updateUser();
+    } else if (await resultViewDelay.wait()) {
       activateModal('TRAINING_PUZZLE_FAILURE', {
         primaryAction: async () => {
           navigation.goBack();
@@ -134,6 +140,7 @@ const TrainingPuzzleSolve = () => {
   };
 
   const handleRetry = () => {
+    resultViewDelay.cancel();
     boardRef.current?.cancelAiTurn();
     if (puzzleDetail) {
       setCurrentSequence(puzzleDetail.boardStatus);
@@ -142,7 +149,8 @@ const TrainingPuzzleSolve = () => {
   };
 
   const handleShowAnswer = () => {
-    if (isLoading || !puzzleDetail?.id) {
+    // 결과 모달을 띄우려는 중이면 정답 구매 모달과 겹치지 않게 무시한다
+    if (isLoading || !puzzleDetail?.id || resultViewDelay.isWaiting()) {
       return;
     }
 
@@ -289,6 +297,7 @@ const TrainingPuzzleSolve = () => {
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
           puzzleCache={puzzleCache}
+          showResultHighlight
         />
       </BoardWrapper>
 
