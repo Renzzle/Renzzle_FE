@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BoardWrapper, Container, HeaderWrapper } from './index.styles';
 import PuzzleHeader from '../../components/features/PuzzleHeader';
 import Board, { BoardRef } from '../../components/features/Board';
@@ -250,6 +250,13 @@ const TrainingPuzzleSolve = () => {
     };
   }, []);
 
+  // 렌더마다 새 객체를 넘기면 Board가 미리 받아둔 다음 수 후보를 버리고 다시 받는다
+  const puzzleCache = useMemo(
+    () =>
+      puzzleDetail ? { puzzleType: 'TRAINING' as const, puzzleId: puzzleDetail.id } : undefined,
+    [puzzleDetail?.id],
+  );
+
   if (!puzzleDetail) {
     return (
       <Container>
@@ -281,7 +288,7 @@ const TrainingPuzzleSolve = () => {
           sequence={puzzleDetail.boardStatus}
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
-          puzzleCache={{ puzzleType: 'TRAINING', puzzleId: puzzleDetail.id }}
+          puzzleCache={puzzleCache}
         />
       </BoardWrapper>
 

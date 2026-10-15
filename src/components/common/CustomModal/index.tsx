@@ -13,6 +13,7 @@ import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import { GameOutcome } from '../../../types';
+import { SlowRequestNotice } from '../SlowRequestIndicator';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
@@ -28,11 +29,13 @@ export type ModalCategoryType =
   | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_GAME_END_CONFIRM'
+  | 'RANKING_REQUEST_FAILED'
   | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
   | 'NICKNAME_CHANGE_PURCHASE'
   | 'USER_DELETE_CONFIRM'
+  | 'TUTORIAL_SKIP_CONFIRM'
   | 'FEATURE_IN_PROGRESS'
   | 'NETWORK_ERROR'
   | 'PERSONAL_NOTICE'
@@ -41,6 +44,7 @@ export type ModalCategoryType =
 
 const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
   'NETWORK_ERROR',
+  'RANKING_REQUEST_FAILED',
   'TRAINING_PUZZLE_SUCCESS',
   'COMMUNITY_PUZZLE_SUCCESS',
   'RANKING_PUZZLE_SUCCESS',
@@ -116,6 +120,11 @@ export const MODAL_TEXTS = {
     BODY: 'modal.rankingGameEndConfirm.message',
     FOOTER: ['modal.rankingGameEndConfirm.cancel', 'modal.rankingGameEndConfirm.confirm'],
   },
+  RANKING_REQUEST_FAILED: {
+    TITLE: 'modal.rankingRequestFailed.title',
+    BODY: 'modal.rankingRequestFailed.message',
+    FOOTER: ['modal.rankingRequestFailed.cancel', 'modal.rankingRequestFailed.confirm'],
+  },
   COMMUNITY_FILTER: {
     TITLE: 'modal.communityFilter.title',
     BODY: '',
@@ -140,6 +149,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.userDeleteConfirm.title',
     BODY: 'modal.userDeleteConfirm.message',
     FOOTER: ['modal.userDeleteConfirm.cancel', 'modal.userDeleteConfirm.confirm'],
+  },
+  TUTORIAL_SKIP_CONFIRM: {
+    TITLE: 'modal.tutorialSkipConfirm.title',
+    BODY: 'modal.tutorialSkipConfirm.message',
+    FOOTER: ['modal.tutorialSkipConfirm.cancel', 'modal.tutorialSkipConfirm.confirm'],
   },
   FEATURE_IN_PROGRESS: {
     TITLE: 'modal.featureInProgress.title',
@@ -290,6 +304,7 @@ const CustomModal = ({
                 onSecondaryAction={onSecondaryAction}
                 {...props}>
                 {children}
+                {category !== 'NETWORK_ERROR' && <SlowRequestNotice />}
               </ModalCard>
             </View>
           </TouchableWithoutFeedback>

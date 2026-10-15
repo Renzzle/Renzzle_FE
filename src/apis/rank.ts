@@ -22,7 +22,7 @@ export const getCommunityRanking = async () => {
 
 export const getMyRating = async () => {
   try {
-    const response = await apiClient.get('/api/rank/rating/my');
+    const response = await apiClient.get('/api/rank/rating/my', { skipLoadingIndicator: true });
 
     return response.data.response;
   } catch (error) {
@@ -40,9 +40,14 @@ export const startRankingGame = async () => {
   }
 };
 
-export const submitRankingGameResult = async (isSolved: boolean) => {
+export const submitRankingGameResult = async (isSolved: boolean, boardStatus?: string) => {
   try {
-    const response = await apiClient.post('api/rank/game/result', { isSolved });
+    // 실패하면 게임 화면이 직접 모달을 띄운다
+    const response = await apiClient.post(
+      'api/rank/game/result',
+      { isSolved, boardStatus },
+      { skipNetworkErrorModal: true },
+    );
 
     return response.data.response;
   } catch (error) {
@@ -52,7 +57,10 @@ export const submitRankingGameResult = async (isSolved: boolean) => {
 
 export const finishRankingGame = async () => {
   try {
-    const response = await apiClient.post('api/rank/game/end');
+    // 실패하면 게임 화면이 직접 모달을 띄운다
+    const response = await apiClient.post('api/rank/game/end', undefined, {
+      skipNetworkErrorModal: true,
+    });
 
     return response.data.response;
   } catch (error) {

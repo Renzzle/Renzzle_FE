@@ -1,15 +1,16 @@
 const AD_UNIT_ID = 'ca-app-pub-8517144519151386/4005306762';
 const AD_TRIGGER_COUNT = 3; // Show ad every 3 solves
+const AD_RELOAD_DELAY_MS = 30 * 1000;
 
 type InterstitialAdInstance = {
   loaded: boolean;
   load: () => void;
-  show: () => void;
+  show: () => Promise<void>;
   addAdEventListener: (eventType: string, listener: () => void) => () => void;
 };
 
 let interstitial: InterstitialAdInstance | null = null;
-let adEventType: { CLOSED: string } | null = null;
+let adEventType: { CLOSED: string; ERROR: string } | null = null;
 let globalSolveCount = 0;
 
 const getInterstitial = () => {
@@ -28,6 +29,10 @@ const getInterstitial = () => {
     createdInterstitial.load();
     createdInterstitial.addAdEventListener(AdEventType.CLOSED, () => {
       interstitial?.load();
+    });
+    // 불러오거나 보여주는 데 실패하면 다시 불러오지 않아 그 뒤로 광고가 안 나오므로, 잠시 뒤 다시 불러온다
+    createdInterstitial.addAdEventListener(AdEventType.ERROR, () => {
+      setTimeout(() => interstitial?.load(), AD_RELOAD_DELAY_MS);
     });
     interstitial = createdInterstitial;
   }
@@ -55,11 +60,22 @@ export const usePuzzleAd = () => {
     );
 
     if (globalSolveCount % AD_TRIGGER_COUNT === 0 && currentInterstitial.loaded) {
-      const unsubscribeCallback = currentInterstitial.addAdEventListener(adEventType.CLOSED, () => {
+      let isFinished = false;
+      const finish = () => {
+        if (isFinished) {
+          return;
+        }
+        isFinished = true;
+        unsubscribeClosed();
+        unsubscribeError();
         onAdFinished();
-        unsubscribeCallback();
-      });
-      currentInterstitial.show();
+      };
+      const unsubscribeClosed = currentInterstitial.addAdEventListener(adEventType.CLOSED, finish);
+      // 보여주지 못하면 닫힘 이벤트가 오지 않으므로 바로 다음으로 넘어간다
+      const unsubscribeError = currentInterstitial.addAdEventListener(adEventType.ERROR, finish);
+      Promise.resolve()
+        .then(() => currentInterstitial.show())
+        .catch(finish);
     } else {
       onAdFinished();
     }

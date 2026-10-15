@@ -26,7 +26,7 @@
 		4B9E2DC0ECB391AC61810A65 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9095129BA970934F7713F120 /* PrivacyInfo.xcprivacy */; };
 		66B4D082EE5147C3B0A0A270 /* ChangaOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EA43DD933DD409B87ADC870 /* ChangaOne-Regular.ttf */; };
 		6FE3888C2FA0B19800896508 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6FE388892FA0B19800896508 /* CMakeLists.txt */; };
-		6FE3889D2FA0C51E00896508 /* RenzzleModules.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6FE3889C2FA0C51500896508 /* RenzzleModules.mm */; };
+		6FE3889D2FA0C51E00896508 /* RenzzleModules.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6FE3889C2FA0C51500896508 /* RenzzleModules.mm */; settings = {COMPILER_FLAGS = "-O3"; }; };
 		7699B88040F8A987B510C191 /* libPods-Renzzle_FE-Renzzle_FETests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-Renzzle_FE-Renzzle_FETests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9085CAA35B024E76BCF482A0 /* Pretendard-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 88B3B96D986C4663893824F7 /* Pretendard-Thin.otf */; };
@@ -79,6 +79,7 @@
 		6F007AE82FC5703D00384F15 /* tt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tt.h; sourceTree = "<group>"; };
 		6F007AE92FC5708C00384F15 /* transposition_table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transposition_table.h; sourceTree = "<group>"; };
 		6F007AEA2FC5709B00384F15 /* vcf_candidate_finder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vcf_candidate_finder.h; sourceTree = "<group>"; };
+		6F007AEB2FC570A500384F15 /* vcf_replay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vcf_replay.h; sourceTree = "<group>"; };
 		6FDD2D212CB90E2F005BD15A /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
 		6FDD2D222CB90E2F005BD15A /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
 		6FDD2D232CB90E2F005BD15A /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
@@ -294,6 +295,7 @@
 			isa = PBXGroup;
 			children = (
 				6F007AEA2FC5709B00384F15 /* vcf_candidate_finder.h */,
+				6F007AEB2FC570A500384F15 /* vcf_replay.h */,
 				6F007AE92FC5708C00384F15 /* transposition_table.h */,
 				6F007AE22FC5700900384F15 /* detail */,
 				6FE3887E2FA0B19800896508 /* search.h */,

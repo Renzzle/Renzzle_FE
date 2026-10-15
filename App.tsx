@@ -39,10 +39,11 @@ import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
 import theme from './src/styles/theme.ts';
 import useNetworkStore from './src/store/useNetworkStore.ts';
-import { CustomModal } from './src/components/common/index.ts';
+import { CustomModal, SlowRequestIndicator } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
 import ChangeNickname from './src/screens/Settings/ChangeNickname/index.tsx';
 import ChangePassword from './src/screens/Settings/ChangePassword/index.tsx';
+import Tutorial from './src/screens/Tutorial/index.tsx';
 import Notice from './src/screens/Notice/index.tsx';
 import DeviceInfo from 'react-native-device-info';
 import { getPersonalNotice } from './src/apis/notice.ts';
@@ -297,6 +298,11 @@ function App(): React.JSX.Element | null {
                     options={{ title: 'settings.changePassword' }}
                   />
                   <Stack.Screen
+                    name="Tutorial"
+                    component={Tutorial}
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
                     name="TrainingPacks"
                     component={TrainingPacks}
                     options={{ title: 'home.trainingPuzzle' }}
@@ -383,6 +389,8 @@ function App(): React.JSX.Element | null {
                 </>
               )}
             </Stack.Navigator>
+
+            <SlowRequestIndicator />
 
             <CustomModal
               isVisible={isNetworkError}

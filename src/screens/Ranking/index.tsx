@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import { ActiveTabContainer, Container, DescText, MyRankingContainer } from './index.styles';
 import TabBar from '../../components/common/TabBar';
@@ -20,15 +20,19 @@ const Ranking = () => {
     null,
   );
   const [bestRankingResponse, setBestRankingResponse] = useState<BestRankingResponse | null>(null);
+  // 탭을 빨리 바꾸면 이전 탭 요청이 늦게 끝나면서 지금 탭의 로딩을 끄지 않게, 마지막 요청만 로딩을 끈다
+  const lastRequestIdRef = useRef(0);
 
   const fetchRankingData = useCallback(async () => {
-    if (currentTab === 'RATING' && ratingRankingResponse) {
-      return;
-    }
-    if (currentTab === 'BEST' && bestRankingResponse) {
+    if (
+      (currentTab === 'RATING' && ratingRankingResponse) ||
+      (currentTab === 'BEST' && bestRankingResponse)
+    ) {
+      setLoading(false);
       return;
     }
 
+    const requestId = ++lastRequestIdRef.current;
     setLoading(true);
     try {
       if (currentTab === 'RATING') {
@@ -41,7 +45,9 @@ const Ranking = () => {
     } catch (error) {
       showBottomToast('error', error as string);
     } finally {
-      setLoading(false);
+      if (lastRequestIdRef.current === requestId) {
+        setLoading(false);
+      }
     }
   }, [currentTab, ratingRankingResponse, bestRankingResponse]);
 

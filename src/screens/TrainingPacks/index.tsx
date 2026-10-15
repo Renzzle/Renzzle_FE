@@ -41,15 +41,24 @@ const TrainingPacks = () => {
       activateModal('TRAINING_PACK_PURCHASE', {
         primaryAction: async () => {
           setPurchaseLoading(true);
-          const isSuccess = await handlePurchase(item.id);
-          if (isSuccess) {
+          try {
+            const isSuccess = await handlePurchase(item.id);
+            if (!isSuccess) {
+              return;
+            }
+
+            // 구매한 팩은 목록에서도 바로 풀어, 다시 눌렀을 때 구매 요청이 또 나가지 않게 한다
+            const purchasedPack = { ...item, locked: false };
+            setPacks((prevPacks) =>
+              prevPacks.map((prevPack) => (prevPack.id === item.id ? purchasedPack : prevPack)),
+            );
+
             await updateUser();
             showBottomToast('success', t('toast.purchaseComplete'));
-            navigation.navigate('TrainingPuzzles', { pack: item });
-          } else {
-            return;
+            navigation.navigate('TrainingPuzzles', { pack: purchasedPack });
+          } finally {
+            setPurchaseLoading(false);
           }
-          setPurchaseLoading(false);
         },
       });
     } else {
@@ -70,19 +79,32 @@ const TrainingPacks = () => {
 
   // Fetch data on initial mount
   useEffect(() => {
+    // 탭을 빨리 바꾸면 이전 탭의 늦은 응답이 지금 탭 목록을 덮어쓰지 않게 무시한다
+    let isStale = false;
+
     const fetchPackData = async (difficulty: string) => {
       setLoading(true);
       try {
         const language = i18n.language.split('-')[0].toUpperCase();
         const data = await getPack(difficulty, language);
-        setPacks(data);
+        if (!isStale) {
+          setPacks(data);
+        }
       } catch (error) {
-        showBottomToast('error', t('toast.trainingPackLoadFailed') + error);
+        if (!isStale) {
+          showBottomToast('error', t('toast.trainingPackLoadFailed') + error);
+        }
       } finally {
-        setLoading(false);
+        if (!isStale) {
+          setLoading(false);
+        }
       }
     };
     fetchPackData(currentTab);
+
+    return () => {
+      isStale = true;
+    };
   }, [currentTab, i18n.language, t]);
 
   // Optimistic update

@@ -4,13 +4,12 @@ import SignupEmailStep from './SignupEmailStep';
 import SignupCodeStep from './SignupCodeStep';
 import SignupPasswordStep from './SignupPasswordStep';
 import SignupNicknameStep from './SignupNicknameStep';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DeviceInfo from 'react-native-device-info';
 import { registerUser } from '../../apis/auth';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { useLogin } from '../../hooks/useLogin';
 import { useTranslation } from 'react-i18next';
+import useTutorialStore from '../../store/useTutorialStore';
 
 enum SignupStep {
   Email,
@@ -21,8 +20,8 @@ enum SignupStep {
 
 const Signup = () => {
   const { t } = useTranslation();
-  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const { login } = useLogin();
+  const setTutorialPending = useTutorialStore((state) => state.setTutorialPending);
   const [step, setStep] = useState<SignupStep>(SignupStep.Email);
   const [email, setEmail] = useState<string>('');
   const [code, setCode] = useState<string>('');
@@ -42,8 +41,10 @@ const Signup = () => {
     try {
       const response = await registerUser(email, password, nickname, authVerityToken, deviceId);
       if (response?.isSuccess) {
+        // 로그인되면 인증 스택으로 바뀌며 Home이 바로 뜨므로, 그 전에 튜토리얼 표시 여부를 저장해 둔다.
+        // (Home으로 직접 이동하면 Home이 띄운 튜토리얼 화면이 닫히므로 별도로 이동하지 않는다)
+        await setTutorialPending(true);
         await login(email, password);
-        navigation.navigate('Home');
       }
     } catch (error) {
       showBottomToast('error', error as string);

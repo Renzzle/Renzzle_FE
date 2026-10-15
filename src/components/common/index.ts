@@ -6,3 +6,4 @@ export { default as CustomText } from './CustomText';
 export { default as CustomTextInput } from './CustomTextInput';
 export { default as DividerThin } from './DividerThin';
 export { default as Icon } from './Icon';
+export { default as SlowRequestIndicator } from './SlowRequestIndicator';

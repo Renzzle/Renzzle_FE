@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -26,6 +27,7 @@ import {
   convertToLowercaseAlphabet,
   convertToReverseNumber,
   getSequenceDepth,
+  positionToCoordinates,
   positionToValue,
   valueToCoordinates,
 } from '../../../utils/utils';
@@ -49,6 +51,21 @@ type PuzzleAiAnswerSource = 'local-only' | 'cache-hit' | 'cache-miss' | 'cache-f
 
 const PUZZLE_AI_BENCHMARK_MODE = 'CACHE' as PuzzleAiBenchmarkMode;
 const IS_AI_BENCHMARK_ENABLED = __DEV__;
+
+// CheckWinJNI 결과: 방금 둔 쪽의 승리(1), 방금 둔 흑의 금수 패배(2), 그 외(0)
+type CheckWinResult = 'win' | 'forbidden' | 'none';
+
+const toCheckWinResult = (check: number): CheckWinResult =>
+  check === 1 ? 'win' : check === 2 ? 'forbidden' : 'none';
+
+// 네이티브 수순 파서는 형식을 검증하지 않아 잘못된 문자열이 들어가면 보드 범위 밖을 읽어 앱이 종료될 수 있으므로,
+// 이 형식(a~o + 1~15의 반복)에 맞는 수순만 네이티브로 보낸다
+const VALID_SEQUENCE_PATTERN = /^(?:[a-o](?:1[0-5]|[1-9]))*$/;
+
+const getLastMoveCoordinates = (sequence: string) => {
+  const lastMove = sequence.match(/[a-o](?:1[0-5]|[1-9])$/);
+  return lastMove ? positionToCoordinates(lastMove[0]) : null;
+};
 
 const getPuzzleAiMode = (): PuzzleAiBenchmarkMode => {
   return __DEV__ ? PUZZLE_AI_BENCHMARK_MODE : 'CACHE';
@@ -151,6 +168,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [localSequence, setLocalSequence] = useState(sequence);
+  // 금수로 패배한 돌의 위치 (X 표시)
+  const [forbiddenMove, setForbiddenMove] = useState<{ x: number; y: number } | null>(null);
+  // 오목 완성이나 금수로 게임이 끝나 더 둘 수 없는 상태
+  const [isGameOver, setIsGameOver] = useState(false);
+  const isReviewMode = mode === 'make' && makeMode === 'review';
 
   const isAiThinkingVisible =
     useDelayedVisibility(mode === 'solve' && isDisabled) && !hideAiIndicator;
@@ -164,6 +186,8 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   // Cancellable Request Refs
   const isMountedRef = useRef(true);
   const checkWinRequestIdRef = useRef(0);
+  // 착수 결과는 수순이 같으면 항상 같으므로, 선택(첫 번째 탭) 때 미리 판정해 두고 착수 즉시 사용한다
+  const checkWinCacheRef = useRef<Map<string, CheckWinResult>>(new Map());
 
   const cancelCalculate = useCallback(
     (activeRequestId: number) => {
@@ -463,7 +487,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   }, []);
 
   const checkWin = useCallback(
-    (sequenceToCheck: string): Promise<boolean | null> => {
+    (sequenceToCheck: string): Promise<CheckWinResult | null> => {
       checkWinRequestIdRef.current += 1;
       const requestId = checkWinRequestIdRef.current;
 
@@ -474,6 +498,11 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
             return;
           }
 
+          if (!VALID_SEQUENCE_PATTERN.test(sequenceToCheck)) {
+            resolve('none');
+            return;
+          }
+
           try {
             const check = await CheckWinJNI.checkWinWrapper(sequenceToCheck);
             if (!isMountedRef.current || checkWinRequestIdRef.current !== requestId) {
@@ -481,7 +510,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
               return;
             }
 
-            resolve(check === 1);
+            resolve(toCheckWinResult(check));
           } catch (error) {
             if (!isMountedRef.current || checkWinRequestIdRef.current !== requestId) {
               resolve(null);
@@ -490,7 +519,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
             console.log(error);
             showBottomToast('error', t('toast.numberProcessingError'));
-            resolve(false);
+            resolve('none');
           }
         }, 0);
       });
@@ -575,6 +604,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           if (result === -1) {
             logAiBenchmark('terminal');
             finishAiRequest(requestId);
+            setIsGameOver(true);
             setIsWin?.(false);
             setIsLoading?.(false);
             setIsDisabled(false);
@@ -584,6 +614,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
           if (result === 1000) {
             logAiBenchmark('terminal');
             finishAiRequest(requestId);
+            setIsGameOver(true);
             setIsWin?.(true);
             setIsLoading?.(false);
             setIsDisabled(false);
@@ -604,15 +635,16 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
 
           const { x, y } = coordinates;
           const newSequence = addToSequence(x, y, userSequence);
-          const isAiWin = await checkWin(newSequence);
+          const aiResult = await checkWin(newSequence);
 
-          if (isAiWin === null || !isActiveAiRequest(requestId)) {
+          if (aiResult === null || !isActiveAiRequest(requestId)) {
             return;
           }
 
-          if (isAiWin) {
+          if (aiResult === 'win') {
             logAiBenchmark('ai-win');
             finishAiRequest(requestId);
+            setIsGameOver(true);
             setIsWin?.(false);
             setIsLoading?.(false);
             setIsDisabled(false);
@@ -673,20 +705,41 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setStoneY(null);
 
     if (mode === 'solve') {
-      const isUserWin = await checkWin(newSequence);
+      // 차례는 이미 상대에게 넘어갔으므로, 판정을 기다리는 동안에도 다음 수를 두지 못하게 잠근다
+      setIsDisabled(true);
+      const userResult = checkWinCacheRef.current.get(newSequence) ?? (await checkWin(newSequence));
 
-      if (isUserWin === null) {
+      if (userResult === null) {
         return;
       }
 
-      if (isUserWin) {
-        setIsWin?.(true);
+      // 미리 판정한 결과는 착수 터치를 처리하는 중에 바로 나오므로, 결과(모달)는 터치 처리가 끝난 다음 프레임에 알린다
+      const reportResult = (isWin: boolean) => {
+        requestAnimationFrame(() => {
+          if (isMountedRef.current) {
+            setIsWin?.(isWin);
+          }
+        });
+      };
+
+      if (userResult === 'win') {
+        setIsGameOver(true);
         setIsLoading?.(false);
         setIsDisabled(false);
+        reportResult(true);
         return;
       }
 
-      setIsDisabled(true);
+      if (userResult === 'forbidden') {
+        // 흑이 금수(33, 44, 장목)에 두면 즉시 패배한다. 둔 돌에 X를 표시하고 AI 차례 없이 패배로 처리한다
+        setForbiddenMove({ x: stoneX, y: stoneY });
+        setIsGameOver(true);
+        setIsLoading?.(false);
+        setIsDisabled(false);
+        reportResult(false);
+        return;
+      }
+
       setIsLoading?.(true);
       handleAiTurn(newSequence, !isBlackTurn);
     }
@@ -704,9 +757,29 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     updateBoard,
   ]);
 
+  // 수순의 결과를 미리 판정해 둔다. 실패하면 실제로 필요할 때 다시 판정한다
+  const prefetchCheckWin = useCallback(
+    (sequenceToCheck: string) => {
+      if (
+        checkWinCacheRef.current.has(sequenceToCheck) ||
+        !VALID_SEQUENCE_PATTERN.test(sequenceToCheck)
+      ) {
+        return;
+      }
+
+      CheckWinJNI.checkWinWrapper(sequenceToCheck)
+        .then((check: number) => {
+          checkWinCacheRef.current.set(sequenceToCheck, toCheckWinResult(check));
+        })
+        .catch(() => {});
+    },
+    [CheckWinJNI],
+  );
+
   const handleCellPress = useCallback(
     (x: number, y: number) => {
-      if (isDisabled) {
+      // 오목 완성이나 금수로 게임이 끝난 뒤에는 더 둘 수 없다
+      if (isDisabled || isGameOver) {
         return;
       }
 
@@ -715,10 +788,74 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       } else {
         setStoneX(x);
         setStoneY(y);
+        // 선택한 자리에 두었을 때의 결과를 미리 판정해, 착수 즉시 결과(금수 X 등)를 보여준다
+        if ((mode === 'solve' || isReviewMode) && board[x][y].stone === 0) {
+          prefetchCheckWin(
+            localSequence + convertToLowercaseAlphabet(y) + convertToReverseNumber(x).toString(),
+          );
+        }
       }
     },
-    [handlePut, isDisabled, stoneX, stoneY],
+    [
+      board,
+      handlePut,
+      isDisabled,
+      isGameOver,
+      isReviewMode,
+      localSequence,
+      mode,
+      prefetchCheckWin,
+      stoneX,
+      stoneY,
+    ],
   );
+
+  // 검토 모드: 검토 수순의 각 단계를 미리 판정해 두어, 앞뒤로 이동할 때 결과를 바로 보여준다
+  useEffect(() => {
+    if (!isReviewMode) {
+      return;
+    }
+
+    let prefix = '';
+    (mainSequence.match(/[a-o](?:1[0-5]|[1-9])/g) ?? []).forEach((move) => {
+      prefix += move;
+      if (prefix.length > problemSequence.length) {
+        prefetchCheckWin(prefix);
+      }
+    });
+  }, [isReviewMode, mainSequence, prefetchCheckWin, problemSequence]);
+
+  // 검토 모드: 현재 수순이 이미 끝난 게임이면(오목 완성, 금수) 더 둘 수 없게 하고, 금수면 마지막 돌에 X를 표시한다
+  useLayoutEffect(() => {
+    if (!isReviewMode) {
+      return;
+    }
+
+    const applyResult = (result: CheckWinResult) => {
+      setIsGameOver(result !== 'none');
+      setForbiddenMove(result === 'forbidden' ? getLastMoveCoordinates(localSequence) : null);
+    };
+
+    const cachedResult = checkWinCacheRef.current.get(localSequence);
+    if (cachedResult) {
+      applyResult(cachedResult);
+      return;
+    }
+
+    let isStale = false;
+    applyResult('none');
+    checkWin(localSequence).then((result) => {
+      if (isStale || result === null) {
+        return;
+      }
+      checkWinCacheRef.current.set(localSequence, result);
+      applyResult(result);
+    });
+
+    return () => {
+      isStale = true;
+    };
+  }, [checkWin, isReviewMode, localSequence]);
 
   useEffect(() => {
     if (mode === 'make' && makeMode === 'create') {
@@ -802,6 +939,13 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     setLocalSequence(sequence);
     setBoard(newBoard);
     setIsBlackTurn(turn);
+    // 풀이 모드에서 새 문제로 바뀌면 이전 문제의 게임 종료 상태와 미리 받아 둔 판정을 지운다
+    // (검토 모드는 수순이 바뀔 때마다 다시 초기화되므로, 종료 상태를 현재 수순으로부터 따로 계산한다)
+    if (mode === 'solve') {
+      setForbiddenMove(null);
+      setIsGameOver(false);
+      checkWinCacheRef.current.clear();
+    }
   }, [mode, problemSequence, sequence, t]);
 
   useEffect(() => {
@@ -841,6 +985,7 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
               sequence={cell.moveNumber}
               onPress={() => handleCellPress(x, y)}
               pulseLastMove={isAiThinkingVisible}
+              isForbidden={forbiddenMove?.x === x && forbiddenMove?.y === y}
             />
           ))}
         </StoneRow>
@@ -893,6 +1038,8 @@ interface CellProps {
   onPress: () => void;
   showHighlights?: boolean;
   pulseLastMove?: boolean;
+  // 금수로 패배한 돌에 X 표시
+  isForbidden?: boolean;
   style?: ViewStyle;
 }
 
@@ -906,13 +1053,17 @@ export const Cell = ({
   onPress,
   showHighlights = true,
   pulseLastMove = false,
+  isForbidden = false,
   style,
 }: CellProps) => {
   return (
     <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth}>
-          {sequence &&
+          {isForbidden ? (
+            <Icon name="CrossIcon" color="error/error_color" size={cellWidth * 0.9} />
+          ) : (
+            sequence &&
             (sequence > 0 ? (
               <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
                 {sequence}
@@ -924,7 +1075,8 @@ export const Cell = ({
               ) : (
                 <LastMoveHighlight width={cellWidth / 3.3} />
               ))
-            ))}
+            ))
+          )}
         </Stone>
       ) : showHighlights && pos === `${stoneX}-${stoneY}` ? (
         <Icon name="FocusIcon" color="error/error_color" />

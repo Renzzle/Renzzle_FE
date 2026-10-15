@@ -6,6 +6,7 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import i18n, { initI18n } from '../../locales/i18n';
 import { AppDataItem, getAppData } from '../../apis/config';
 import useConfigStore from '../../store/useConfigStore';
+import useTutorialStore from '../../store/useTutorialStore';
 
 const findAppDataValue = (appData: AppDataItem[], tag: string) =>
   appData.find((item) => item.tag === tag)?.value;
@@ -20,6 +21,7 @@ const useInitializeApp = (): boolean => {
   const { restoreCredentials, clearTokens } = useAuthStore();
   const { setFeedbackUrl, setStoreUrls, setPolicyUrls, setRewardConfig, setPriceConfig } =
     useConfigStore();
+  const restoreTutorialPending = useTutorialStore((state) => state.restoreTutorialPending);
 
   useEffect(() => {
     const loadAppData = async () => {
@@ -50,7 +52,11 @@ const useInitializeApp = (): boolean => {
 
     const initApp = async () => {
       try {
-        const [, credentials] = await Promise.all([initI18n(), restoreCredentials()]);
+        const [, credentials] = await Promise.all([
+          initI18n(),
+          restoreCredentials(),
+          restoreTutorialPending(),
+        ]);
         const { accessToken, refreshToken } = credentials;
 
         if (accessToken || refreshToken) {
@@ -84,6 +90,7 @@ const useInitializeApp = (): boolean => {
     setPolicyUrls,
     setRewardConfig,
     setPriceConfig,
+    restoreTutorialPending,
   ]);
 
   return isLoading;

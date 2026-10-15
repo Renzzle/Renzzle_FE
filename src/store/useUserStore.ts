@@ -30,8 +30,8 @@ export const useUserStore = create<UserStore>((set) => ({
       const user = await getUser();
       set({ user });
     } catch (error) {
+      // 잠깐 실패했다고 헤더의 닉네임·재화가 사라지지 않게 이전 정보를 그대로 둔다
       console.log('Failed to update user in store:', error);
-      set({ user: null });
     }
   },
 }));
