@@ -202,9 +202,13 @@ apiClient.interceptors.response.use(
             if (isNoResponseError(refreshError) && !originalRequest.skipNetworkErrorModal) {
               useNetworkStore.getState().setNetworkError(true);
             }
-            processQueue(refreshError); // Fail all queued requests
+            const failure =
+              axios.isAxiosError(refreshError) && refreshError.response
+                ? getApiErrorMessage(refreshError.response.data?.errorResponse)
+                : refreshError;
+            processQueue(failure); // Fail all queued requests
             isRefreshing = false;
-            return Promise.reject(refreshError);
+            return Promise.reject(failure);
           }
 
           // 서버가 재발급을 거절했으므로 다시 로그인해야 한다
@@ -225,7 +229,7 @@ apiClient.interceptors.response.use(
     }
     const errorResponse = error.response?.data?.errorResponse;
     console.log(errorResponse);
-    return Promise.reject(errorResponse ? getApiErrorMessage(errorResponse) : error);
+    return Promise.reject(getApiErrorMessage(errorResponse));
   },
 );
 
