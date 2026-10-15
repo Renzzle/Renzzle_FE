@@ -13,6 +13,7 @@ import CustomButton from '../CustomButton';
 import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import { GameOutcome } from '../../../types';
+import { SlowRequestNotice } from '../SlowRequestIndicator';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
@@ -28,6 +29,7 @@ export type ModalCategoryType =
   | 'DELETE_PUZZLE_CONFIRM'
   | 'RANKING_PUZZLE_INTRO'
   | 'RANKING_GAME_END_CONFIRM'
+  | 'RANKING_REQUEST_FAILED'
   | 'COMMUNITY_FILTER'
   | 'TRAINING_PACK_PURCHASE'
   | 'PUZZLE_REVIEW_PURCHASE'
@@ -39,6 +41,7 @@ export type ModalCategoryType =
 
 const NON_DISMISSIBLE_CATEGORIES: ModalCategoryType[] = [
   'NETWORK_ERROR',
+  'RANKING_REQUEST_FAILED',
   'TRAINING_PUZZLE_SUCCESS',
   'COMMUNITY_PUZZLE_SUCCESS',
   'RANKING_PUZZLE_SUCCESS',
@@ -111,6 +114,11 @@ export const MODAL_TEXTS = {
     TITLE: 'modal.rankingGameEndConfirm.title',
     BODY: 'modal.rankingGameEndConfirm.message',
     FOOTER: ['modal.rankingGameEndConfirm.cancel', 'modal.rankingGameEndConfirm.confirm'],
+  },
+  RANKING_REQUEST_FAILED: {
+    TITLE: 'modal.rankingRequestFailed.title',
+    BODY: 'modal.rankingRequestFailed.message',
+    FOOTER: ['modal.rankingRequestFailed.cancel', 'modal.rankingRequestFailed.confirm'],
   },
   COMMUNITY_FILTER: {
     TITLE: 'modal.communityFilter.title',
@@ -271,6 +279,7 @@ const CustomModal = ({
                 onSecondaryAction={onSecondaryAction}
                 {...props}>
                 {children}
+                {category !== 'NETWORK_ERROR' && <SlowRequestNotice />}
               </ModalCard>
             </View>
           </TouchableWithoutFeedback>

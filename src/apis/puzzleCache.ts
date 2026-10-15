@@ -1,5 +1,8 @@
 import apiClient from './interceptor';
 
+// 캐시를 못 받으면 기기에서 AI를 계산하므로, 오래 기다리지 않고 바로 넘어간다
+const NEXT_MOVES_TIMEOUT_MS = 5 * 1000;
+
 export type PuzzleCacheType = 'TRAINING' | 'COMMUNITY';
 
 export interface PuzzleCacheRequest {
@@ -31,6 +34,9 @@ export const getPuzzleCacheNextMoves = async ({
         puzzleId,
         userTurnBoardState,
       },
+      timeout: NEXT_MOVES_TIMEOUT_MS,
+      skipNetworkErrorModal: true,
+      skipLoadingIndicator: true,
     });
 
     return response.data.response ?? [];
@@ -46,12 +52,16 @@ export const savePuzzleCache = async ({
   answerPuzzle,
 }: PuzzleCacheRequest & { answerPuzzle: string }) => {
   try {
-    const response = await apiClient.post('/api/puzzle/cache/save', {
-      puzzleType,
-      puzzleId,
-      currentBoardState,
-      answerPuzzle,
-    });
+    const response = await apiClient.post(
+      '/api/puzzle/cache/save',
+      {
+        puzzleType,
+        puzzleId,
+        currentBoardState,
+        answerPuzzle,
+      },
+      { skipNetworkErrorModal: true, skipLoadingIndicator: true },
+    );
 
     return response.data;
   } catch (error) {

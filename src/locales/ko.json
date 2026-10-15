@@ -38,6 +38,9 @@
   },
   "common": {
     "appName": "Renzzle",
+    "connecting": "연결 중...",
+    "loadMoreFailed": "목록을 더 불러오지 못했어요.",
+    "retry": "다시 시도",
     "ranking": "랭킹",
     "myPuzzle": "내 퍼즐",
     "likes": "좋아요",
@@ -164,6 +167,14 @@
       "confirm": "종료하기",
       "cancel": "계속하기"
     },
+    "rankingRequestFailed": {
+      "title": "통신 오류",
+      "message": "서버와 통신하지 못했어요.\n나가면 이번 게임의 보상을 받지 못할 수 있어요.",
+      "disconnected": "인터넷 연결을 확인한 뒤 다시 시도해 주세요.",
+      "serverError": "잠시 후 다시 시도해 주세요.",
+      "confirm": "다시 시도",
+      "cancel": "나가기"
+    },
     "communityFilter": {
       "title": "필터",
       "confirm": "적용",
@@ -254,7 +265,7 @@
     "title": "랭킹",
     "rating": "레이팅",
     "best": "베스트 퍼즐러",
-    "ratingDescription": "랭킹 퍼즐로 얻은 레이팅 점수입니다. 최대 100위까지 표시되며, 랭킹은 1시간마다 갱신됩니다.",
+    "ratingDescription": "랭킹 퍼즐로 얻은 레이팅 점수입니다. 최대 100위까지 표시되며, 랭킹은 5분마다 갱신됩니다.",
     "bestDescription": "최근 1년 간 Renzzle 커뮤니티에서 출제, 풀이, 인기 퍼즐로 활발한 영향을 끼친 이용자입니다. 최대 100위까지 표시됩니다.",
     "score": "{{score}}점",
     "rank": "{{rank}}위",
@@ -398,6 +409,9 @@
 
     "passwordChanged": "비밀번호가 변경되었습니다.",
     "passwordChangeFailed": "비밀번호 변경에 실패했습니다.",
+
+    "sessionExpired": "로그인이 만료되었습니다. 다시 로그인해 주세요.",
+    "verificationExpired": "이메일 인증 시간이 지났습니다. 처음부터 다시 인증해 주세요.",
 
     "enterEmail": "이메일을 입력해주세요.",
     "enterPassword": "비밀번호를 입력해주세요.",

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BoardReactionWrapper,
   BoardStatsWrapper,
@@ -61,6 +61,7 @@ const CommunityPuzzleSolve = () => {
   const [outcome, setOutcome] = useState<GameOutcome>({ price: 100 });
   const [boardKey, setBoardKey] = useState(0);
   const puzzleDetailRef = useRef(puzzleDetail);
+  const isReactingRef = useRef(false);
   const boardRef = useRef<BoardRef>(null);
 
   const isPuzzleResultModal =
@@ -121,10 +122,24 @@ const CommunityPuzzleSolve = () => {
   };
 
   const handleReactionChange = async (newReaction: ReactionType) => {
-    if (isLoading) {
+    // 토글 요청이 동시에 나가면 도착 순서에 따라 서버 결과가 화면과 달라지므로, 하나씩만 보낸다
+    if (isLoading || !puzzleDetail || isReactingRef.current) {
       return;
     }
 
+    const previous = {
+      likeCount: puzzleDetail.likeCount,
+      myLike: puzzleDetail.myLike,
+      myDislike: puzzleDetail.myDislike,
+    };
+    const isLikeToggle = newReaction === 'like' || (puzzleDetail.myLike && newReaction === null);
+    const isDislikeToggle =
+      newReaction === 'dislike' || (puzzleDetail.myDislike && newReaction === null);
+    if (!isLikeToggle && !isDislikeToggle) {
+      return;
+    }
+
+    isReactingRef.current = true;
     setPuzzleDetail((prev) => {
       if (!prev) {
         return null;
@@ -148,18 +163,29 @@ const CommunityPuzzleSolve = () => {
       };
     });
 
-    if (!puzzleDetail?.id) {
-      return;
-    }
-
     try {
-      if (newReaction === 'like' || (puzzleDetail.myLike && newReaction === null)) {
-        await updateLike(puzzleDetail.id);
-      } else if (newReaction === 'dislike' || (puzzleDetail.myDislike && newReaction === null)) {
-        await updateDislike(puzzleDetail.id);
-      }
+      // 서버는 바뀐 뒤의 상태를 돌려주므로, 그 값으로 화면을 맞춘다
+      const isOn: boolean = isLikeToggle
+        ? await updateLike(puzzleDetail.id)
+        : await updateDislike(puzzleDetail.id);
+      const myLike = isLikeToggle && isOn;
+      const myDislike = isDislikeToggle && isOn;
+
+      setPuzzleDetail((prev) =>
+        prev
+          ? {
+              ...prev,
+              myLike,
+              myDislike,
+              likeCount: previous.likeCount + Number(myLike) - Number(previous.myLike),
+            }
+          : prev,
+      );
     } catch (error) {
+      setPuzzleDetail((prev) => (prev ? { ...prev, ...previous } : prev));
       showBottomToast('error', error as string);
+    } finally {
+      isReactingRef.current = false;
     }
   };
 
@@ -305,6 +331,13 @@ const CommunityPuzzleSolve = () => {
     getDetail();
   }, [route.params.puzzle.id]);
 
+  // 렌더마다 새 객체를 넘기면 Board가 미리 받아둔 다음 수 후보를 버리고 다시 받는다
+  const puzzleCache = useMemo(
+    () =>
+      puzzleDetail ? { puzzleType: 'COMMUNITY' as const, puzzleId: puzzleDetail.id } : undefined,
+    [puzzleDetail?.id],
+  );
+
   if (!puzzleDetail) {
     return (
       <Container>
@@ -349,7 +382,7 @@ const CommunityPuzzleSolve = () => {
           sequence={puzzleDetail.boardStatus}
           setSequence={setCurrentSequence}
           setIsWin={handleResult}
-          puzzleCache={{ puzzleType: 'COMMUNITY', puzzleId: puzzleDetail.id }}
+          puzzleCache={puzzleCache}
         />
         <BoardReactionWrapper>
           <LikeDislikeToggle

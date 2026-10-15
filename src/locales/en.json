@@ -38,6 +38,9 @@
   },
   "common": {
     "appName": "Renzzle",
+    "connecting": "Connecting...",
+    "loadMoreFailed": "Couldn't load more.",
+    "retry": "Retry",
     "ranking": "Ranking",
     "myPuzzle": "My",
     "likes": "Likes",
@@ -164,6 +167,14 @@
       "confirm": "Finish",
       "cancel": "Keep Playing"
     },
+    "rankingRequestFailed": {
+      "title": "Connection Error",
+      "message": "Couldn't reach the server.\nIf you leave, you may not get the rewards for this game.",
+      "disconnected": "Check your internet connection and try again.",
+      "serverError": "Please try again in a moment.",
+      "confirm": "Retry",
+      "cancel": "Leave"
+    },
     "communityFilter": {
       "title": "Filter",
       "confirm": "Apply",
@@ -254,7 +265,7 @@
     "title": "Ranking",
     "rating": "Rating",
     "best": "Best Puzzlers",
-    "ratingDescription": "This is the rating score obtained from ranking puzzles. Up to the top 100 are displayed, and rankings are updated every hour.",
+    "ratingDescription": "This is the rating score obtained from ranking puzzles. Up to the top 100 are displayed, and rankings are updated every 5 minutes.",
     "bestDescription": "Users who have actively influenced the Renzzle community over the past year through creating, solving, and popular puzzles. Up to the top 100 are displayed.",
     "score": "{{score}} pts",
     "rank": "Rank {{rank}}",
@@ -398,6 +409,9 @@
 
     "passwordChanged": "Password changed.",
     "passwordChangeFailed": "Failed to change password.",
+
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "verificationExpired": "Email verification has expired. Please verify your email again.",
 
     "enterEmail": "Enter your email.",
     "enterPassword": "Enter your password.",
