@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 const AD_UNIT_ID = 'ca-app-pub-8517144519151386/4005306762';
 const AD_TRIGGER_COUNT = 3; // Show ad every 3 solves
 const AD_RELOAD_DELAY_MS = 30 * 1000;
@@ -41,7 +43,7 @@ const getInterstitial = () => {
 };
 
 export const usePuzzleAd = () => {
-  const showAdIfReady = (onAdFinished: () => void) => {
+  const showAdIfReady = useCallback((onAdFinished: () => void) => {
     if (__DEV__) {
       onAdFinished();
       return;
@@ -79,7 +81,7 @@ export const usePuzzleAd = () => {
     } else {
       onAdFinished();
     }
-  };
+  }, []);
 
   return { showAdIfReady };
 };
