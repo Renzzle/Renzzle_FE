@@ -31,7 +31,7 @@ import {
   positionToValue,
   valueToCoordinates,
 } from '../../../utils/utils';
-import { Animated, Easing, NativeModules, ViewStyle } from 'react-native';
+import { Animated, Easing, NativeModules } from 'react-native';
 import { CustomText, Icon } from '../../common';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 import { useTranslation } from 'react-i18next';
@@ -1112,11 +1112,9 @@ interface CellProps {
   isSelected?: boolean;
   sequence: number | null;
   onPress: () => void;
-  showHighlights?: boolean;
   pulseLastMove?: boolean;
   // 금수로 패배한 돌에 X 표시
   isForbidden?: boolean;
-  style?: ViewStyle;
 }
 
 // 판을 다시 그려도 값이 바뀐 칸만 새로 그리도록 메모이제이션한다
@@ -1127,13 +1125,11 @@ export const Cell = memo(function Cell({
   isSelected = false,
   sequence,
   onPress,
-  showHighlights = true,
   pulseLastMove = false,
   isForbidden = false,
-  style,
 }: CellProps) {
   return (
-    <CellContainer onPress={onPress} cellWidth={cellWidth} style={style}>
+    <CellContainer onPress={onPress} cellWidth={cellWidth}>
       {stone !== 0 ? (
         <Stone stone={stone} cellWidth={cellWidth}>
           {isForbidden ? (
@@ -1154,10 +1150,9 @@ export const Cell = memo(function Cell({
             ))
           )}
         </Stone>
-      ) : showHighlights && isSelected ? (
+      ) : isSelected ? (
         <Icon name="FocusIcon" color="error/error_color" />
-      ) : showHighlights &&
-        (pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7') ? (
+      ) : pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7' ? (
         <IndicatePoint />
       ) : null}
     </CellContainer>
