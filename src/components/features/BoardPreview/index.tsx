@@ -34,8 +34,6 @@ const BoardPreview = ({ sequence = '', isSolved = false, size = 90 }: BoardPrevi
             pos={`${x}-${y}`}
             stone={stone}
             cellWidth={cellWidth} // Assume a fixed width
-            stoneX={x}
-            stoneY={y}
             sequence={null}
             onPress={() => {}}
             showHighlights={false}

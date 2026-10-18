@@ -20,25 +20,6 @@ export const BoardBackground = styled(View)<{ boardWidth: number }>`
   background-color: ${theme.color['sub_color/beige/c']};
 `;
 
-export const FramContainer = styled(View)`
-  position: absolute;
-  border-width: 1.5px;
-  border-color: ${theme.color['gray/gray500']};
-`;
-
-export const FrameRow = styled(View)`
-  flex-direction: row;
-`;
-
-export const FrameCell = styled(View)<{ cellWidth: number }>`
-  width: ${({ cellWidth }) => cellWidth}px;
-  height: ${({ cellWidth }) => cellWidth}px;
-  justify-content: center;
-  align-items: center;
-  border-width: 0.5px;
-  border-color: ${theme.color['gray/gray500']};
-`;
-
 export const StoneRow = styled(View)`
   flex-direction: row;
 `;
