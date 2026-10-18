@@ -31,7 +31,6 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';
 import { useTranslation } from 'react-i18next';
-import type { ScrollView } from 'react-native';
 import PuzzleActionButton from '../../components/features/PuzzleActionButton';
 
 interface PuzzleData {
