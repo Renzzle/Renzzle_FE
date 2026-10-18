@@ -32,6 +32,7 @@ import PuzzleAttributes from '../../components/features/PuzzleAttributes';
 import { useUserStore } from '../../store/useUserStore';
 import { useTranslation } from 'react-i18next';
 import PuzzleActionButton from '../../components/features/PuzzleActionButton';
+import useCooldown from '../../hooks/useCooldown';
 
 interface PuzzleData {
   boardStatus: string;
@@ -43,6 +44,8 @@ type FailedRequest = { type: 'result'; isSolved: boolean; boardStatus: string } 
 type PuzzleEndReason = GameEndReason | 'skip';
 
 const RETRY_DELAY_MS = 1000;
+// 문제를 보자마자 건너뛰어 쉬운 문제만 골라 풀지 못하게 한다
+const SKIP_COOLDOWN_MS = 10 * 1000;
 // 다섯 돌 강조가 먼저 보이도록 결과 배지를 조금 늦게 띄운다
 const BADGE_DELAY_MS = 220;
 const SLIDE_OUT_MS = 160;
@@ -96,6 +99,12 @@ const RankedPuzzleSolve = () => {
   const [failure, setFailure] = useState<{ request: FailedRequest; reason: string } | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const isRetryingRef = useRef(false);
+  const isTimerPaused = !!isLoading || isGameFinished || isFinishing || isSubmitting;
+  const skipCooldown = useCooldown({
+    durationMs: SKIP_COOLDOWN_MS,
+    paused: isTimerPaused,
+    resetKey: puzzleNumber,
+  });
   const canLeaveRef = useRef(false);
   const boardRef = useRef<BoardRef>(null);
   const startRatingRef = useRef<number | null>(null);
@@ -454,7 +463,7 @@ const RankedPuzzleSolve = () => {
         <ProgressBarContainer ref={timerRef} collapsable={false}>
           <TimerWithProgressBar
             start={true}
-            paused={!!isLoading || isGameFinished || isFinishing || isSubmitting}
+            paused={isTimerPaused}
             onFinish={handleFinish}
             bonusTimeTrigger={bonusTrigger}
           />
@@ -508,6 +517,7 @@ const RankedPuzzleSolve = () => {
           mode="skip"
           disabled={!!isLoading || isSubmitting || isFinishing}
           onPress={() => handleResult(false, 'skip')}
+          cooldown={skipCooldown}
         />
       </BottomActionsWrapper>
 
