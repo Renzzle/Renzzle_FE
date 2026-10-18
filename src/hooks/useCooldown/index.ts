@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated } from 'react-native';
+
+// 매 프레임 대신 이 간격으로만 채워 JS가 하는 일을 줄인다
+const TICK_MS = 100;
 
 interface UseCooldownOptions {
   durationMs: number;
@@ -23,39 +26,30 @@ const useCooldown = ({ durationMs, paused, resetKey }: UseCooldownOptions): Cool
   const remainingMsRef = useRef(durationMs);
   const [isReady, setIsReady] = useState(false);
 
-  // 멈췄다 다시 이어갈 때 남은 시간만큼만 채우도록 기억해 둔다
   useEffect(() => {
-    const listenerId = progress.addListener(({ value }) => {
-      remainingMsRef.current = (1 - value) * durationMs;
-    });
-    return () => progress.removeListener(listenerId);
-  }, [durationMs, progress]);
-
-  useEffect(() => {
+    remainingMsRef.current = durationMs;
     progress.setValue(0);
     setIsReady(false);
-  }, [progress, resetKey]);
+  }, [durationMs, progress, resetKey]);
 
   useEffect(() => {
     if (paused || isReady) {
       return;
     }
 
-    const animation = Animated.timing(progress, {
-      toValue: 1,
-      duration: remainingMsRef.current,
-      easing: Easing.linear,
-      // SVG 원처럼 네이티브로 움직일 수 없는 속성에도 쓸 수 있게 한다
-      useNativeDriver: false,
-    });
-    animation.start(({ finished }) => {
-      if (finished) {
+    let lastTickAt = Date.now();
+    const timer = setInterval(() => {
+      const now = Date.now();
+      remainingMsRef.current = Math.max(0, remainingMsRef.current - (now - lastTickAt));
+      lastTickAt = now;
+      progress.setValue(1 - remainingMsRef.current / durationMs);
+      if (remainingMsRef.current === 0) {
         setIsReady(true);
       }
-    });
+    }, TICK_MS);
 
-    return () => animation.stop();
-  }, [isReady, paused, progress, resetKey]);
+    return () => clearInterval(timer);
+  }, [durationMs, isReady, paused, progress, resetKey]);
 
   return { progress, isReady };
 };
