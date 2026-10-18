@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Animated, Easing, useWindowDimensions, View } from 'react-native';
 import RankingCounter, { RankingCounterRef } from '../../components/features/RankingCounter';
-import TimerWithProgressBar, { BONUS_TIME } from '../../components/features/TimerWithProgressBar';
+import TimerWithProgressBar, {
+  BONUS_TIME,
+  TimeAdjustment,
+} from '../../components/features/TimerWithProgressBar';
 import {
   BoardWrapper,
   BottomActionsWrapper,
@@ -88,7 +91,7 @@ const RankedPuzzleSolve = () => {
   // 결과는 배지가 카운터에 닿을 때 세므로, 문제 번호는 다음 문제가 뜰 때 따로 올린다
   const [puzzleNumber, setPuzzleNumber] = useState(1);
   const [isFeedbackPlaying, setIsFeedbackPlaying] = useState(false);
-  const [bonusTrigger, setBonusTrigger] = useState(0);
+  const [timeAdjustment, setTimeAdjustment] = useState<TimeAdjustment | null>(null);
   const [shouldFinish, setShouldFinish] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
@@ -115,7 +118,7 @@ const RankedPuzzleSolve = () => {
   const failureCounterRef = useRef<RankingCounterRef>(null);
   const boardAreaRef = useRef<View>(null);
   const resultBadgeRef = useRef<FlyingBadgeRef>(null);
-  const bonusBadgeRef = useRef<FlyingBadgeRef>(null);
+  const timeBadgeRef = useRef<FlyingBadgeRef>(null);
   const isFeedbackSkippedRef = useRef(false);
   const skipFeedbackDelayRef = useRef<(() => void) | null>(null);
   const boardSlide = useRef(new Animated.Value(0)).current;
@@ -221,6 +224,7 @@ const RankedPuzzleSolve = () => {
     isSolved: boolean,
     reason: GameEndReason | undefined,
     onArrive: () => void,
+    timeChangeMs: number,
   ) => {
     const [origin, board, counter, timer] = await Promise.all([
       measureInWindow(containerRef.current),
@@ -244,11 +248,14 @@ const RankedPuzzleSolve = () => {
         onArrive,
       }),
     ];
-    if (isSolved) {
+    if (timeChangeMs !== 0) {
+      const seconds = Math.abs(timeChangeMs) / 1000;
       flights.push(
-        bonusBadgeRef.current?.play({
-          variant: 'bonus',
-          label: t('rankedFeedback.bonusTime', { seconds: BONUS_TIME / 1000 }),
+        timeBadgeRef.current?.play({
+          variant: timeChangeMs > 0 ? 'bonus' : 'penalty',
+          label: t(timeChangeMs > 0 ? 'rankedFeedback.bonusTime' : 'rankedFeedback.penaltyTime', {
+            seconds,
+          }),
           // 결과 배지가 날아가기 시작할 때 같은 자리에서 튀어나와 타이머로 간다
           from: boardCenter,
           emergeOnFlight: true,
@@ -262,7 +269,11 @@ const RankedPuzzleSolve = () => {
   };
 
   // 끝난 판을 잠깐 보여주며 결과 배지를 날리고, 배지가 카운터에 닿을 때 결과를 카운터와 타이머에 반영한다
-  const playResultFeedback = async (isSolved: boolean, reason?: PuzzleEndReason) => {
+  const playResultFeedback = async (
+    isSolved: boolean,
+    reason: PuzzleEndReason | undefined,
+    timeChangeMs: number,
+  ) => {
     let isCounted = false;
     const countResult = () => {
       if (isCounted) {
@@ -272,8 +283,8 @@ const RankedPuzzleSolve = () => {
       // 다시 그리기를 기다리지 않고 카운터부터 튀게 한다
       (isSolved ? successCounterRef : failureCounterRef).current?.bump();
       setResults((prev) => [...prev, { variant: isSolved ? 'success' : 'error' }]);
-      if (isSolved) {
-        setBonusTrigger((prev) => prev + 1);
+      if (timeChangeMs !== 0) {
+        setTimeAdjustment((prev) => ({ id: (prev?.id ?? 0) + 1, deltaMs: timeChangeMs }));
       }
     };
 
@@ -289,7 +300,7 @@ const RankedPuzzleSolve = () => {
       });
       skipFeedbackDelayRef.current = null;
       if (!isFeedbackSkippedRef.current) {
-        await flyResultBadges(isSolved, reason, countResult);
+        await flyResultBadges(isSolved, reason, countResult, timeChangeMs);
       }
       setIsFeedbackPlaying(false);
     }
@@ -302,7 +313,7 @@ const RankedPuzzleSolve = () => {
     isFeedbackSkippedRef.current = true;
     skipFeedbackDelayRef.current?.();
     resultBadgeRef.current?.finish();
-    bonusBadgeRef.current?.finish();
+    timeBadgeRef.current?.finish();
   };
 
   const handleResult = async (result: boolean | null, reason?: PuzzleEndReason) => {
@@ -316,8 +327,13 @@ const RankedPuzzleSolve = () => {
     setIsSubmitting(true);
     setIsPuzzleOver(true);
 
+    // 건너뛰기가 잠긴 동안 지면 남은 쿨타임만큼 시간을 빼서, 일부러 져서 건너뛰는 것을 막는다
+    const penaltyMs =
+      !result && reason !== 'skip' ? Math.ceil(skipCooldown.getRemainingMs() / 1000) * 1000 : 0;
+    const timeChangeMs = result ? BONUS_TIME : -penaltyMs;
+
     // 결과 연출과 서버 전송을 함께 진행하고, 둘 다 끝나면 다음 퍼즐로 넘어간다
-    const feedback = playResultFeedback(result, reason);
+    const feedback = playResultFeedback(result, reason, timeChangeMs);
     try {
       // 응답을 못 받고 다시 보낸 결과를 서버가 이중 반영하지 않도록 지금 퍼즐의 보드를 함께 보낸다
       const data = await retryOnce(() => submitRankingGameResult(result, boardStatus));
@@ -465,7 +481,7 @@ const RankedPuzzleSolve = () => {
             start={true}
             paused={isTimerPaused}
             onFinish={handleFinish}
-            bonusTimeTrigger={bonusTrigger}
+            timeAdjustment={timeAdjustment}
           />
         </ProgressBarContainer>
 
@@ -523,7 +539,7 @@ const RankedPuzzleSolve = () => {
 
       {isFeedbackPlaying && <FeedbackSkipArea onPress={skipResultFeedback} />}
       <FlyingBadge ref={resultBadgeRef} />
-      <FlyingBadge ref={bonusBadgeRef} />
+      <FlyingBadge ref={timeBadgeRef} />
 
       <CustomModal
         isVisible={isModalVisible}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 
 // 매 프레임 대신 이 간격으로만 채워 JS가 하는 일을 줄인다
@@ -16,6 +16,7 @@ export interface Cooldown {
   // 0에서 1로 차오르는 진행값
   progress: Animated.Value;
   isReady: boolean;
+  getRemainingMs: () => number;
 }
 
 /**
@@ -51,7 +52,9 @@ const useCooldown = ({ durationMs, paused, resetKey }: UseCooldownOptions): Cool
     return () => clearInterval(timer);
   }, [durationMs, isReady, paused, progress, resetKey]);
 
-  return { progress, isReady };
+  const getRemainingMs = useCallback(() => remainingMsRef.current, []);
+
+  return { progress, isReady, getRemainingMs };
 };
 
 export default useCooldown;

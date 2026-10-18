@@ -311,7 +311,8 @@
     "forbidden": "금수 패배",
     "solved": "성공",
     "failed": "실패",
-    "bonusTime": "+{{seconds}}초"
+    "bonusTime": "+{{seconds}}초",
+    "penaltyTime": "-{{seconds}}초"
   },
   "tutorial": {
     "skip": "건너뛰기",

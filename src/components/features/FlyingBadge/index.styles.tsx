@@ -1,7 +1,11 @@
 import { Animated, View } from 'react-native';
 import styled from 'styled-components';
 import theme from '../../../styles/theme';
-import { FlyingBadgeVariant } from '.';
+import type { FlyingBadgeVariant } from '.';
+
+// 시간 증감 배지는 아이콘 없이 짧은 글자만 담는 작은 배지다
+export const isTimeVariant = (variant: FlyingBadgeVariant) =>
+  variant === 'bonus' || variant === 'penalty';
 
 export const BADGE_ANCHOR_WIDTH = 240;
 export const BADGE_ANCHOR_HEIGHT = 48;
@@ -20,10 +24,12 @@ export const BadgeBody = styled(View)<{ variant: FlyingBadgeVariant }>`
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  padding: ${({ variant }) => (variant === 'bonus' ? '4px 10px' : '7px 14px 7px 9px')};
+  padding: ${({ variant }) => (isTimeVariant(variant) ? '4px 10px' : '7px 14px 7px 9px')};
   border-radius: 999px;
   background-color: ${({ variant }) =>
-    variant === 'error' ? theme.color['main_color/yellow_s'] : theme.color['main_color/blue_p']};
+    variant === 'error' || variant === 'penalty'
+      ? theme.color['main_color/yellow_s']
+      : theme.color['main_color/blue_p']};
 `;
 
 export const BadgeIcon = styled(View)`

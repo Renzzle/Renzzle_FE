@@ -311,7 +311,8 @@
     "forbidden": "Forbidden move",
     "solved": "Solved",
     "failed": "Failed",
-    "bonusTime": "+{{seconds}}s"
+    "bonusTime": "+{{seconds}}s",
+    "penaltyTime": "-{{seconds}}s"
   },
   "tutorial": {
     "skip": "Skip",
