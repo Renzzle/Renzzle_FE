@@ -7,6 +7,7 @@ import theme from '../../../styles/theme';
 
 const TOTAL_DURATION = 3 * 60 * 1000; // 3 min
 export const BONUS_TIME = 10 * 1000; // 10 sec
+const TICK_MS = 200;
 
 interface TimerWithProgressBarProps {
   start: boolean;
@@ -63,7 +64,7 @@ const TimerWithProgressBar = ({
     }
 
     intervalRef.current = setInterval(() => {
-      const next = remainingTimeRef.current - 1000;
+      const next = remainingTimeRef.current - TICK_MS;
 
       if (next <= 0) {
         finishTimer();
@@ -72,7 +73,7 @@ const TimerWithProgressBar = ({
 
       remainingTimeRef.current = next;
       setRemainingTime(next);
-    }, 1000);
+    }, TICK_MS);
   }, [finishTimer]);
 
   // Add bonus time
@@ -171,7 +172,8 @@ const TimerWithProgressBar = ({
   }, [paused, startTimer, stopTimer]);
 
   const formatTime = (milliseconds: number) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
+    // 1초보다 짧은 간격으로 줄어드므로, 1초가 다 지나야 다음 초를 보이도록 올림한다
+    const totalSeconds = Math.ceil(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     const formattedSeconds = String(seconds).padStart(2, '0');
