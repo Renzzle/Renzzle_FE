@@ -186,7 +186,7 @@ const TimerWithProgressBar = ({
         height={12}
         borderRadius={6}
         animated
-        useNativeDriver
+        useNativeDriver={false}
         color={theme.color['main_color/blue_p']}
         unfilledColor={theme.color['gray/gray100']}
         borderWidth={0}
