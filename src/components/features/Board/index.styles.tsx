@@ -24,6 +24,18 @@ export const StoneRow = styled(View)`
   flex-direction: row;
 `;
 
+export const CellBox = styled(View)<{ cellWidth: number }>`
+  position: absolute;
+  width: ${({ cellWidth }) => cellWidth}px;
+  height: ${({ cellWidth }) => cellWidth}px;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const BoardTouchArea = styled(Pressable)`
+  position: absolute;
+`;
+
 export const CellContainer = styled(Pressable)<{ cellWidth: number }>`
   width: ${({ cellWidth }) => cellWidth}px;
   height: ${({ cellWidth }) => cellWidth}px;

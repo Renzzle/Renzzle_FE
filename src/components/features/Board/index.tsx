@@ -5,17 +5,17 @@ import React, {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
 import {
   BoardBackground,
+  BoardTouchArea,
+  CellBox,
   CellContainer,
   IndicatePoint,
   LastMoveHighlight,
   Stone,
-  StoneRow,
 } from './index.styles';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import BoardFrameNumber from './BoardFrameNumber';
@@ -31,7 +31,7 @@ import {
   positionToValue,
   valueToCoordinates,
 } from '../../../utils/utils';
-import { Animated, Easing, NativeModules } from 'react-native';
+import { Animated, Easing, GestureResponderEvent, NativeModules } from 'react-native';
 import { CustomText, Icon } from '../../common';
 import { showBottomToast } from '../../common/Toast/toastMessage';
 import { useTranslation } from 'react-i18next';
@@ -213,6 +213,9 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
   const width = useDeviceWidth();
   const boardWidth = width - 20;
   const cellWidth = (boardWidth - 26) / 14;
+  // 돌을 놓는 BOARD_SIZE칸이 판 가운데에 오도록 하는 시작 위치
+  const gridSize = BOARD_SIZE * cellWidth;
+  const gridOffset = (boardWidth - gridSize) / 2;
 
   const { UserAgainstActionJNI, CheckWinJNI } = NativeModules;
   const [board, setBoard] = useState<CellType[][]>(createEmptyBoard());
@@ -874,15 +877,19 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
     ],
   );
 
-  // 칸마다 누르기 함수를 한 번만 만들어 두어야, 판을 다시 그릴 때 바뀐 칸만 새로 그린다
+  // 칸마다 누를 수 있는 뷰를 두는 대신, 판 전체에서 누른 위치로 칸을 찾는다
   const handleCellPressRef = useRef(handleCellPress);
   handleCellPressRef.current = handleCellPress;
-  const cellPressHandlers = useMemo(
-    () =>
-      Array.from({ length: BOARD_SIZE }, (_, x) =>
-        Array.from({ length: BOARD_SIZE }, (__, y) => () => handleCellPressRef.current(x, y)),
-      ),
-    [],
+  const handleBoardPress = useCallback(
+    (event: GestureResponderEvent) => {
+      const { locationX, locationY } = event.nativeEvent;
+      const x = Math.floor(locationY / cellWidth);
+      const y = Math.floor(locationX / cellWidth);
+      if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
+        handleCellPressRef.current(x, y);
+      }
+    },
+    [cellWidth],
   );
 
   // 검토 모드: 검토 수순의 각 단계를 미리 판정해 두어, 앞뒤로 이동할 때 결과를 바로 보여준다
@@ -1040,23 +1047,30 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
       <BoardFrameNumber direction="vertical" />
       <BoardFrameNumber direction="horizontal" />
       <BoardGrid boardWidth={boardWidth} cellWidth={cellWidth} />
-      {board.map((row, x) => (
-        <StoneRow key={x}>
-          {row.map((cell, y) => (
-            <Cell
-              key={`${x}-${y}`}
-              pos={`${x}-${y}`}
+      {board.flatMap((row, x) =>
+        row.map((cell, y) => {
+          const pos = `${x}-${y}`;
+          const isSelected = stoneX === x && stoneY === y;
+          if (cell.stone === 0 && !isSelected && !STAR_POINTS.has(pos)) {
+            return null;
+          }
+          return (
+            <PlacedCell
+              key={pos}
+              x={x}
+              y={y}
+              gridOffset={gridOffset}
+              pos={pos}
               stone={cell.stone}
               cellWidth={cellWidth}
-              isSelected={stoneX === x && stoneY === y}
+              isSelected={isSelected}
               sequence={cell.moveNumber}
-              onPress={cellPressHandlers[x][y]}
               pulseLastMove={isAiThinkingVisible && cell.moveNumber === -1}
               isForbidden={forbiddenMove?.x === x && forbiddenMove?.y === y}
             />
-          ))}
-        </StoneRow>
-      ))}
+          );
+        }),
+      )}
       {showResultHighlight && gameResult && (
         <ResultHighlight
           boardWidth={boardWidth}
@@ -1067,6 +1081,10 @@ const Board = forwardRef<BoardRef, BoardProps>(function Board(
         />
       )}
       {mode === 'solve' && <AiThinkingIndicator visible={isAiThinkingVisible} />}
+      <BoardTouchArea
+        style={{ left: gridOffset, top: gridOffset, width: gridSize, height: gridSize }}
+        onPress={handleBoardPress}
+      />
     </BoardBackground>
   );
 });
@@ -1104,58 +1122,87 @@ const PulsingLastMoveHighlight = ({ width }: { width: number }) => {
   );
 };
 
-interface CellProps {
+const STAR_POINTS = new Set(['3-3', '3-11', '11-3', '11-11', '7-7']);
+
+interface CellContentProps {
   pos: string;
   stone: StoneType;
   cellWidth: number;
   // 착수하려고 고른 칸
   isSelected?: boolean;
   sequence: number | null;
-  onPress: () => void;
   pulseLastMove?: boolean;
   // 금수로 패배한 돌에 X 표시
   isForbidden?: boolean;
 }
 
-// 판을 다시 그려도 값이 바뀐 칸만 새로 그리도록 메모이제이션한다
-export const Cell = memo(function Cell({
+const CellContent = ({
   pos,
   stone,
   cellWidth,
   isSelected = false,
   sequence,
-  onPress,
   pulseLastMove = false,
   isForbidden = false,
-}: CellProps) {
-  return (
-    <CellContainer onPress={onPress} cellWidth={cellWidth}>
-      {stone !== 0 ? (
-        <Stone stone={stone} cellWidth={cellWidth}>
-          {isForbidden ? (
-            <Icon name="CrossIcon" color="error/error_color" size={cellWidth * 0.9} />
+}: CellContentProps) => {
+  if (stone !== 0) {
+    return (
+      <Stone stone={stone} cellWidth={cellWidth}>
+        {isForbidden ? (
+          <Icon name="CrossIcon" color="error/error_color" size={cellWidth * 0.9} />
+        ) : (
+          sequence &&
+          (sequence > 0 ? (
+            <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
+              {sequence}
+            </CustomText>
           ) : (
-            sequence &&
-            (sequence > 0 ? (
-              <CustomText size={10} color={stone === 1 ? 'gray/white' : 'gray/black'}>
-                {sequence}
-              </CustomText>
+            sequence === -1 &&
+            (pulseLastMove ? (
+              <PulsingLastMoveHighlight width={cellWidth / 3.3} />
             ) : (
-              sequence === -1 &&
-              (pulseLastMove ? (
-                <PulsingLastMoveHighlight width={cellWidth / 3.3} />
-              ) : (
-                <LastMoveHighlight width={cellWidth / 3.3} />
-              ))
+              <LastMoveHighlight width={cellWidth / 3.3} />
             ))
-          )}
-        </Stone>
-      ) : isSelected ? (
-        <Icon name="FocusIcon" color="error/error_color" />
-      ) : pos === '3-3' || pos === '3-11' || pos === '11-3' || pos === '11-11' || pos === '7-7' ? (
-        <IndicatePoint />
-      ) : null}
+          ))
+        )}
+      </Stone>
+    );
+  }
+  if (isSelected) {
+    return <Icon name="FocusIcon" color="error/error_color" />;
+  }
+  return STAR_POINTS.has(pos) ? <IndicatePoint /> : null;
+};
+
+// 칸마다 누를 수 있는 칸 (튜토리얼처럼 칸 위에 따로 그릴 것이 있는 판에서 쓴다)
+export const Cell = memo(function Cell({
+  onPress,
+  ...content
+}: CellContentProps & { onPress: () => void }) {
+  return (
+    <CellContainer onPress={onPress} cellWidth={content.cellWidth}>
+      <CellContent {...content} />
     </CellContainer>
+  );
+});
+
+// 내용이 있는 칸만 제자리에 그린다. 누르기는 판 전체의 터치 영역이 받는다
+const PlacedCell = memo(function PlacedCell({
+  x,
+  y,
+  gridOffset,
+  ...content
+}: CellContentProps & { x: number; y: number; gridOffset: number }) {
+  return (
+    <CellBox
+      pointerEvents="none"
+      cellWidth={content.cellWidth}
+      style={{
+        left: gridOffset + y * content.cellWidth,
+        top: gridOffset + x * content.cellWidth,
+      }}>
+      <CellContent {...content} />
+    </CellBox>
   );
 });
 
