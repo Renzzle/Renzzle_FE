@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, useWindowDimensions, View } from 'react-native';
 import RankingCounter, { RankingCounterRef } from '../../components/features/RankingCounter';
 import TimerWithProgressBar, {
@@ -36,10 +36,14 @@ import { useUserStore } from '../../store/useUserStore';
 import { useTranslation } from 'react-i18next';
 import PuzzleActionButton from '../../components/features/PuzzleActionButton';
 import useCooldown from '../../hooks/useCooldown';
+import { PuzzleCacheType } from '../../apis/puzzleCache';
 
 interface PuzzleData {
   boardStatus: string;
   winColor: 'BLACK' | 'WHITE';
+  // 이전 버전 서버는 보내지 않으므로, 없으면 캐시 없이 엔진만 쓴다
+  puzzleType?: PuzzleCacheType;
+  puzzleId?: number;
 }
 
 type FailedRequest = { type: 'result'; isSolved: boolean; boardStatus: string } | { type: 'end' };
@@ -460,6 +464,14 @@ const RankedPuzzleSolve = () => {
     });
   });
 
+  // 렌더마다 새 객체를 넘기면 Board가 미리 받아둔 다음 수 후보를 버리고 다시 받는다
+  const puzzleType = puzzleData?.puzzleType;
+  const puzzleId = puzzleData?.puzzleId;
+  const puzzleCache = useMemo(
+    () => (puzzleType && puzzleId != null ? { puzzleType, puzzleId } : undefined),
+    [puzzleType, puzzleId],
+  );
+
   const boardSlideStyle = {
     opacity: boardSlide.interpolate({ inputRange: [-1, 0, 1], outputRange: [0.3, 1, 0.3] }),
     transform: [
@@ -510,6 +522,7 @@ const RankedPuzzleSolve = () => {
               ref={boardRef}
               mode="solve"
               sequence={puzzleData.boardStatus}
+              puzzleCache={puzzleCache}
               setSequence={(sequence) => {
                 playedSequencesRef.current[puzzleData.boardStatus] = sequence;
               }}
