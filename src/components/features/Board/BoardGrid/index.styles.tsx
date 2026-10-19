@@ -9,6 +9,5 @@ export const GridLine = styled(View)`
 
 export const GridFrame = styled(View)`
   position: absolute;
-  border-width: 2px;
   border-color: ${theme.color['gray/gray500']};
 `;
