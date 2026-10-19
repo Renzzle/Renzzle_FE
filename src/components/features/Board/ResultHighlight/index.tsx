@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, PixelRatio } from 'react-native';
 import theme from '../../../../styles/theme';
 import { BOARD_SIZE } from '../../../../utils/utils';
-import { HighlightLayer, ResultFrame, StoneRing, StrikeLine } from './index.styles';
+import { HighlightLayer, ResultFrame, RingCell, StoneRing, StrikeLine } from './index.styles';
 
 export interface BoardPoint {
   x: number;
@@ -11,6 +11,10 @@ export interface BoardPoint {
 
 const RING_STAGGER_MS = 60;
 const STRIKE_DELAY_MS = 220;
+
+const snap = (value: number) => PixelRatio.roundToNearestPixel(value);
+const RING_GAP = 2.5;
+const RING_BORDER_WIDTH = snap(2.5);
 
 interface ResultHighlightProps {
   boardWidth: number;
@@ -73,7 +77,8 @@ const ResultHighlight = ({
     const end = centerOf(line[line.length - 1]);
     const length = Math.hypot(end.left - start.left, end.top - start.top);
     const angle = Math.atan2(end.top - start.top, end.left - start.left);
-    const ringSize = cellWidth + 4;
+    // 돌(칸보다 1 작다)과 크기 차이가 짝수 픽셀이어야, 같은 칸에서 가운데 맞출 때 반올림이 같아 중심이 겹친다
+    const ringSize = cellWidth - 1 + snap(RING_GAP) * 2;
 
     // 선은 줄의 가운데에서 양 끝으로 그어진다
     return (
@@ -87,16 +92,19 @@ const ResultHighlight = ({
             transform: [{ rotate: `${angle}rad` }, { scaleX: strikeProgress }],
           }}
         />
-        {line.map((point, index) => {
-          const center = centerOf(point);
-          return (
+        {line.map((point, index) => (
+          <RingCell
+            key={`${point.x}-${point.y}`}
+            cellWidth={cellWidth}
+            style={{
+              left: gridOffset + point.y * cellWidth,
+              top: gridOffset + point.x * cellWidth,
+            }}>
             <StoneRing
-              key={`${point.x}-${point.y}`}
               color={color}
               size={ringSize}
               style={{
-                left: center.left - ringSize / 2,
-                top: center.top - ringSize / 2,
+                borderWidth: RING_BORDER_WIDTH,
                 opacity: ringProgress[index],
                 transform: [
                   {
@@ -108,8 +116,8 @@ const ResultHighlight = ({
                 ],
               }}
             />
-          );
-        })}
+          </RingCell>
+        ))}
       </>
     );
   };

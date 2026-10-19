@@ -20,12 +20,18 @@ export const ResultFrame = styled(Animated.View)<{ color: string }>`
   border-color: ${({ color }) => color};
 `;
 
-export const StoneRing = styled(Animated.View)<{ color: string; size: number }>`
+export const RingCell = styled(View)<{ cellWidth: number }>`
   position: absolute;
+  width: ${({ cellWidth }) => cellWidth}px;
+  height: ${({ cellWidth }) => cellWidth}px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const StoneRing = styled(Animated.View)<{ color: string; size: number }>`
   width: ${({ size }) => size}px;
   height: ${({ size }) => size}px;
   border-radius: ${({ size }) => size / 2}px;
-  border-width: 2.5px;
   border-color: ${({ color }) => color};
 `;
 
