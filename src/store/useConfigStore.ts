@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { AppDataItem, getAppData } from '../apis/config';
 
 interface ConfigStoreState {
   feedbackUrl: string | null;
@@ -12,17 +13,18 @@ interface ConfigStoreState {
   hintPrice: number | null;
   rankReward: number | null;
   trainingReward: number | null;
-  setFeedbackUrl: (url: string) => void;
-  setStoreUrls: (urls: { iosStoreUrl?: string; androidStoreUrl?: string }) => void;
-  setPolicyUrls: (urls: { privacyPolicyUrl?: string; termsOfUseUrl?: string }) => void;
-  setRewardConfig: (config: {
-    attendanceReward?: number;
-    communityReward?: number;
-    rankReward?: number;
-    trainingReward?: number;
-  }) => void;
-  setPriceConfig: (config: { changeNicknamePrice?: number; hintPrice?: number }) => void;
+
+  // 서버에서 앱 설정(링크, 보상·가격)을 불러와 스토어를 갱신. 토큰이 필요하여 자동 로그인과 로그인 직후에 호출
+  loadAppData: () => Promise<void>;
 }
+
+const findAppDataValue = (appData: AppDataItem[], tag: string) =>
+  appData.find((item) => item.tag === tag)?.value;
+
+const findAppDataNumber = (appData: AppDataItem[], tag: string) => {
+  const value = Number(findAppDataValue(appData, tag));
+  return Number.isFinite(value) ? value : undefined;
+};
 
 const useConfigStore = create<ConfigStoreState>((set) => ({
   feedbackUrl: null,
@@ -36,29 +38,31 @@ const useConfigStore = create<ConfigStoreState>((set) => ({
   hintPrice: null,
   rankReward: null,
   trainingReward: null,
-  setFeedbackUrl: (url) => set({ feedbackUrl: url }),
-  setStoreUrls: ({ iosStoreUrl, androidStoreUrl }) =>
-    set((state) => ({
-      iosStoreUrl: iosStoreUrl ?? state.iosStoreUrl,
-      androidStoreUrl: androidStoreUrl ?? state.androidStoreUrl,
-    })),
-  setPolicyUrls: ({ privacyPolicyUrl, termsOfUseUrl }) =>
-    set((state) => ({
-      privacyPolicyUrl: privacyPolicyUrl ?? state.privacyPolicyUrl,
-      termsOfUseUrl: termsOfUseUrl ?? state.termsOfUseUrl,
-    })),
-  setRewardConfig: ({ attendanceReward, communityReward, rankReward, trainingReward }) =>
-    set((state) => ({
-      attendanceReward: attendanceReward ?? state.attendanceReward,
-      communityReward: communityReward ?? state.communityReward,
-      rankReward: rankReward ?? state.rankReward,
-      trainingReward: trainingReward ?? state.trainingReward,
-    })),
-  setPriceConfig: ({ changeNicknamePrice, hintPrice }) =>
-    set((state) => ({
-      changeNicknamePrice: changeNicknamePrice ?? state.changeNicknamePrice,
-      hintPrice: hintPrice ?? state.hintPrice,
-    })),
+
+  loadAppData: async () => {
+    try {
+      const appData = await getAppData();
+      const value = (tag: string) => findAppDataValue(appData, tag);
+      const number = (tag: string) => findAppDataNumber(appData, tag);
+
+      // 서버에 없는 항목은 이전 값을 그대로 둔다
+      set((state) => ({
+        feedbackUrl: value('feedback_url') || state.feedbackUrl,
+        iosStoreUrl: value('ios_store_url') ?? state.iosStoreUrl,
+        androidStoreUrl: value('android_store_url') ?? state.androidStoreUrl,
+        privacyPolicyUrl: value('privacy_policy_url') ?? state.privacyPolicyUrl,
+        termsOfUseUrl: value('terms_of_use_url') ?? state.termsOfUseUrl,
+        attendanceReward: number('attendance_reward') ?? state.attendanceReward,
+        changeNicknamePrice: number('change_nickname_price') ?? state.changeNicknamePrice,
+        communityReward: number('community_reward') ?? state.communityReward,
+        hintPrice: number('hint_price') ?? state.hintPrice,
+        rankReward: number('rank_reward') ?? state.rankReward,
+        trainingReward: number('training_reward') ?? state.trainingReward,
+      }));
+    } catch (error) {
+      console.log('설정 로드 실패:', error);
+    }
+  },
 }));
 
 export default useConfigStore;
