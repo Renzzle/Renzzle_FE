@@ -5,9 +5,12 @@ import { reissueToken } from './auth';
 import useNetworkStore from '../store/useNetworkStore';
 import { getApiErrorMessage } from './errorMessage';
 import i18n from '../locales/i18n';
+import { ApiError } from './apiError';
 
 declare module 'axios' {
   interface AxiosRequestConfig {
+    // 결제 검증처럼 오류 코드와 HTTP 상태를 구분해야 하는 호출에서만 사용한다
+    includeErrorDetails?: boolean;
     // 실패해도 대신할 방법이 있는 요청은 네트워크 오류 모달을 띄우지 않는다
     skipNetworkErrorModal?: boolean;
     // 사용자가 기다리지 않는 요청은 "연결 중" 안내를 띄우지 않는다
@@ -228,8 +231,12 @@ apiClient.interceptors.response.use(
       }
     }
     const errorResponse = error.response?.data?.errorResponse;
-    console.log(errorResponse);
-    return Promise.reject(getApiErrorMessage(errorResponse));
+    const message = getApiErrorMessage(errorResponse);
+    return Promise.reject(
+      error.config?.includeErrorDetails
+        ? new ApiError(message, errorResponse?.code, error.response?.status)
+        : message,
+    );
   },
 );
 

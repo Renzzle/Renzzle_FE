@@ -29,7 +29,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
     category: modalCategory,
   } = useModal();
   const user = useUserStore((state) => state.user);
-  const { products, selectedProductId, purchasePiece, resetSelection } = usePiecePurchase({
+  const { products, selectedProductId, purchasePiece } = usePiecePurchase({
     onPurchaseComplete: closePrimarily,
   });
 
@@ -61,7 +61,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
   const matchedType = getMenuTypeByRouteName(route.name);
 
   const handlePuzzleClick = () => {
-    activateModal('PIECE_PURCHASE', { primaryAction: resetSelection });
+    activateModal('PIECE_PURCHASE', { primaryAction: () => {} });
   };
 
   const renderLeftContent = () => {
