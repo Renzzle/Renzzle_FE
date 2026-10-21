@@ -1,11 +1,9 @@
-/* eslint-disable react-native/no-inline-styles */
-
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import Preview, { InnerBorder, SolvedOverlay, SolvedText } from './index.styles';
-import { Cell } from '../Board';
 import { BOARD_SIZE, parseSequence } from '../../../utils/utils';
 import { useTranslation } from 'react-i18next';
-import { SizeType } from '../../../styles/theme';
+import theme, { SizeType } from '../../../styles/theme';
 
 interface BoardPreviewProps {
   sequence: string;
@@ -13,11 +11,15 @@ interface BoardPreviewProps {
   size?: number;
 }
 
+// 판 크기에 비해 돌 간격을 조금 좁혀 테두리 안에 들어오게 한다
+const STONE_SPACING = 0.94;
+
 const BoardPreview = ({ sequence = '', isSolved = false, size = 90 }: BoardPreviewProps) => {
   const { t } = useTranslation();
 
   const moves = React.useMemo(() => parseSequence(sequence), [sequence]);
   const cellWidth = size / BOARD_SIZE;
+  const stoneSize = cellWidth - 1;
 
   const sizeTypes: SizeType[] = [8, 10, 12, 14, 16, 18, 20, 22, 52];
   const rawSize = size * 0.13;
@@ -25,25 +27,25 @@ const BoardPreview = ({ sequence = '', isSolved = false, size = 90 }: BoardPrevi
     Math.abs(curr - rawSize) < Math.abs(prev - rawSize) ? curr : prev,
   );
 
+  // 목록에 여러 개가 함께 그려지므로, 돌마다 누를 수 있는 칸 대신 단순한 원 하나만 그린다
   return (
     <Preview size={size}>
       <InnerBorder size={size * 0.95} pointerEvents="none">
         {moves.map(({ x, y, stone }, index) => (
-          <Cell
+          <View
             key={index}
-            pos={`${x}-${y}`}
-            stone={stone}
-            cellWidth={cellWidth} // Assume a fixed width
-            stoneX={x}
-            stoneY={y}
-            sequence={null}
-            onPress={() => {}}
-            showHighlights={false}
-            style={{
-              position: 'absolute',
-              top: x * cellWidth * 0.94, // Adjust based on cell size
-              left: y * cellWidth * 0.94, // Adjust based on cell size
-            }}
+            style={[
+              styles.stone,
+              stone === 1 ? styles.black : styles.white,
+              {
+                top: x * cellWidth * STONE_SPACING + 0.5,
+                left: y * cellWidth * STONE_SPACING + 0.5,
+                width: stoneSize,
+                height: stoneSize,
+                borderRadius: stoneSize / 2,
+                borderWidth: cellWidth * 0.025,
+              },
+            ]}
           />
         ))}
       </InnerBorder>
@@ -58,5 +60,18 @@ const BoardPreview = ({ sequence = '', isSolved = false, size = 90 }: BoardPrevi
     </Preview>
   );
 };
+
+const styles = StyleSheet.create({
+  stone: {
+    position: 'absolute',
+    borderColor: theme.color['gray/gray500'],
+  },
+  black: {
+    backgroundColor: theme.color['gray/black'],
+  },
+  white: {
+    backgroundColor: theme.color['gray/white'],
+  },
+});
 
 export default React.memo(BoardPreview);

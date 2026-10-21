@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import {
   Container,
@@ -27,6 +27,7 @@ import { getRankGameArchive } from '../../apis/rank';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import { BottomButtonBar, CustomModal, CustomText, Icon } from '../../components/common';
 import useModal from '../../hooks/useModal';
+import { usePuzzleAd } from '../../hooks/usePuzzleAd';
 import { useTranslation } from 'react-i18next';
 import theme from '../../styles/theme';
 
@@ -43,6 +44,8 @@ const RankedGameResult = () => {
     category: modalCategory,
   } = useModal();
   const [archive, setArchive] = useState<RankArchive[] | null>(null);
+  const { showAdIfReady } = usePuzzleAd();
+  const leaveStateRef = useRef<'idle' | 'showingAd' | 'leaving'>('idle');
 
   const isLoading = archive === null;
   const successCount = archive?.filter((item) => item.isSolved).length ?? 0;
@@ -62,6 +65,31 @@ const RankedGameResult = () => {
 
     fetchArchive();
   }, []);
+
+  // 스와이프로 나가면 광고를 보여준 뒤에 떠날 수 없으므로 막는다 (native-stack은 beforeRemove로 제스처를 막지 못한다)
+  useLayoutEffect(() => {
+    navigation.setOptions({ gestureEnabled: false });
+  }, [navigation]);
+
+  // 홈으로, 다시 도전하기, 뒤로가기 등 결과 화면을 나갈 때도 다른 퍼즐처럼 광고 기회를 센다
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', (e) => {
+        if (leaveStateRef.current === 'leaving') {
+          return;
+        }
+        e.preventDefault();
+        if (leaveStateRef.current === 'showingAd') {
+          return;
+        }
+        leaveStateRef.current = 'showingAd';
+        showAdIfReady(() => {
+          leaveStateRef.current = 'leaving';
+          navigation.dispatch(e.data.action);
+        });
+      }),
+    [navigation, showAdIfReady],
+  );
 
   const handleProblemPress = (index: number) => {
     if (!archive || archive.length === 0) {

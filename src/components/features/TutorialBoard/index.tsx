@@ -2,14 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing } from 'react-native';
 import { CellOverlay, CellWrapper, TargetRing } from './index.styles';
 import { Cell, StoneType } from '../Board';
-import {
-  BoardBackground,
-  FramContainer,
-  FrameCell,
-  FrameRow,
-  StoneRow,
-} from '../Board/index.styles';
+import { BoardBackground, StoneRow } from '../Board/index.styles';
 import BoardFrameNumber from '../Board/BoardFrameNumber';
+import BoardGrid from '../Board/BoardGrid';
 import { Icon } from '../../common';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import { BOARD_SIZE, coordinatesToPosition, positionToCoordinates } from '../../../utils/utils';
@@ -137,15 +132,7 @@ const TutorialBoard = ({
     <BoardBackground boardWidth={boardWidth}>
       <BoardFrameNumber direction="vertical" />
       <BoardFrameNumber direction="horizontal" />
-      <FramContainer>
-        {Array.from({ length: BOARD_SIZE - 1 }).map((_, rowIndex) => (
-          <FrameRow key={rowIndex}>
-            {Array.from({ length: BOARD_SIZE - 1 }).map((__, colIndex) => (
-              <FrameCell key={colIndex} cellWidth={cellWidth} />
-            ))}
-          </FrameRow>
-        ))}
-      </FramContainer>
+      <BoardGrid boardWidth={boardWidth} cellWidth={cellWidth} />
       {stones.map((row, x) => (
         <StoneRow key={x}>
           {row.map((stone, y) => {
@@ -160,8 +147,7 @@ const TutorialBoard = ({
                   pos={`${x}-${y}`}
                   stone={stone}
                   cellWidth={cellWidth}
-                  stoneX={selected?.x}
-                  stoneY={selected?.y}
+                  isSelected={isSelected}
                   sequence={isPlacedStone ? -1 : null}
                   onPress={() => handleCellPress(x, y)}
                   isForbidden={isPlacedStone && !!placedStone?.isForbidden}

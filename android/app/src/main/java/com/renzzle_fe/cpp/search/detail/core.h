@@ -62,7 +62,7 @@ bool Search::tryResolveFromTT(int depth, Value& alpha, Value& beta, MoveList* pv
     return false;
 }
 
-int Search::getShallowMoveLimit(Evaluator& evaluator, int depth, bool attackerTurn) {
+int Search::getShallowMoveLimit(Evaluator& evaluator, int depth, bool attackerTurn, ThreatKind threat) {
     // defender turns must enumerate fully (true longest defense)
     if (!attackerTurn) {
         return std::numeric_limits<int>::max();
@@ -72,17 +72,25 @@ int Search::getShallowMoveLimit(Evaluator& evaluator, int depth, bool attackerTu
         && board.getPath().size() == rootBoard.getPath().size()) {
         return std::numeric_limits<int>::max();
     }
-    // defending against an opposing mate or 4-3 threat: enumerate all candidates,
+    // defending against an opposing mate, 4-3 or VCF threat: enumerate all candidates,
     // otherwise the search may cut off the only saving line and falsely report LOSE.
-    if (evaluator.isOppoMateExist() || evaluator.isOppoFourThreeExist()) {
+    if (evaluator.isOppoMateExist() || evaluator.isOppoFourThreeExist() || threat == VCF_THREAT) {
         return std::numeric_limits<int>::max();
     }
     // attacker forcing with no opposing threat — shallow truncation allowed
     return (depth <= 3) ? 4 : (depth <= 5) ? 6 : std::numeric_limits<int>::max();
 }
 
+Value Search::evaluateStatic() {
+    if (options.mode != Mode::DEFENSIVE) {
+        return evaluateTacticalSummary(board);
+    }
+    const Piece attacker = rootBoard.isBlackTurn() ? WHITE : BLACK;
+    return evaluateTacticalSummary(board, attacker, DEFENSIVE_ATTACKER_WEIGHT);
+}
+
 Value Search::evaluateLeafNode(bool isMax, int depth) {
-    Value val = evaluateTacticalSummary(board);
+    Value val = evaluateStatic();
     if (!isMax) {
         val.invert();
     }
@@ -400,12 +408,34 @@ Value Search::abp(int depth, bool isMax, Value alpha, Value beta, MoveList* pv) 
     Value bestVal = isMax
         ? Value(MIN_VALUE - 1, Value::Type::UNKNOWN)
         : Value(MAX_VALUE + 1, Value::Type::UNKNOWN);
+
+    // stand pat: an unforced DEFENSIVE interior side may play quietly instead, so its
+    // threats all failing doesn't lose; the static value stands in for that move
+    const bool standPat = options.mode == Mode::DEFENSIVE && !isRootNode && threat != VCF_THREAT
+        && !evaluator.isOppoMateExist() && !evaluator.isOppoFourThreeExist();
+    if (standPat) {
+        Value standValue = evaluateStatic();
+        if (!isMax) {
+            standValue.invert();
+        }
+        if (isMax ? standValue >= beta : standValue <= alpha) {
+            standValue.setType(isMax ? Value::Type::LOWER_BOUND : Value::Type::UPPER_BOUND);
+            return standValue;
+        }
+        bestVal = standValue;
+        if (isMax && standValue > alpha) {
+            alpha = standValue;
+        }
+        if (!isMax && standValue < beta) {
+            beta = standValue;
+        }
+    }
     Pos bestMove;
     MoveList bestChildPV;
     uint8_t searchedMoveCodes[BOARD_SIZE * BOARD_SIZE];
     size_t searchedMoveCount = 0;
 
-    const int shallowMoveLimit = getShallowMoveLimit(evaluator, depth, attackerTurn);
+    const int shallowMoveLimit = getShallowMoveLimit(evaluator, depth, attackerTurn, threat);
     const bool sideToMoveIsBlack = board.isBlackTurn();
     const Pos ttBestMove = (ttEntry != nullptr && ttEntry->bestMove != TranspositionTable::INVALID_MOVE)
         ? TranspositionTable::decodeMove(ttEntry->bestMove)
@@ -517,8 +547,9 @@ CandidateList Search::getCandidates(Evaluator& evaluator, bool isMax, int depth,
 
     const bool patternThreat = evaluator.isOppoMateExist() || evaluator.isOppoFourThreeExist();
 
-    // DEFENSIVE: at root broaden to full candidates when opp is quiet;
-    // non-root stays threats-only to limit fanout.
+    // DEFENSIVE: the side to move answers an open three, 4-3 or VCF threat as VCT's
+    // defender does. With none, root broadens to full candidates; deeper nodes keep to
+    // their own threats and may stand pat.
     if (options.mode == Mode::DEFENSIVE) {
         const bool atRoot = (board.getPath().size() == rootBoard.getPath().size());
 
@@ -527,22 +558,34 @@ CandidateList Search::getCandidates(Evaluator& evaluator, bool isMax, int depth,
             if (getThreatDefense(moves, true, false) == NO_THREAT || moves.empty()) {
                 getPatternThreatDefend(evaluator, moves);
             }
-        } else if (atRoot && state.vcfThreats
-            && getThreatDefense(moves, false, true) == VCF_THREAT && !moves.empty()) {
-            // an opponent VCF threat against the move being chosen; deeper nodes skip the
-            // check (it costs 3-10x there). With no refutation the broad set below picks
-            // the longest defense.
-            threat = VCF_THREAT;
-        } else {
-            if (atRoot) {
-                evaluator.getCandidates(moves);
+            return moves;
+        }
+
+        const bool vcfThreat = state.vcfThreats
+            && getThreatDefense(moves, false, true) == VCF_THREAT;
+        if (atRoot) {
+            // with no refutation the broad set picks the longest defense
+            if (vcfThreat && !moves.empty()) {
+                threat = VCF_THREAT;
                 return moves;
             }
-            evaluator.getThreats(moves);
-            CandidateList makers;
-            evaluator.getFourThreeMakers(makers);
-            appendUniqueMoves(moves, makers);
+            evaluator.getCandidates(moves);
+            // pure blocks too: holding out can mean cutting the opponent's shapes first
+            CandidateList blocks;
+            evaluator.getShapeBlocks(blocks);
+            appendUniqueMoves(moves, blocks);
+            return moves;
         }
+
+        // the refutations, if any, plus the side's own threats, which may win first
+        if (vcfThreat) {
+            threat = VCF_THREAT;
+        }
+        CandidateList ownMoves;
+        evaluator.getThreats(ownMoves);
+        appendUniqueMoves(moves, ownMoves);
+        evaluator.getFourThreeMakers(ownMoves);
+        appendUniqueMoves(moves, ownMoves);
         return moves;
     }
 

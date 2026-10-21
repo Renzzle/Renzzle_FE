@@ -7,19 +7,27 @@ import theme from '../../../styles/theme';
 
 const TOTAL_DURATION = 3 * 60 * 1000; // 3 min
 export const BONUS_TIME = 10 * 1000; // 10 sec
+const TICK_MS = 200;
+
+export interface TimeAdjustment {
+  // 바뀔 때마다 한 번씩 적용한다
+  id: number;
+  deltaMs: number;
+}
 
 interface TimerWithProgressBarProps {
   start: boolean;
   paused: boolean;
   onFinish: () => void;
-  bonusTimeTrigger?: number;
+  // 보너스로 늘리거나 벌칙으로 줄인다. 다 줄어들면 바로 끝난다
+  timeAdjustment?: TimeAdjustment | null;
 }
 
 const TimerWithProgressBar = ({
   start,
   paused,
   onFinish,
-  bonusTimeTrigger,
+  timeAdjustment,
 }: TimerWithProgressBarProps) => {
   const [remainingTime, setRemainingTime] = useState<number>(TOTAL_DURATION);
   // 현재 남은 시간을 추적하기 위한 Ref (EventListener 내부에서 최신값 접근용)
@@ -29,7 +37,7 @@ const TimerWithProgressBar = ({
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null); // Store the interval ID for clearing the timer later
   const backgroundTimestamp = useRef<number | null>(null);
   const started = useRef<boolean>(false);
-  const isInitialMount = useRef(true);
+  const appliedAdjustmentIdRef = useRef<number | null>(null);
   const finishTriggeredRef = useRef(false);
 
   const progress = remainingTime / TOTAL_DURATION;
@@ -63,7 +71,7 @@ const TimerWithProgressBar = ({
     }
 
     intervalRef.current = setInterval(() => {
-      const next = remainingTimeRef.current - 1000;
+      const next = remainingTimeRef.current - TICK_MS;
 
       if (next <= 0) {
         finishTimer();
@@ -72,22 +80,23 @@ const TimerWithProgressBar = ({
 
       remainingTimeRef.current = next;
       setRemainingTime(next);
-    }, 1000);
+    }, TICK_MS);
   }, [finishTimer]);
 
-  // Add bonus time
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
+    if (!timeAdjustment || appliedAdjustmentIdRef.current === timeAdjustment.id) {
       return;
     }
+    appliedAdjustmentIdRef.current = timeAdjustment.id;
 
-    if (bonusTimeTrigger !== undefined) {
-      const next = Math.min(remainingTimeRef.current + BONUS_TIME, TOTAL_DURATION);
-      remainingTimeRef.current = next;
-      setRemainingTime(next);
+    const next = Math.min(remainingTimeRef.current + timeAdjustment.deltaMs, TOTAL_DURATION);
+    if (next <= 0) {
+      finishTimer();
+      return;
     }
-  }, [bonusTimeTrigger]);
+    remainingTimeRef.current = next;
+    setRemainingTime(next);
+  }, [finishTimer, timeAdjustment]);
 
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
@@ -171,7 +180,8 @@ const TimerWithProgressBar = ({
   }, [paused, startTimer, stopTimer]);
 
   const formatTime = (milliseconds: number) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
+    // 1초보다 짧은 간격으로 줄어드므로, 1초가 다 지나야 다음 초를 보이도록 올림한다
+    const totalSeconds = Math.ceil(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     const formattedSeconds = String(seconds).padStart(2, '0');
@@ -185,8 +195,8 @@ const TimerWithProgressBar = ({
         width={null}
         height={12}
         borderRadius={6}
-        animated
-        useNativeDriver
+        animated={false}
+        useNativeDriver={false}
         color={theme.color['main_color/blue_p']}
         unfilledColor={theme.color['gray/gray100']}
         borderWidth={0}

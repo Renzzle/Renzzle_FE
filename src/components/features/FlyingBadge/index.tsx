@@ -7,9 +7,10 @@ import {
   BadgeAnchor,
   BadgeBody,
   BadgeIcon,
+  isTimeVariant,
 } from './index.styles';
 
-export type FlyingBadgeVariant = 'success' | 'error' | 'bonus';
+export type FlyingBadgeVariant = 'success' | 'error' | 'bonus' | 'penalty';
 
 export interface Point {
   x: number;
@@ -130,7 +131,7 @@ const FlyingBadge = forwardRef<FlyingBadgeRef>(function FlyingBadge(_, ref) {
         ],
       }}>
       <BadgeBody variant={variant}>
-        {variant !== 'bonus' && (
+        {!isTimeVariant(variant) && (
           <BadgeIcon>
             <Icon
               name={variant === 'success' ? 'CheckIcon' : 'CloseIcon'}
@@ -139,7 +140,7 @@ const FlyingBadge = forwardRef<FlyingBadgeRef>(function FlyingBadge(_, ref) {
             />
           </BadgeIcon>
         )}
-        <CustomText size={variant === 'bonus' ? 12 : 14} weight="bold" color="gray/white">
+        <CustomText size={isTimeVariant(variant) ? 12 : 14} weight="bold" color="gray/white">
           {label}
         </CustomText>
       </BadgeBody>
