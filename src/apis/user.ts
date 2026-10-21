@@ -1,7 +1,8 @@
 import { ApiCallParams } from '../components/common/InfiniteScrollList';
+import type { User } from '../store/useUserStore';
 import apiClient from './interceptor';
 
-export const getUser = async () => {
+export const getUser = async (): Promise<User> => {
   try {
     const response = await apiClient.get('/api/user');
 

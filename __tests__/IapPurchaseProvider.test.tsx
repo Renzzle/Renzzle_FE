@@ -17,7 +17,6 @@ import { ALL_IAP_PRODUCT_IDS, IAP_PRODUCT_IDS } from '../src/constants/iap';
 import usePiecePurchase from '../src/hooks/usePiecePurchase';
 import { useIapProducts } from '../src/providers/IapProductsProvider';
 import { IapPurchaseProvider, useIapPurchase } from '../src/providers/IapPurchaseProvider';
-import usePurchaseStore from '../src/store/usePurchaseStore';
 import { useUserStore } from '../src/store/useUserStore';
 
 jest.mock('react-native-iap', () => ({
@@ -34,15 +33,10 @@ jest.mock('../src/components/common/Toast/toastMessage', () => ({ showBottomToas
 jest.mock('../src/providers/IapProductsProvider', () => ({ useIapProducts: jest.fn() }));
 jest.mock('../src/locales/i18n', () => ({ t: (key: string) => key }));
 jest.mock('../src/store/useUserStore', () => ({ useUserStore: { getState: jest.fn() } }));
-jest.mock('../src/store/usePurchaseStore', () => ({
-  __esModule: true,
-  default: { getState: jest.fn() },
-}));
 
 const consumers = new Map<string, ReturnType<typeof usePiecePurchase>>();
 let controller: ReturnType<typeof useIapPurchase>;
 const mockUpdateUser = jest.fn();
-const mockSetAdsRemoved = jest.fn();
 const mockLoadProducts = jest.fn();
 const removeUpdates = jest.fn();
 const removeErrors = jest.fn();
@@ -130,12 +124,6 @@ beforeEach(() => {
     setUser: jest.fn(),
     clearUser: jest.fn(),
     updateUser: mockUpdateUser,
-  });
-  jest.mocked(usePurchaseStore.getState).mockReturnValue({
-    isAdsRemoved: false,
-    isHydrated: true,
-    initializePurchaseState: jest.fn(),
-    setAdsRemoved: mockSetAdsRemoved,
   });
   jest.mocked(verifyInAppPurchase).mockResolvedValue({
     platform: 'IOS',
@@ -275,7 +263,7 @@ it('does not finish or grant an unverified purchase and allows retry after a rea
   expect(successCount()).toBe(1);
 });
 
-it('processes remove-ads purchases once without consuming them', async () => {
+it('refreshes server user information once after an ad removal purchase without consuming it', async () => {
   await mount();
   await act(async () => {
     await controller.purchaseProduct(IAP_PRODUCT_IDS.REMOVE_ADS);
@@ -286,9 +274,7 @@ it('processes remove-ads purchases once without consuming them', async () => {
     emit(event);
   });
   expect(finishTransaction).toHaveBeenCalledWith({ purchase: event, isConsumable: false });
-  expect(mockSetAdsRemoved).toHaveBeenCalledTimes(1);
-  expect(mockSetAdsRemoved).toHaveBeenCalledWith(true);
-  expect(mockUpdateUser).not.toHaveBeenCalled();
+  expect(mockUpdateUser).toHaveBeenCalledTimes(1);
 });
 
 it('deduplicates native errors and request promise rejections', async () => {
@@ -335,7 +321,7 @@ it('restores an owned remove-ads purchase through the same transaction processor
     emitError({ code: ErrorCode.E_ALREADY_OWNED });
   });
   expect(verifyInAppPurchase).toHaveBeenCalledTimes(1);
-  expect(mockSetAdsRemoved).toHaveBeenCalledWith(true);
+  expect(mockUpdateUser).toHaveBeenCalledTimes(1);
   expect(showBottomToast).toHaveBeenCalledWith('success', 'toast.removeAdsRestored');
   expect(controller.pendingProductId).toBeNull();
 });

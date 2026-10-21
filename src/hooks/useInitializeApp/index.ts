@@ -6,14 +6,12 @@ import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import i18n, { initI18n } from '../../locales/i18n';
 import useConfigStore from '../../store/useConfigStore';
 import useTutorialStore from '../../store/useTutorialStore';
-import usePurchaseStore from '../../store/usePurchaseStore';
 
 const useInitializeApp = (): boolean => {
   const [isLoading, setIsLoading] = useState(true);
   const { restoreCredentials, clearTokens } = useAuthStore();
   const loadAppData = useConfigStore((state) => state.loadAppData);
   const restoreTutorialPending = useTutorialStore((state) => state.restoreTutorialPending);
-  const initializePurchaseState = usePurchaseStore((state) => state.initializePurchaseState);
 
   useEffect(() => {
     const initApp = async () => {
@@ -22,7 +20,6 @@ const useInitializeApp = (): boolean => {
           initI18n(),
           restoreCredentials(),
           restoreTutorialPending(),
-          initializePurchaseState(),
         ]);
         const { accessToken, refreshToken } = credentials;
 
@@ -46,13 +43,7 @@ const useInitializeApp = (): boolean => {
     };
 
     initApp();
-  }, [
-    restoreCredentials,
-    clearTokens,
-    loadAppData,
-    restoreTutorialPending,
-    initializePurchaseState,
-  ]);
+  }, [restoreCredentials, clearTokens, loadAppData, restoreTutorialPending]);
 
   return isLoading;
 };

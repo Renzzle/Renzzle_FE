@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
 import mobileAds, { AdEventType, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
-import usePurchaseStore from '../../store/usePurchaseStore';
+import { useUserStore } from '../../store/useUserStore';
 
 const AD_UNIT_ID = __DEV__
   ? TestIds.INTERSTITIAL
@@ -47,7 +47,8 @@ const getInterstitial = () => {
 
 export const usePuzzleAd = () => {
   const showAdIfReady = useCallback((onAdFinished: () => void) => {
-    if (usePurchaseStore.getState().isAdsRemoved) {
+    // 서버에서 광고 미제거 상태가 확인된 사용자에게만 광고를 표시한다.
+    if (useUserStore.getState().user?.adsRemoved !== false) {
       onAdFinished();
       return;
     }

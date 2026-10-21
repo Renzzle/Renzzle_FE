@@ -22,7 +22,6 @@ import { verifyInAppPurchase } from '../apis/payment';
 import { showBottomToast } from '../components/common/Toast/toastMessage';
 import { ALL_IAP_PRODUCT_IDS, IAP_PRODUCT_IDS } from '../constants/iap';
 import i18n from '../locales/i18n';
-import usePurchaseStore from '../store/usePurchaseStore';
 import { useUserStore } from '../store/useUserStore';
 import { useIapProducts } from './IapProductsProvider';
 import { ApiError } from '../apis/apiError';
@@ -121,11 +120,7 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
             return;
           }
 
-          if (purchase.productId === IAP_PRODUCT_IDS.REMOVE_ADS) {
-            await usePurchaseStore.getState().setAdsRemoved(true);
-          } else {
-            await useUserStore.getState().updateUser();
-          }
+          await useUserStore.getState().updateUser();
           completed.current.add(key);
           showBottomToast(
             'success',

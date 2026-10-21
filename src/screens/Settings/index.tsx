@@ -12,7 +12,6 @@ import { deleteUser } from '../../apis/user';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import useAuthStore from '../../store/useAuthStore';
 import useConfigStore from '../../store/useConfigStore';
-import usePurchaseStore from '../../store/usePurchaseStore';
 import { IAP_PRODUCT_IDS } from '../../constants/iap';
 import { useIapPurchase } from '../../providers/IapPurchaseProvider';
 
@@ -28,7 +27,6 @@ const Settings = () => {
   const user = useUserStore((state) => state.user);
   const { feedbackUrl, privacyPolicyUrl, termsOfUseUrl } = useConfigStore();
   const { clearTokens } = useAuthStore();
-  const isAdsRemoved = usePurchaseStore((state) => state.isAdsRemoved);
   const { purchaseProduct } = useIapPurchase();
   const {
     isModalVisible,
@@ -39,7 +37,7 @@ const Settings = () => {
   } = useModal();
 
   const handleRemoveAds = async () => {
-    if (isAdsRemoved) {
+    if (user?.adsRemoved) {
       showBottomToast('info', t('toast.adsAlreadyRemoved'));
       return;
     }

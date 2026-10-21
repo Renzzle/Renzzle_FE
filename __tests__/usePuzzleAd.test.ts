@@ -6,7 +6,7 @@ const mockAd = {
   show: jest.fn().mockResolvedValue(undefined),
   addAdEventListener: jest.fn(() => jest.fn()),
 };
-let mockIsAdsRemoved = false;
+let mockUser: { adsRemoved: boolean } | null = { adsRemoved: false };
 
 jest.mock('react-native-google-mobile-ads', () => ({
   __esModule: true,
@@ -15,10 +15,31 @@ jest.mock('react-native-google-mobile-ads', () => ({
   InterstitialAd: { createForAdRequest: mockCreateAd },
   AdEventType: { CLOSED: 'closed', ERROR: 'error' },
 }));
-jest.mock('../src/store/usePurchaseStore', () => ({
-  __esModule: true,
-  default: { getState: () => ({ isAdsRemoved: mockIsAdsRemoved }) },
+jest.mock('../src/store/useUserStore', () => ({
+  useUserStore: { getState: () => ({ user: mockUser }) },
 }));
+
+const renderPuzzleAd = () => {
+  const React = require('react') as typeof import('react');
+  const renderer = require('react-test-renderer') as typeof import('react-test-renderer');
+  const { usePuzzleAd } = require('../src/hooks/usePuzzleAd');
+  let result!: ReturnType<typeof import('../src/hooks/usePuzzleAd').usePuzzleAd>;
+  let root!: import('react-test-renderer').ReactTestRenderer;
+  const Consumer = () => {
+    result = usePuzzleAd();
+    return null;
+  };
+
+  renderer.act(() => {
+    root = renderer.create(React.createElement(Consumer));
+  });
+  renderer.act(() => root.unmount());
+  return result;
+};
+
+beforeAll(() => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+});
 
 const flushPromises = async () => {
   await Promise.resolve();
@@ -29,7 +50,7 @@ const flushPromises = async () => {
 beforeEach(() => {
   jest.resetModules();
   jest.clearAllMocks();
-  mockIsAdsRemoved = false;
+  mockUser = { adsRemoved: false };
   mockInitialize.mockResolvedValue([]);
   mockCreateAd.mockReturnValue(mockAd);
 });
@@ -39,9 +60,8 @@ it('initializes once, waits before loading, and lets puzzles continue while pend
   mockInitialize.mockReturnValue(new Promise((resolve) => {
     resolveInitialization = resolve;
   }));
-  const { usePuzzleAd } = require('../src/hooks/usePuzzleAd');
-  const first = usePuzzleAd();
-  const second = usePuzzleAd();
+  const first = renderPuzzleAd();
+  const second = renderPuzzleAd();
   const onFinished = jest.fn();
 
   first.showAdIfReady(onFinished);
@@ -68,8 +88,7 @@ it('continues without ads and retries initialization after a failure', async () 
   mockInitialize.mockRejectedValueOnce(new Error('SDK unavailable'));
   const warning = jest.spyOn(console, 'warn').mockImplementation(() => {});
   try {
-    const { usePuzzleAd } = require('../src/hooks/usePuzzleAd');
-    const { showAdIfReady } = usePuzzleAd();
+    const { showAdIfReady } = renderPuzzleAd();
     const onFinished = jest.fn();
 
     showAdIfReady(onFinished);
@@ -86,13 +105,37 @@ it('continues without ads and retries initialization after a failure', async () 
   }
 });
 
-it('skips SDK initialization for an ad removal purchase', () => {
-  mockIsAdsRemoved = true;
-  const { usePuzzleAd } = require('../src/hooks/usePuzzleAd');
+it('skips SDK initialization when the server user has ads removed', () => {
+  mockUser = { adsRemoved: true };
   const onFinished = jest.fn();
 
-  usePuzzleAd().showAdIfReady(onFinished);
+  renderPuzzleAd().showAdIfReady(onFinished);
   expect(onFinished).toHaveBeenCalledTimes(1);
   expect(mockInitialize).not.toHaveBeenCalled();
   expect(mockCreateAd).not.toHaveBeenCalled();
+});
+
+it('skips ads until server user information is available', () => {
+  mockUser = null;
+  const onFinished = jest.fn();
+
+  renderPuzzleAd().showAdIfReady(onFinished);
+  expect(onFinished).toHaveBeenCalledTimes(1);
+  expect(mockInitialize).not.toHaveBeenCalled();
+});
+
+it('uses updated server user information even when an ad is already loaded', async () => {
+  const { showAdIfReady } = renderPuzzleAd();
+  const onFinished = jest.fn();
+
+  showAdIfReady(onFinished);
+  await flushPromises();
+  showAdIfReady(onFinished);
+
+  mockUser = { adsRemoved: true };
+  showAdIfReady(onFinished);
+  await flushPromises();
+
+  expect(mockAd.show).not.toHaveBeenCalled();
+  expect(onFinished).toHaveBeenCalledTimes(3);
 });

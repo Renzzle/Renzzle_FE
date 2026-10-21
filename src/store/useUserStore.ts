@@ -6,6 +6,7 @@ export interface User {
   email: string;
   nickname: string;
   currency: number;
+  adsRemoved: boolean;
 }
 
 interface UserStore {
