@@ -12,6 +12,8 @@ import { deleteUser } from '../../apis/user';
 import { showBottomToast } from '../../components/common/Toast/toastMessage';
 import useAuthStore from '../../store/useAuthStore';
 import useConfigStore from '../../store/useConfigStore';
+import { IAP_PRODUCT_IDS } from '../../constants/iap';
+import { useIapPurchase } from '../../providers/IapPurchaseProvider';
 
 const EXTERNAL_URLS = {
   DEFAULT_FEEDBACK: 'https://forms.gle/NTVoFDAxy498yTv17',
@@ -25,6 +27,7 @@ const Settings = () => {
   const user = useUserStore((state) => state.user);
   const { feedbackUrl, privacyPolicyUrl, termsOfUseUrl } = useConfigStore();
   const { clearTokens } = useAuthStore();
+  const { purchaseProduct, restorePurchases } = useIapPurchase();
   const {
     isModalVisible,
     activateModal,
@@ -33,7 +36,14 @@ const Settings = () => {
     category: modalCategory,
   } = useModal();
 
-  const handleRemoveAds = () => {};
+  const handleRemoveAds = async () => {
+    if (user?.adsRemoved) {
+      showBottomToast('info', t('toast.adsAlreadyRemoved'));
+      return;
+    }
+
+    await purchaseProduct(IAP_PRODUCT_IDS.REMOVE_ADS);
+  };
 
   const openExternalUrl = async (url: string, errorMessage: string) => {
     try {
@@ -73,7 +83,8 @@ const Settings = () => {
     { label: t('settings.language'), onPress: () => navigation.navigate('Language') },
     { label: t('settings.changeNickname'), onPress: () => navigation.navigate('ChangeNickname') },
     { label: t('settings.changePassword'), onPress: () => navigation.navigate('ChangePassword') },
-    { label: t('settings.removeAds'), onPress: () => handleRemoveAds },
+    { label: t('settings.removeAds'), onPress: handleRemoveAds },
+    { label: t('settings.restorePurchases'), onPress: restorePurchases },
     {
       label: t('settings.privacyPolicy'),
       onPress: () =>

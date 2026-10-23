@@ -1,7 +1,8 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { Animated, Easing, View } from 'react-native';
+import { Animated, Easing, HostInstance } from 'react-native';
 import { Container } from './index.styles';
-import { RankingResultTheme, ResultVariant } from '../../../types';
+import { ResultVariant } from '../../../types';
+import { RankingResultTheme } from '../../../constants/rankingResultTheme';
 import { CustomText, Icon } from '../../common';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 export interface RankingCounterRef {
   // 결과 배지가 도착할 때 톡 커졌다 돌아온다
   bump: () => void;
-  measureInWindow: View['measureInWindow'];
+  measureInWindow: HostInstance['measureInWindow'];
 }
 
 const RankingCounter = forwardRef<RankingCounterRef, Props>(function RankingCounter(
@@ -20,7 +21,7 @@ const RankingCounter = forwardRef<RankingCounterRef, Props>(function RankingCoun
   ref,
 ) {
   const selectedVariant = RankingResultTheme[variant];
-  const viewRef = useRef<View>(null);
+  const viewRef = useRef<HostInstance>(null);
   const bumpProgress = useRef(new Animated.Value(0)).current;
   const scale = bumpProgress.interpolate({ inputRange: [0, 0.35, 1], outputRange: [1, 1.25, 1] });
 

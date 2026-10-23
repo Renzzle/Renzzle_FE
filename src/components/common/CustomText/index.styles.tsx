@@ -3,7 +3,9 @@ import { Platform, Text } from 'react-native';
 import theme from '../../../styles/theme';
 import { TextPropsType } from './index.types';
 
-export type StyledTextType = Required<TextPropsType>;
+export type StyledTextType = Required<
+  Pick<TextPropsType, 'color' | 'size' | 'weight' | 'lineHeight'>
+>;
 export const StyledText = styled(Text)<StyledTextType>`
   font-family: ${(props) => {
     if (Platform.OS === 'ios') {

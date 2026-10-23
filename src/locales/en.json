@@ -54,6 +54,7 @@
     "changeNickname": "Change Nickname",
     "changePassword": "Change Password",
     "removeAds": "Remove Ads",
+    "restorePurchases": "Restore Purchases",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "feedback": "Send Feedback",
@@ -191,6 +192,11 @@
       "message": "Would you like to view the answer?\nRequired Cost: {{price}} Pieces",
       "confirm": "Purchase",
       "cancel": "Cancel"
+    },
+    "piecePurchase": {
+      "title": "Buy Pieces",
+      "message": "Choose a piece pack to buy.",
+      "cancel": "Close"
     },
     "nicknameChangePurchase": {
       "title": "Change Nickname",
@@ -449,6 +455,8 @@
     "receiptTransactionMismatch": "Receipt transaction does not match the request.",
     "unknownIapProduct": "Unregistered in-app purchase product.",
     "alreadyProcessedReceipt": "Receipt already processed.",
+    "purchasePending": "The payment is not complete yet.",
+    "storeApiFailed": "Could not confirm the payment with the store. Please try again later.",
 
     "alreadySolvedPuzzle": "Puzzle already solved.",
     "alreadyExistingTranslation": "Translation already exists for this language.",
@@ -488,6 +496,20 @@
 
     "purchaseComplete": "Purchase completed.",
     "priceInfoUnavailable": "Price information could not be loaded. Please try again later.",
+    "removeAdsRestored": "Ad removal has been restored.",
+    "purchaseFailed": "Purchase failed.",
+    "adsAlreadyRemoved": "Ads have already been removed.",
+    "storeNotConnected": "Unable to connect to the store.",
+    "productUnavailable": "Unable to load the product.",
+    "purchasePending": "Waiting for payment approval. It will be applied automatically once complete.",
+    "purchaseDeferred": "Purchase approval requested. It will be applied once approved.",
+    "purchaseRetryLater": "Your payment went through but is taking a while to apply. It will be applied automatically soon.",
+    "purchaseAlreadyApplied": "This purchase has already been applied.",
+    "previousPurchaseApplied": "A previous payment has been applied.",
+    "retryPurchase": "Your previous payment has been settled. Please purchase again.",
+    "removeAdsOtherAccount": "Ad removal for this store account is applied to another account.",
+    "noPurchaseToRestore": "No purchases to restore.",
+    "restoreFailed": "Failed to restore purchases.",
 
     "verificationError": "An error occurred during verification.",
     "duplicatePuzzle": "This puzzle already exists. Create a new one.",

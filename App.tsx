@@ -11,6 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BootSplash from 'react-native-bootsplash';
 import i18n from './src/locales/i18n.ts';
 import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
@@ -37,7 +38,6 @@ import RankedGameResult from './src/screens/RankedGameResult/index.tsx';
 import RankedPuzzleReview from './src/screens/RankedPuzzleReview/index.tsx';
 import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
-import theme from './src/styles/theme.ts';
 import useNetworkStore from './src/store/useNetworkStore.ts';
 import { CustomModal, SlowRequestIndicator } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
@@ -50,6 +50,8 @@ import { getPersonalNotice } from './src/apis/notice.ts';
 import { NoticeLanguage, PersonalNoticeItem } from './src/types/index.ts';
 import { useUserStore } from './src/store/useUserStore.ts';
 import useConfigStore from './src/store/useConfigStore.ts';
+import { IapProductsProvider } from './src/providers/IapProductsProvider';
+import { IapPurchaseProvider } from './src/providers/IapPurchaseProvider';
 
 const Stack = createNativeStackNavigator();
 const IOS_APP_STORE_ID = '6793042991';
@@ -111,6 +113,10 @@ function App(): React.JSX.Element | null {
   const hasRequestedPersonalNotice = React.useRef(false);
 
   const renderCustomHeader = (props: NativeStackHeaderProps) => <CustomHeader {...props} />;
+  // 첫 화면이 그려진 뒤에 걷어야 스플래시가 빈 화면으로 사라지지 않는다
+  const hideSplash = () => {
+    BootSplash.hide({ fade: true });
+  };
 
   React.useEffect(() => {
     console.log('personal notice gate', {
@@ -225,9 +231,7 @@ function App(): React.JSX.Element | null {
         `\n${i18n.t('modal.forceUpdate.latestVersion')}: ${personalNoticeModal.version}`
       : undefined;
   const personalNoticePrimaryButtonText =
-    personalNoticeModal?.category === 'FORCE_UPDATE'
-      ? 'modal.forceUpdate.update'
-      : undefined;
+    personalNoticeModal?.category === 'FORCE_UPDATE' ? 'modal.forceUpdate.update' : undefined;
   const shouldHidePersonalNoticeFooter =
     Platform.OS === 'ios' && personalNoticeModal?.category === 'SYSTEM_CHECK';
 
@@ -236,181 +240,183 @@ function App(): React.JSX.Element | null {
   }
 
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <AppWrapper>
-            <StatusBar
-              barStyle={'dark-content'}
-              backgroundColor={theme.color['gray/grayBG']}
-              translucent={false}
-            />
+    <IapPurchaseProvider>
+      <GestureHandlerRootView style={styles.root}>
+        <SafeAreaProvider>
+          <NavigationContainer onReady={hideSplash}>
+            <AppWrapper>
+              <StatusBar barStyle={'dark-content'} />
 
-            <Stack.Navigator
-              screenOptions={{
-                header: renderCustomHeader,
-                animation: Platform.OS === 'android' ? 'fade_from_bottom' : 'default',
-              }}>
-              {accessToken ? (
-                <>
-                  <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{ title: 'common.appName' }}
-                  />
-                  <Stack.Screen
-                    name="MyPuzzles"
-                    component={MyPuzzles}
-                    options={{ title: 'common.myPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="LikedPuzzles"
-                    component={LikedPuzzles}
-                    options={{ title: 'common.likes' }}
-                  />
-                  <Stack.Screen
-                    name="Ranking"
-                    component={Ranking}
-                    options={{ title: 'common.ranking' }}
-                  />
-                  <Stack.Screen
-                    name="Notice"
-                    component={Notice}
-                    options={{ title: 'common.notice' }}
-                  />
-                  <Stack.Screen
-                    name="Settings"
-                    component={Settings}
-                    options={{ title: 'common.settings' }}
-                  />
-                  <Stack.Screen
-                    name="Language"
-                    component={Language}
-                    options={{ title: 'settings.language' }}
-                  />
-                  <Stack.Screen
-                    name="ChangeNickname"
-                    component={ChangeNickname}
-                    options={{ title: 'settings.changeNickname' }}
-                  />
-                  <Stack.Screen
-                    name="ChangePassword"
-                    component={ChangePassword}
-                    options={{ title: 'settings.changePassword' }}
-                  />
-                  <Stack.Screen
-                    name="Tutorial"
-                    component={Tutorial}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="TrainingPacks"
-                    component={TrainingPacks}
-                    options={{ title: 'home.trainingPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="TrainingPuzzles"
-                    component={TrainingPuzzles}
-                    options={{ title: 'home.trainingPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="TrainingPuzzleSolve"
-                    component={TrainingPuzzleSolve}
-                    options={{ title: 'home.trainingPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="TrainingPuzzleReview"
-                    component={PuzzleReview}
-                    options={{ title: 'puzzle.review' }}
-                  />
-                  <Stack.Screen
-                    name="TrainingPuzzleViewAnswer"
-                    component={PuzzleReview}
-                    options={{ title: 'puzzle.viewAnswer' }}
-                  />
-                  <Stack.Screen
-                    name="CommunityPuzzles"
-                    component={CommunityPuzzles}
-                    options={{ title: 'home.communityPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="CommunityPuzzleSolve"
-                    component={CommunityPuzzleSolve}
-                    options={{ title: 'home.communityPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="CommunityPuzzleReview"
-                    component={PuzzleReview}
-                    options={{ title: 'puzzle.review' }}
-                  />
-                  <Stack.Screen
-                    name="CommunityPuzzleViewAnswer"
-                    component={PuzzleReview}
-                    options={{ title: 'puzzle.viewAnswer' }}
-                  />
-                  <Stack.Screen
-                    name="CreateCommunityPuzzle"
-                    component={CreateCommunityPuzzle}
-                    options={{ title: 'home.communityPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="AnswerCommunityPuzzle"
-                    component={AnswerCommunityPuzzle}
-                    options={{ title: 'home.communityPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="RankedPuzzleSolve"
-                    component={RankedPuzzleSolve}
-                    options={{ title: 'home.rankingPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="RankedGameResult"
-                    component={RankedGameResult}
-                    options={{ title: 'home.rankingPuzzle' }}
-                  />
-                  <Stack.Screen
-                    name="RankedPuzzleReview"
-                    component={RankedPuzzleReview}
-                    options={{ title: 'puzzle.review' }}
-                  />
-                </>
-              ) : (
-                <>
-                  <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="Signup"
-                    component={Signup}
-                    options={{ title: 'auth.signup' }}
-                  />
-                  <Stack.Screen
-                    name="FindPassword"
-                    component={FindPassword}
-                    options={{ title: 'auth.findPassword' }}
-                  />
-                </>
-              )}
-            </Stack.Navigator>
+              <Stack.Navigator
+                screenOptions={{
+                  header: renderCustomHeader,
+                  animation: Platform.OS === 'android' ? 'fade_from_bottom' : 'default',
+                }}>
+                {accessToken ? (
+                  <>
+                    <Stack.Screen
+                      name="Home"
+                      component={Home}
+                      options={{ title: 'common.appName' }}
+                    />
+                    <Stack.Screen
+                      name="MyPuzzles"
+                      component={MyPuzzles}
+                      options={{ title: 'common.myPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="LikedPuzzles"
+                      component={LikedPuzzles}
+                      options={{ title: 'common.likes' }}
+                    />
+                    <Stack.Screen
+                      name="Ranking"
+                      component={Ranking}
+                      options={{ title: 'common.ranking' }}
+                    />
+                    <Stack.Screen
+                      name="Notice"
+                      component={Notice}
+                      options={{ title: 'common.notice' }}
+                    />
+                    <Stack.Screen
+                      name="Settings"
+                      component={Settings}
+                      options={{ title: 'common.settings' }}
+                    />
+                    <Stack.Screen
+                      name="Language"
+                      component={Language}
+                      options={{ title: 'settings.language' }}
+                    />
+                    <Stack.Screen
+                      name="ChangeNickname"
+                      component={ChangeNickname}
+                      options={{ title: 'settings.changeNickname' }}
+                    />
+                    <Stack.Screen
+                      name="ChangePassword"
+                      component={ChangePassword}
+                      options={{ title: 'settings.changePassword' }}
+                    />
+                    <Stack.Screen
+                      name="Tutorial"
+                      component={Tutorial}
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="TrainingPacks"
+                      component={TrainingPacks}
+                      options={{ title: 'home.trainingPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="TrainingPuzzles"
+                      component={TrainingPuzzles}
+                      options={{ title: 'home.trainingPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="TrainingPuzzleSolve"
+                      component={TrainingPuzzleSolve}
+                      options={{ title: 'home.trainingPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="TrainingPuzzleReview"
+                      component={PuzzleReview}
+                      options={{ title: 'puzzle.review' }}
+                    />
+                    <Stack.Screen
+                      name="TrainingPuzzleViewAnswer"
+                      component={PuzzleReview}
+                      options={{ title: 'puzzle.viewAnswer' }}
+                    />
+                    <Stack.Screen
+                      name="CommunityPuzzles"
+                      component={CommunityPuzzles}
+                      options={{ title: 'home.communityPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="CommunityPuzzleSolve"
+                      component={CommunityPuzzleSolve}
+                      options={{ title: 'home.communityPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="CommunityPuzzleReview"
+                      component={PuzzleReview}
+                      options={{ title: 'puzzle.review' }}
+                    />
+                    <Stack.Screen
+                      name="CommunityPuzzleViewAnswer"
+                      component={PuzzleReview}
+                      options={{ title: 'puzzle.viewAnswer' }}
+                    />
+                    <Stack.Screen
+                      name="CreateCommunityPuzzle"
+                      component={CreateCommunityPuzzle}
+                      options={{ title: 'home.communityPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="AnswerCommunityPuzzle"
+                      component={AnswerCommunityPuzzle}
+                      options={{ title: 'home.communityPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="RankedPuzzleSolve"
+                      component={RankedPuzzleSolve}
+                      options={{ title: 'home.rankingPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="RankedGameResult"
+                      component={RankedGameResult}
+                      options={{ title: 'home.rankingPuzzle' }}
+                    />
+                    <Stack.Screen
+                      name="RankedPuzzleReview"
+                      component={RankedPuzzleReview}
+                      options={{ title: 'puzzle.review' }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Stack.Screen
+                      name="Signin"
+                      component={Signin}
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="Signup"
+                      component={Signup}
+                      options={{ title: 'auth.signup' }}
+                    />
+                    <Stack.Screen
+                      name="FindPassword"
+                      component={FindPassword}
+                      options={{ title: 'auth.findPassword' }}
+                    />
+                  </>
+                )}
+              </Stack.Navigator>
 
-            <SlowRequestIndicator />
+              <SlowRequestIndicator />
 
-            <CustomModal
-              isVisible={isNetworkError}
-              category="NETWORK_ERROR"
-              onPrimaryAction={handleCloseNetworkError}
-            />
-            <CustomModal
-              isVisible={!!personalNoticeModal}
-              category={personalNoticeModal?.category ?? null}
-              onPrimaryAction={handleClosePersonalNotice}
-              bodyText={personalNoticeBodyText}
-              primaryButtonText={personalNoticePrimaryButtonText}
-              hideFooter={shouldHidePersonalNoticeFooter}
-            />
-          </AppWrapper>
-          <Toast config={toastConfig} />
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+              <CustomModal
+                isVisible={isNetworkError}
+                category="NETWORK_ERROR"
+                onPrimaryAction={handleCloseNetworkError}
+              />
+              <CustomModal
+                isVisible={!!personalNoticeModal}
+                category={personalNoticeModal?.category ?? null}
+                onPrimaryAction={handleClosePersonalNotice}
+                bodyText={personalNoticeBodyText}
+                primaryButtonText={personalNoticePrimaryButtonText}
+                hideFooter={shouldHidePersonalNoticeFooter}
+              />
+            </AppWrapper>
+            <Toast config={toastConfig} />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </IapPurchaseProvider>
   );
 }
 
@@ -420,4 +426,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+const AppWithIapProducts = () => (
+  <IapProductsProvider>
+    <App />
+  </IapProductsProvider>
+);
+
+export default AppWithIapProducts;

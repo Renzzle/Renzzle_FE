@@ -9,6 +9,7 @@ export default function CustomText({
   weight = 'normal',
   lineHeight = 'md',
   numberOfLines,
+  style,
   ...props
 }: TextPropsType) {
   return (
@@ -19,6 +20,7 @@ export default function CustomText({
       lineHeight={lineHeight}
       numberOfLines={numberOfLines}
       {...props}
+      style={style ?? undefined}
     >
       {children}
     </StyledText>

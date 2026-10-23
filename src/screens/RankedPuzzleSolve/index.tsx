@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, useWindowDimensions, ViewInstance } from 'react-native';
 import RankingCounter, { RankingCounterRef } from '../../components/features/RankingCounter';
 import TimerWithProgressBar, {
   BONUS_TIME,
@@ -58,7 +58,7 @@ const BADGE_DELAY_MS = 220;
 const SLIDE_OUT_MS = 160;
 const SLIDE_IN_MS = 220;
 
-const measureInWindow = (view: Pick<View, 'measureInWindow'> | null) =>
+const measureInWindow = (view: Pick<ViewInstance, 'measureInWindow'> | null) =>
   new Promise<{ x: number; y: number; width: number; height: number } | null>((resolve) => {
     if (!view) {
       resolve(null);
@@ -116,11 +116,11 @@ const RankedPuzzleSolve = () => {
   const boardRef = useRef<BoardRef>(null);
   const startRatingRef = useRef<number | null>(null);
   const playedSequencesRef = useRef<Record<string, string>>({});
-  const containerRef = useRef<View>(null);
-  const timerRef = useRef<View>(null);
+  const containerRef = useRef<ViewInstance>(null);
+  const timerRef = useRef<ViewInstance>(null);
   const successCounterRef = useRef<RankingCounterRef>(null);
   const failureCounterRef = useRef<RankingCounterRef>(null);
-  const boardAreaRef = useRef<View>(null);
+  const boardAreaRef = useRef<ViewInstance>(null);
   const resultBadgeRef = useRef<FlyingBadgeRef>(null);
   const timeBadgeRef = useRef<FlyingBadgeRef>(null);
   const isFeedbackSkippedRef = useRef(false);

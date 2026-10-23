@@ -1,7 +1,7 @@
 import React from 'react';
 import { ButtonWrapper } from './index.styles';
 import { Icon } from '../../common';
-import { menuThemeMap, MenuType } from '../../../types';
+import { menuThemeMap, MenuType } from '../../../constants/menuThemeMap';
 import theme from '../../../styles/theme';
 
 interface MenuButtonProps {

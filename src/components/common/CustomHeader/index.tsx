@@ -1,7 +1,13 @@
 import { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import React from 'react';
-import { getMenuTypeByRouteName } from '../../../types';
-import { CurrencyWrapper, HeaderContainer, MenuWrapper } from './index.styles';
+import { getMenuTypeByRouteName } from '../../../constants/menuThemeMap';
+import {
+  CurrencyWrapper,
+  HeaderContainer,
+  MenuWrapper,
+  PurchaseOptionButton,
+  PurchaseOptionList,
+} from './index.styles';
 import MenuButton from '../../features/MenuButton';
 import CustomText from '../CustomText';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +16,8 @@ import Icon from '../Icon';
 import theme from '../../../styles/theme';
 import CustomModal from '../CustomModal';
 import useModal from '../../../hooks/useModal';
+import usePiecePurchase from '../../../hooks/usePiecePurchase';
+import { PIECE_PRODUCTS } from '../../../constants/iap';
 
 const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
   const { t } = useTranslation();
@@ -21,6 +29,9 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
     category: modalCategory,
   } = useModal();
   const user = useUserStore((state) => state.user);
+  const { products, selectedProductId, purchasePiece } = usePiecePurchase({
+    onPurchaseComplete: closePrimarily,
+  });
 
   const isHome = route.name === 'Home';
 
@@ -50,8 +61,7 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
   const matchedType = getMenuTypeByRouteName(route.name);
 
   const handlePuzzleClick = () => {
-    // TODO: 퍼즐 구매 로직 추가
-    activateModal('FEATURE_IN_PROGRESS', { primaryAction: () => {} });
+    activateModal('PIECE_PURCHASE', { primaryAction: () => {} });
   };
 
   const renderLeftContent = () => {
@@ -101,8 +111,32 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
         isVisible={isModalVisible}
         category={modalCategory}
         onPrimaryAction={closePrimarily}
-        onSecondaryAction={closeSecondarily}
-      />
+        onSecondaryAction={closeSecondarily}>
+        <PurchaseOptionList>
+          {PIECE_PRODUCTS.map((product) => {
+            const storeProduct = products.find((item) => item.id === product.productId);
+            const priceText = storeProduct?.displayPrice ?? '-';
+            const isDisabled = selectedProductId !== null;
+            const textColor = isDisabled ? 'gray/gray400' : 'gray/gray900';
+            const priceColor = isDisabled ? 'gray/gray400' : 'main_color/blue_p';
+
+            return (
+              <PurchaseOptionButton
+                key={product.productId}
+                disabled={isDisabled}
+                onPress={() => purchasePiece(product.productId)}>
+                <CustomText size={14} weight="bold" lineHeight="sm" color={textColor}>
+                  {product.pieces}
+                  {t('puzzle.piece')}
+                </CustomText>
+                <CustomText size={14} weight="bold" lineHeight="sm" color={priceColor}>
+                  {priceText}
+                </CustomText>
+              </PurchaseOptionButton>
+            );
+          })}
+        </PurchaseOptionList>
+      </CustomModal>
     </HeaderContainer>
   );
 };

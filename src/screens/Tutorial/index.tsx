@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LayoutChangeEvent, ScrollView } from 'react-native';
+import { LayoutChangeEvent, ScrollViewInstance } from 'react-native';
 import {
   CommonActions,
   NavigationAction,
@@ -38,7 +38,8 @@ import MenuButton from '../../components/features/MenuButton';
 import TutorialBoard, { PlacedStone } from '../../components/features/TutorialBoard';
 import useModal from '../../hooks/useModal';
 import useTutorialStore from '../../store/useTutorialStore';
-import { menuThemeMap, MenuType, RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../types';
+import { menuThemeMap, MenuType } from '../../constants/menuThemeMap';
 
 const MODE_MENUS: MenuType[] = ['trainingPuzzle', 'communityPuzzle', 'rankingPuzzle'];
 const FORBIDDEN_TYPES = ['doubleThree', 'doubleFour', 'overline'] as const;
@@ -58,7 +59,7 @@ const Tutorial = () => {
     category: modalCategory,
   } = useModal();
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   // 튜토리얼을 끝내거나 건너뛰어 나가는 중에는 beforeRemove에서 막지 않는다
   const isLeavingRef = useRef(false);
 

@@ -200,7 +200,7 @@ const AnswerCommunityPuzzle = () => {
       if (data.isSuccess) {
         activateModal('PUZZLE_UPLOAD_SUCCESS', {
           primaryAction: () => {
-            navigation.navigate('CommunityPuzzles');
+            navigation.popTo('CommunityPuzzles');
           },
         });
       } else {

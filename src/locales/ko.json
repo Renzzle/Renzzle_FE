@@ -54,6 +54,7 @@
     "changeNickname": "닉네임 변경",
     "changePassword": "비밀번호 변경",
     "removeAds": "광고 제거",
+    "restorePurchases": "구매 복원",
     "privacyPolicy": "개인정보 처리방침",
     "termsOfService": "이용 약관",
     "feedback": "개발자에게 피드백하기",
@@ -191,6 +192,11 @@
       "message": "정답을 열람하시겠습니까?\n필요 재화: {{price}}조각",
       "confirm": "구매하기",
       "cancel": "취소"
+    },
+    "piecePurchase": {
+      "title": "조각 구매",
+      "message": "구매할 조각 팩을 선택해주세요.",
+      "cancel": "닫기"
     },
     "nicknameChangePurchase": {
       "title": "닉네임 변경",
@@ -449,6 +455,8 @@
     "receiptTransactionMismatch": "결제 영수증 정보가 요청과 일치하지 않습니다.",
     "unknownIapProduct": "등록되지 않은 상품입니다.",
     "alreadyProcessedReceipt": "이미 처리된 결제 영수증입니다.",
+    "purchasePending": "결제가 아직 완료되지 않았습니다.",
+    "storeApiFailed": "스토어에서 결제를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.",
 
     "alreadySolvedPuzzle": "이미 푼 퍼즐입니다.",
     "alreadyExistingTranslation": "해당 언어의 번역이 이미 존재합니다.",
@@ -488,6 +496,20 @@
 
     "purchaseComplete": "구매가 완료되었습니다.",
     "priceInfoUnavailable": "가격 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "removeAdsRestored": "광고 제거가 복원되었습니다.",
+    "purchaseFailed": "구매에 실패했습니다.",
+    "adsAlreadyRemoved": "이미 광고 제거가 적용되어 있습니다.",
+    "storeNotConnected": "스토어에 연결할 수 없습니다.",
+    "productUnavailable": "구매 상품을 불러올 수 없습니다.",
+    "purchasePending": "결제 승인을 기다리고 있습니다. 완료되면 자동으로 반영됩니다.",
+    "purchaseDeferred": "구매 승인을 요청했습니다. 승인되면 자동으로 반영됩니다.",
+    "purchaseRetryLater": "결제는 완료되었지만 반영이 늦어지고 있습니다. 잠시 후 자동으로 다시 반영합니다.",
+    "purchaseAlreadyApplied": "이미 반영된 구매입니다.",
+    "previousPurchaseApplied": "이전 결제가 반영되었습니다.",
+    "retryPurchase": "이전 결제 정리를 마쳤습니다. 다시 구매해 주세요.",
+    "removeAdsOtherAccount": "이 스토어 계정의 광고 제거는 다른 계정에 적용되어 있습니다.",
+    "noPurchaseToRestore": "복원할 구매 내역이 없습니다.",
+    "restoreFailed": "구매 복원에 실패했습니다.",
 
     "verificationError": "검증 중 오류가 발생했습니다.",
     "duplicatePuzzle": "이미 있는 퍼즐이에요. 새로 만들어 주세요.",
