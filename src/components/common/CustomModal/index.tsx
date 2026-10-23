@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useEffect, useId, useRef } from 'react';
+import { Modal, Platform, TouchableWithoutFeedback, View } from 'react-native';
 import {
   CenteredView,
   ModalBodyContainer,
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import useDeviceWidth from '../../../hooks/useDeviceWidth';
 import { GameOutcome } from '../../../types';
 import { SlowRequestNotice } from '../SlowRequestIndicator';
+import { markModalClosed, markModalOpen } from './modalPresence';
 
 export type ModalCategoryType =
   | 'TRAINING_PUZZLE_SUCCESS'
@@ -282,6 +283,24 @@ const CustomModal = ({
   children,
   ...props
 }: CustomModalProps) => {
+  const modalId = useId();
+  const isVisibleRef = useRef(isVisible);
+  isVisibleRef.current = isVisible;
+
+  // Only iOS stacks an ad on top of the modal; it counts as open until the native dismissal finishes
+  useEffect(() => {
+    if (Platform.OS === 'ios' && isVisible) {
+      markModalOpen(modalId);
+    }
+  }, [isVisible, modalId]);
+  useEffect(() => () => markModalClosed(modalId), [modalId]);
+
+  const handleNativeDismiss = () => {
+    if (!isVisibleRef.current) {
+      markModalClosed(modalId);
+    }
+  };
+
   const handleDismiss = () => {
     if (category && NON_DISMISSIBLE_CATEGORIES.includes(category)) {
       return;
@@ -299,7 +318,8 @@ const CustomModal = ({
       visible={isVisible}
       transparent={true}
       animationType="fade"
-      onRequestClose={handleDismiss}>
+      onRequestClose={handleDismiss}
+      onDismiss={handleNativeDismiss}>
       {isVisible && (
         <CenteredView onPress={handleDismiss}>
           <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>

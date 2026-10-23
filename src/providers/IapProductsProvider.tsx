@@ -1,5 +1,13 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { getProducts, Product, useIAPContext } from 'react-native-iap';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { endConnection, fetchProducts, initConnection, Product } from 'react-native-iap';
 import { ALL_IAP_PRODUCT_IDS } from '../constants/iap';
 
 interface IapProductsContextValue {
@@ -10,10 +18,36 @@ interface IapProductsContextValue {
 
 const IapProductsContext = createContext<IapProductsContextValue | null>(null);
 
+// An empty or partial answer can mean the store is not ready yet, so it is not kept and is asked again later
+const hasAllProducts = (products: Product[]) =>
+  ALL_IAP_PRODUCT_IDS.every((productId) =>
+    products.some((product) => product.id === productId),
+  );
+
 export const IapProductsProvider = ({ children }: React.PropsWithChildren) => {
-  const { connected, products, setProducts } = useIAPContext();
+  const [connected, setConnected] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
   const loadedProductsRef = useRef<Product[] | null>(null);
   const pendingRequestRef = useRef<Promise<Product[]> | null>(null);
+
+  // Only opens the connection; IapPurchaseProvider owns the purchase listeners
+  useEffect(() => {
+    let active = true;
+    initConnection()
+      .then((result) => {
+        if (active) {
+          setConnected(result);
+        }
+      })
+      .catch((error) => {
+        console.log('Store connection failed:', error);
+      });
+
+    return () => {
+      active = false;
+      endConnection().catch(() => {});
+    };
+  }, []);
 
   const loadProducts = useCallback((): Promise<Product[]> => {
     // Every consumer waits for the same native request to avoid cancelling another lookup.
@@ -29,9 +63,12 @@ export const IapProductsProvider = ({ children }: React.PropsWithChildren) => {
       return Promise.resolve(loadedProductsRef.current);
     }
 
-    pendingRequestRef.current = getProducts({ skus: ALL_IAP_PRODUCT_IDS })
-      .then((nextProducts) => {
-        loadedProductsRef.current = nextProducts;
+    pendingRequestRef.current = fetchProducts({ skus: ALL_IAP_PRODUCT_IDS, type: 'in-app' })
+      .then((result) => {
+        const nextProducts = (result ?? []) as Product[];
+        if (hasAllProducts(nextProducts)) {
+          loadedProductsRef.current = nextProducts;
+        }
         setProducts(nextProducts);
         return nextProducts;
       })
@@ -40,7 +77,7 @@ export const IapProductsProvider = ({ children }: React.PropsWithChildren) => {
       });
 
     return pendingRequestRef.current;
-  }, [connected, setProducts]);
+  }, [connected]);
 
   useEffect(() => {
     if (connected) {

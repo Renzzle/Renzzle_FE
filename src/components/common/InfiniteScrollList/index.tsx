@@ -44,7 +44,7 @@ interface InfiniteScrollListProps<T>
   defaultParams?: Partial<ApiCallParams>;
   getRefreshParams?: () => Partial<ApiCallParams>;
   onEndReachedThreshold?: number;
-  ListEmptyComponent?: React.ReactElement | null;
+  ListEmptyComponent?: React.ReactElement;
 }
 
 export interface InfiniteScrollListRef<T> {
@@ -72,7 +72,10 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [cursorId, setCursorId] = useState<number | null>(null);
+    // Read through refs because the list can ask for the next page before a re-render, and a stale
+    // cursor or refresh flag would fetch the first page twice
+    const cursorIdRef = useRef<number | null>(null);
+    const isRefreshingRef = useRef(false);
     // 다음 페이지를 못 불러오면 끝에 닿을 때마다 다시 요청하지 않고, 사용자가 다시 시도할 때까지 멈춘다
     const [hasPageError, setHasPageError] = useState(false);
     const hasPageErrorRef = useRef(false);
@@ -104,7 +107,12 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
     }));
 
     const fetchData = useCallback(async () => {
-      if (isFetchingPageRef.current || hasPageErrorRef.current || !hasMore || refreshing) {
+      if (
+        isFetchingPageRef.current ||
+        hasPageErrorRef.current ||
+        isRefreshingRef.current ||
+        !hasMore
+      ) {
         return;
       }
 
@@ -115,7 +123,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
         const fetched = await apiCall({
           ...defaultParams,
           ...refreshParamsRef.current,
-          id: cursorId,
+          id: cursorIdRef.current,
           size: pageSize,
         });
 
@@ -128,7 +136,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
 
         if (fetched.length > 0) {
           const lastItem = fetched[fetched.length - 1] as any;
-          setCursorId(lastItem.id ?? null);
+          cursorIdRef.current = lastItem.id ?? null;
         }
       } catch (err) {
         if (generation === generationRef.current) {
@@ -142,7 +150,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
           setLoading(false);
         }
       }
-    }, [apiCall, hasMore, refreshing, cursorId, defaultParams, pageSize, t]);
+    }, [apiCall, hasMore, defaultParams, pageSize, t]);
 
     const retryPage = () => {
       hasPageErrorRef.current = false;
@@ -156,6 +164,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
       hasPageErrorRef.current = false;
       setLoading(false);
       setHasPageError(false);
+      isRefreshingRef.current = true;
       setRefreshing(true);
       setHasMore(true);
 
@@ -177,9 +186,9 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
 
         if (fetched.length > 0) {
           const lastItem = fetched[fetched.length - 1] as any;
-          setCursorId(lastItem.id ?? null);
+          cursorIdRef.current = lastItem.id ?? null;
         } else {
-          setCursorId(null);
+          cursorIdRef.current = null;
         }
 
         if (fetched.length < pageSize) {
@@ -191,6 +200,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
         }
       } finally {
         if (generation === generationRef.current) {
+          isRefreshingRef.current = false;
           setRefreshing(false);
         }
       }
@@ -236,7 +246,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
         onEndReached={fetchData}
         onEndReachedThreshold={onEndReachedThreshold}
         ListFooterComponent={renderFooter}
-        ListEmptyComponent={!loading ? ListEmptyComponent : null}
+        ListEmptyComponent={!loading ? ListEmptyComponent : undefined}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

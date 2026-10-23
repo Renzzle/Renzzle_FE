@@ -9,13 +9,7 @@ import {
 } from './index.styles';
 import Board, { BoardRef } from '../../components/features/Board';
 import { Icon } from '../../components/common';
-import {
-  CommonActions,
-  RouteProp,
-  StackActions,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/ParamList';
 import { CommunityPuzzle, TrainingPuzzle } from '../../types/Puzzle';
@@ -91,11 +85,11 @@ const PuzzleReview = () => {
 
     isHandlingBackRef.current = true;
     navigation.dispatch(
-      CommonActions.navigate({
-        name: isCommunityPuzzle ? 'CommunityPuzzleSolve' : 'TrainingPuzzleSolve',
-        params: { reviewAction },
-        merge: true,
-      }),
+      StackActions.popTo(
+        isCommunityPuzzle ? 'CommunityPuzzleSolve' : 'TrainingPuzzleSolve',
+        { reviewAction },
+        { merge: true },
+      ),
     );
   };
 

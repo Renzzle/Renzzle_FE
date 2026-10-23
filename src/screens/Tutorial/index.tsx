@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LayoutChangeEvent, ScrollView } from 'react-native';
+import { LayoutChangeEvent, ScrollViewInstance } from 'react-native';
 import {
   CommonActions,
   NavigationAction,
@@ -59,7 +59,7 @@ const Tutorial = () => {
     category: modalCategory,
   } = useModal();
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   // 튜토리얼을 끝내거나 건너뛰어 나가는 중에는 beforeRemove에서 막지 않는다
   const isLeavingRef = useRef(false);
 

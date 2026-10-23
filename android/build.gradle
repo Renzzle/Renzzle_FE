@@ -4,19 +4,19 @@ gradle.startParameter.excludedTaskNames.addAll(
 
 buildscript {
     ext {
-        buildToolsVersion = "35.0.0"
+        buildToolsVersion = "37.0.0"
         minSdkVersion = 24
-        compileSdkVersion = 36
+        compileSdkVersion = 37
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
-        kotlinVersion = "1.9.24"
+        kotlinVersion = "2.2.0"
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:8.9.2')
+        classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
     }
@@ -24,15 +24,3 @@ buildscript {
 
 apply plugin: "com.facebook.react.rootproject"
 
-subprojects { subproject ->
-    if (subproject.name == "react-native-safe-area-context") {
-        subproject.afterEvaluate {
-            def isSafeAreaNewArchEnabled =
-                    subproject.hasProperty("newArchEnabled") && subproject.newArchEnabled == "true"
-
-            if (!isSafeAreaNewArchEnabled && subproject.plugins.hasPlugin("com.android.library")) {
-                subproject.android.sourceSets.main.java.srcDirs += "src/paper/java"
-            }
-        }
-    }
-}

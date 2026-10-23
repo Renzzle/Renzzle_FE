@@ -49,10 +49,10 @@ afterEach(() => {
 
 it('preserves the payment verification error code and status through the interceptor', async () => {
   const event = {
+    id: 'transaction-1',
     productId: 'com.renzzle.piece1000',
     transactionId: 'transaction-1',
-    transactionReceipt: 'test-receipt',
-  } as Purchase;
+  } as unknown as Purchase;
   const error = await verifyInAppPurchase(event).catch((failure) => failure);
   expect(error).toBeInstanceOf(ApiError);
   expect(error).toMatchObject({

@@ -114,8 +114,8 @@ const CustomHeader: React.FC<NativeStackHeaderProps> = ({ options, route }) => {
         onSecondaryAction={closeSecondarily}>
         <PurchaseOptionList>
           {PIECE_PRODUCTS.map((product) => {
-            const storeProduct = products.find((item) => item.productId === product.productId);
-            const priceText = storeProduct?.localizedPrice ?? '-';
+            const storeProduct = products.find((item) => item.id === product.productId);
+            const priceText = storeProduct?.displayPrice ?? '-';
             const isDisabled = selectedProductId !== null;
             const textColor = isDisabled ? 'gray/gray400' : 'gray/gray900';
             const priceColor = isDisabled ? 'gray/gray400' : 'main_color/blue_p';

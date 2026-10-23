@@ -218,7 +218,7 @@ const RankedGameResult = () => {
             <LoadingWrapper>
               <ActivityIndicator color={theme.color['gray/gray300']} />
             </LoadingWrapper>
-          ) : null
+          ) : undefined
         }
         ItemSeparatorComponent={ItemSeparator}
         // eslint-disable-next-line react-native/no-inline-styles
@@ -233,7 +233,7 @@ const RankedGameResult = () => {
           {
             text: t('rankedResult.home'),
             onAction: () => {
-              navigation.navigate('Home');
+              navigation.popTo('Home');
             },
           },
           {

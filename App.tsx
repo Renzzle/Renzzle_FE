@@ -11,6 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BootSplash from 'react-native-bootsplash';
 import i18n from './src/locales/i18n.ts';
 import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
@@ -37,7 +38,6 @@ import RankedGameResult from './src/screens/RankedGameResult/index.tsx';
 import RankedPuzzleReview from './src/screens/RankedPuzzleReview/index.tsx';
 import PuzzleReview from './src/screens/PuzzleReview/index.tsx';
 import AnswerCommunityPuzzle from './src/screens/CreateCommunityPuzzle/AnswerCommunityPuzzle/index.tsx';
-import theme from './src/styles/theme.ts';
 import useNetworkStore from './src/store/useNetworkStore.ts';
 import { CustomModal, SlowRequestIndicator } from './src/components/common/index.ts';
 import Language from './src/screens/Settings/Language/index.tsx';
@@ -50,7 +50,6 @@ import { getPersonalNotice } from './src/apis/notice.ts';
 import { NoticeLanguage, PersonalNoticeItem } from './src/types/index.ts';
 import { useUserStore } from './src/store/useUserStore.ts';
 import useConfigStore from './src/store/useConfigStore.ts';
-import { withIAPContext } from 'react-native-iap';
 import { IapProductsProvider } from './src/providers/IapProductsProvider';
 import { IapPurchaseProvider } from './src/providers/IapPurchaseProvider';
 
@@ -114,6 +113,10 @@ function App(): React.JSX.Element | null {
   const hasRequestedPersonalNotice = React.useRef(false);
 
   const renderCustomHeader = (props: NativeStackHeaderProps) => <CustomHeader {...props} />;
+  // 첫 화면이 그려진 뒤에 걷어야 스플래시가 빈 화면으로 사라지지 않는다
+  const hideSplash = () => {
+    BootSplash.hide({ fade: true });
+  };
 
   React.useEffect(() => {
     console.log('personal notice gate', {
@@ -240,13 +243,9 @@ function App(): React.JSX.Element | null {
     <IapPurchaseProvider>
       <GestureHandlerRootView style={styles.root}>
         <SafeAreaProvider>
-          <NavigationContainer>
+          <NavigationContainer onReady={hideSplash}>
             <AppWrapper>
-              <StatusBar
-                barStyle={'dark-content'}
-                backgroundColor={theme.color['gray/grayBG']}
-                translucent={false}
-              />
+              <StatusBar barStyle={'dark-content'} />
 
               <Stack.Navigator
                 screenOptions={{
@@ -433,4 +432,4 @@ const AppWithIapProducts = () => (
   </IapProductsProvider>
 );
 
-export default withIAPContext(AppWithIapProducts);
+export default AppWithIapProducts;

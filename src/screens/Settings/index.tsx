@@ -27,7 +27,7 @@ const Settings = () => {
   const user = useUserStore((state) => state.user);
   const { feedbackUrl, privacyPolicyUrl, termsOfUseUrl } = useConfigStore();
   const { clearTokens } = useAuthStore();
-  const { purchaseProduct } = useIapPurchase();
+  const { purchaseProduct, restorePurchases } = useIapPurchase();
   const {
     isModalVisible,
     activateModal,
@@ -84,6 +84,7 @@ const Settings = () => {
     { label: t('settings.changeNickname'), onPress: () => navigation.navigate('ChangeNickname') },
     { label: t('settings.changePassword'), onPress: () => navigation.navigate('ChangePassword') },
     { label: t('settings.removeAds'), onPress: handleRemoveAds },
+    { label: t('settings.restorePurchases'), onPress: restorePurchases },
     {
       label: t('settings.privacyPolicy'),
       onPress: () =>
