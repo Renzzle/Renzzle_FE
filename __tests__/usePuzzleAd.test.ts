@@ -139,3 +139,22 @@ it('uses updated server user information even when an ad is already loaded', asy
   expect(mockAd.show).not.toHaveBeenCalled();
   expect(onFinished).toHaveBeenCalledTimes(3);
 });
+
+it('waits for an open modal to finish closing before showing the ad', async () => {
+  const { markModalClosed, markModalOpen } =
+    require('../src/components/common/CustomModal/modalPresence') as typeof import('../src/components/common/CustomModal/modalPresence');
+  const { showAdIfReady } = renderPuzzleAd();
+  const onFinished = jest.fn();
+
+  showAdIfReady(onFinished);
+  await flushPromises();
+  showAdIfReady(onFinished);
+  markModalOpen('puzzle-success');
+  showAdIfReady(onFinished);
+  await flushPromises();
+  expect(mockAd.show).not.toHaveBeenCalled();
+
+  markModalClosed('puzzle-success');
+  await flushPromises();
+  expect(mockAd.show).toHaveBeenCalledTimes(1);
+});

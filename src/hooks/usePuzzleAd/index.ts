@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
 import mobileAds, { AdEventType, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+import { waitForModalsToClose } from '../../components/common/CustomModal/modalPresence';
 import { useUserStore } from '../../store/useUserStore';
 
 const AD_UNIT_ID = __DEV__
@@ -79,7 +80,8 @@ export const usePuzzleAd = () => {
       const unsubscribeClosed = currentInterstitial.addAdEventListener(AdEventType.CLOSED, finish);
       // 보여주지 못하면 닫힘 이벤트가 오지 않으므로 바로 다음으로 넘어간다
       const unsubscribeError = currentInterstitial.addAdEventListener(AdEventType.ERROR, finish);
-      Promise.resolve()
+      // Ads are requested from a modal's button, so it shows once that modal has closed
+      waitForModalsToClose()
         .then(() => currentInterstitial.show())
         .catch(finish);
     } else {
