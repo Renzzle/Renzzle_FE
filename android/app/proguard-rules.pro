@@ -12,3 +12,4 @@
 # Google Tink (react-native-encrypted-storage 관련) 에러 방지
 -dontwarn com.google.errorprone.annotations.Immutable
 -dontwarn com.google.crypto.tink.**
+-keep class * extends androidx.room.RoomDatabase { <init>(); }
