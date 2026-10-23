@@ -11,6 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BootSplash from 'react-native-bootsplash';
 import i18n from './src/locales/i18n.ts';
 import useAuthStore from './src/store/useAuthStore.ts';
 import useInitializeApp from './src/hooks/useInitializeApp/index.ts';
@@ -112,6 +113,10 @@ function App(): React.JSX.Element | null {
   const hasRequestedPersonalNotice = React.useRef(false);
 
   const renderCustomHeader = (props: NativeStackHeaderProps) => <CustomHeader {...props} />;
+  // 첫 화면이 그려진 뒤에 걷어야 스플래시가 빈 화면으로 사라지지 않는다
+  const hideSplash = () => {
+    BootSplash.hide({ fade: true });
+  };
 
   React.useEffect(() => {
     console.log('personal notice gate', {
@@ -238,7 +243,7 @@ function App(): React.JSX.Element | null {
     <IapPurchaseProvider>
       <GestureHandlerRootView style={styles.root}>
         <SafeAreaProvider>
-          <NavigationContainer>
+          <NavigationContainer onReady={hideSplash}>
             <AppWrapper>
               <StatusBar barStyle={'dark-content'} />
 
