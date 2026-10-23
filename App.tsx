@@ -50,7 +50,6 @@ import { getPersonalNotice } from './src/apis/notice.ts';
 import { NoticeLanguage, PersonalNoticeItem } from './src/types/index.ts';
 import { useUserStore } from './src/store/useUserStore.ts';
 import useConfigStore from './src/store/useConfigStore.ts';
-import { withIAPContext } from 'react-native-iap';
 import { IapProductsProvider } from './src/providers/IapProductsProvider';
 import { IapPurchaseProvider } from './src/providers/IapPurchaseProvider';
 
@@ -433,4 +432,4 @@ const AppWithIapProducts = () => (
   </IapProductsProvider>
 );
 
-export default withIAPContext(AppWithIapProducts);
+export default AppWithIapProducts;

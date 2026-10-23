@@ -9,7 +9,6 @@ interface VerifyInAppPurchaseRequest {
   productId: string;
   transactionId: string;
   purchaseToken: string;
-  receipt: string;
 }
 
 export interface VerifyInAppPurchaseResponse {
@@ -26,25 +25,37 @@ const getInAppPurchasePlatform = (): InAppPurchasePlatform => {
   return 'ANDROID';
 };
 
-const buildVerifyInAppPurchaseRequest = (purchase: Purchase): VerifyInAppPurchaseRequest => ({
+// The server checks the purchase with the store by its transaction ID or purchase token, so the receipt is not sent
+const buildVerifyInAppPurchaseRequest = (
+  purchase: Purchase,
+  transactionId: string,
+): VerifyInAppPurchaseRequest => ({
   platform: getInAppPurchasePlatform(),
   productId: purchase.productId,
-  transactionId: purchase.transactionId ?? '',
+  transactionId,
   purchaseToken: purchase.purchaseToken ?? '',
-  receipt:
-    purchase.transactionReceipt || purchase.jwsRepresentationIos || purchase.dataAndroid || '',
 });
 
-export const verifyInAppPurchase = async (purchase: Purchase) => {
-  try {
-    const response = await apiClient.post(
-      '/api/payments/in-app/verify',
-      buildVerifyInAppPurchaseRequest(purchase),
-      { includeErrorDetails: true },
-    );
+interface VerifyInAppPurchaseOptions {
+  // An Apple restore creates a new transaction, so the original transaction's ID is sent instead
+  transactionId?: string;
+  // Retrying a purchase the user is not waiting on
+  background?: boolean;
+}
 
-    return response.data.response as VerifyInAppPurchaseResponse;
-  } catch (error) {
-    throw error;
-  }
+export const verifyInAppPurchase = async (
+  purchase: Purchase,
+  { transactionId = purchase.transactionId ?? '', background = false }: VerifyInAppPurchaseOptions = {},
+) => {
+  const response = await apiClient.post(
+    '/api/payments/in-app/verify',
+    buildVerifyInAppPurchaseRequest(purchase, transactionId),
+    {
+      includeErrorDetails: true,
+      skipNetworkErrorModal: background,
+      skipLoadingIndicator: background,
+    },
+  );
+
+  return response.data.response as VerifyInAppPurchaseResponse;
 };

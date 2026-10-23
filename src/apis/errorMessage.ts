@@ -47,6 +47,8 @@ const ERROR_CODE_TO_I18N_KEY: Record<string, string> = {
   I4003: 'error.receiptTransactionMismatch',
   I4040: 'error.unknownIapProduct',
   I4090: 'error.alreadyProcessedReceipt',
+  I4091: 'error.purchasePending',
+  I5030: 'error.storeApiFailed',
 
   P4000: 'error.alreadySolvedPuzzle',
   P4001: 'error.alreadyExistingTranslation',

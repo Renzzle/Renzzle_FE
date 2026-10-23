@@ -17,8 +17,9 @@ interface UserStore {
   /**
    * 서버에서 최신 유저 정보를 다시 불러와 스토어를 갱신
    * 재화(currency) 변경, 닉네임 수정 등 사용자 정보에 수정 사항이 발생한 뒤 호출
+   * 불러오지 못하면 false (이전 정보는 그대로 둔다)
    */
-  updateUser: () => Promise<void>;
+  updateUser: () => Promise<boolean>;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -30,9 +31,11 @@ export const useUserStore = create<UserStore>((set) => ({
     try {
       const user = await getUser();
       set({ user });
+      return true;
     } catch (error) {
       // 잠깐 실패했다고 헤더의 닉네임·재화가 사라지지 않게 이전 정보를 그대로 둔다
       console.log('Failed to update user in store:', error);
+      return false;
     }
   },
 }));
