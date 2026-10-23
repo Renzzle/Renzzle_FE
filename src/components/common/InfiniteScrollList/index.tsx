@@ -44,7 +44,7 @@ interface InfiniteScrollListProps<T>
   defaultParams?: Partial<ApiCallParams>;
   getRefreshParams?: () => Partial<ApiCallParams>;
   onEndReachedThreshold?: number;
-  ListEmptyComponent?: React.ReactElement | null;
+  ListEmptyComponent?: React.ReactElement;
 }
 
 export interface InfiniteScrollListRef<T> {
@@ -236,7 +236,7 @@ const InfiniteScrollList = forwardRef<InfiniteScrollListRef<any>, InfiniteScroll
         onEndReached={fetchData}
         onEndReachedThreshold={onEndReachedThreshold}
         ListFooterComponent={renderFooter}
-        ListEmptyComponent={!loading ? ListEmptyComponent : null}
+        ListEmptyComponent={!loading ? ListEmptyComponent : undefined}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

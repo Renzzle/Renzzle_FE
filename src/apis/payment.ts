@@ -33,7 +33,8 @@ const buildVerifyInAppPurchaseRequest = (
   platform: getInAppPurchasePlatform(),
   productId: purchase.productId,
   transactionId,
-  purchaseToken: purchase.purchaseToken ?? '',
+  // On iOS this holds the signed transaction, which the server does not use
+  purchaseToken: Platform.OS === 'android' ? purchase.purchaseToken ?? '' : '',
 });
 
 interface VerifyInAppPurchaseOptions {

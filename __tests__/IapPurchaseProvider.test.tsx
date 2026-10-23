@@ -5,13 +5,15 @@ import {
   ErrorCode,
   finishTransaction,
   getAvailablePurchases,
-  IapIos,
+  getPendingTransactionsIOS,
   isUserCancelledError,
   Purchase,
+  PurchaseAndroid,
   purchaseErrorListener,
-  PurchaseStateAndroid,
+  PurchaseIOS,
   purchaseUpdatedListener,
   requestPurchase,
+  restorePurchases,
 } from 'react-native-iap';
 import { verifyInAppPurchase } from '../src/apis/payment';
 import { ApiError } from '../src/apis/apiError';
@@ -24,18 +26,18 @@ import { User, useUserStore } from '../src/store/useUserStore';
 
 jest.mock('react-native-iap', () => ({
   ErrorCode: {
-    E_USER_CANCELLED: 'E_USER_CANCELLED',
-    E_ALREADY_OWNED: 'E_ALREADY_OWNED',
-    E_DEFERRED_PAYMENT: 'E_DEFERRED_PAYMENT',
+    UserCancelled: 'user-cancelled',
+    AlreadyOwned: 'already-owned',
+    DeferredPayment: 'deferred-payment',
   },
-  PurchaseStateAndroid: { UNSPECIFIED_STATE: 0, PURCHASED: 1, PENDING: 2 },
-  IapIos: { getPendingPurchasesIOS: jest.fn() },
   finishTransaction: jest.fn(),
   getAvailablePurchases: jest.fn(),
+  getPendingTransactionsIOS: jest.fn(),
   isUserCancelledError: jest.fn(),
   purchaseErrorListener: jest.fn(),
   purchaseUpdatedListener: jest.fn(),
   requestPurchase: jest.fn(),
+  restorePurchases: jest.fn(),
 }));
 jest.mock('../src/apis/payment', () => ({ verifyInAppPurchase: jest.fn() }));
 jest.mock('../src/components/common/Toast/toastMessage', () => ({ showBottomToast: jest.fn() }));
@@ -103,22 +105,26 @@ const deferred = <T,>() => {
 };
 const purchase = (transactionId = 'transaction-1', productId = IAP_PRODUCT_IDS.PIECE_1000) =>
   ({
+    id: transactionId,
     productId,
     transactionId,
-    transactionReceipt: 'receipt',
-  } as Purchase);
+    purchaseState: 'purchased',
+  } as unknown as PurchaseIOS);
 const androidPurchase = (
   purchaseToken: string,
   productId = IAP_PRODUCT_IDS.PIECE_1000,
-  extra: Partial<Purchase> = {},
+  extra: Partial<PurchaseAndroid> = {},
 ) =>
   ({
     ...purchase(`order-${purchaseToken}`, productId),
     purchaseToken,
-    purchaseStateAndroid: PurchaseStateAndroid.PURCHASED,
     isAcknowledgedAndroid: false,
     ...extra,
-  } as Purchase);
+  } as unknown as Purchase);
+const purchaseRequest = (sku: string) => ({
+  request: { apple: { sku }, google: { skus: [sku] } },
+  type: 'in-app',
+});
 const emit = (event: Purchase) => {
   jest.mocked(purchaseUpdatedListener).mock.calls[0][0](event);
 };
@@ -176,12 +182,12 @@ beforeEach(() => {
     >);
   jest
     .mocked(isUserCancelledError)
-    .mockImplementation((error) => (error as { code?: string })?.code === 'E_USER_CANCELLED');
+    .mockImplementation((error) => (error as { code?: string })?.code === 'user-cancelled');
   jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, handler) => {
     appStateHandler = handler as (state: AppStateStatus) => void;
     return { remove: removeAppState } as unknown as NativeEventSubscription;
   });
-  mockLoadProducts.mockResolvedValue(ALL_IAP_PRODUCT_IDS.map((productId) => ({ productId })));
+  mockLoadProducts.mockResolvedValue(ALL_IAP_PRODUCT_IDS.map((id) => ({ id })));
   jest
     .mocked(useIapProducts)
     .mockReturnValue({ connected: true, products: [], loadProducts: mockLoadProducts });
@@ -192,10 +198,11 @@ beforeEach(() => {
     productId: IAP_PRODUCT_IDS.PIECE_1000,
     grantedCurrency: 1000,
   });
-  jest.mocked(finishTransaction).mockResolvedValue(true);
-  jest.mocked(requestPurchase).mockResolvedValue(undefined);
+  jest.mocked(finishTransaction).mockResolvedValue(undefined);
+  jest.mocked(requestPurchase).mockResolvedValue(null);
   jest.mocked(getAvailablePurchases).mockResolvedValue([]);
-  jest.mocked(IapIos.getPendingPurchasesIOS).mockResolvedValue([]);
+  jest.mocked(getPendingTransactionsIOS).mockResolvedValue([]);
+  jest.mocked(restorePurchases).mockResolvedValue(undefined);
 });
 afterEach(async () => {
   await act(async () => root?.unmount());
@@ -229,7 +236,7 @@ it('uses one listener across headers and rerenders and calls only the latest req
 
 it('blocks duplicate verification and finishing while busy and ignores completed replays', async () => {
   const verification = deferred<Awaited<ReturnType<typeof verifyInAppPurchase>>>();
-  const finishing = deferred<boolean>();
+  const finishing = deferred<void>();
   jest.mocked(verifyInAppPurchase).mockReturnValueOnce(verification.promise);
   jest.mocked(finishTransaction).mockReturnValueOnce(finishing.promise);
   await mount();
@@ -257,7 +264,7 @@ it('blocks duplicate verification and finishing while busy and ignores completed
   expect(finishTransaction).toHaveBeenCalledTimes(1);
   expect(consumers.get('home')!.selectedProductId).toBe(IAP_PRODUCT_IDS.PIECE_1000);
   await act(async () => {
-    finishing.resolve(true);
+    finishing.resolve();
   });
   await act(async () => {
     emit(purchase());
@@ -280,7 +287,7 @@ it('guards rapid taps across different headers before the disabled state renders
   });
   expect(mockLoadProducts).toHaveBeenCalledTimes(1);
   expect(requestPurchase).toHaveBeenCalledTimes(1);
-  expect(requestPurchase).toHaveBeenCalledWith({ sku: IAP_PRODUCT_IDS.PIECE_1000 });
+  expect(requestPurchase).toHaveBeenCalledWith(purchaseRequest(IAP_PRODUCT_IDS.PIECE_1000));
 });
 
 it('handles separate consumable transactions independently', async () => {
@@ -345,7 +352,7 @@ it('retries a delayed purchase from the store queue after a minute', async () =>
     .mocked(verifyInAppPurchase)
     .mockRejectedValueOnce(new ApiError('Store API failed', 'I5030', 503));
   jest
-    .mocked(IapIos.getPendingPurchasesIOS)
+    .mocked(getPendingTransactionsIOS)
     .mockResolvedValueOnce([])
     .mockResolvedValueOnce([event]);
   await mount();
@@ -357,7 +364,7 @@ it('retries a delayed purchase from the store queue after a minute', async () =>
   await act(async () => {
     jest.advanceTimersByTime(60 * 1000);
   });
-  expect(IapIos.getPendingPurchasesIOS).toHaveBeenCalledTimes(2);
+  expect(getPendingTransactionsIOS).toHaveBeenCalledTimes(2);
   expect(verifyInAppPurchase).toHaveBeenCalledTimes(2);
   expect(verifyInAppPurchase).toHaveBeenLastCalledWith(event, {
     transactionId: 'transaction-1',
@@ -381,7 +388,7 @@ it('waits for the next launch or foreground before retrying a refused purchase',
   await act(async () => {
     jest.advanceTimersByTime(60 * 1000);
   });
-  expect(IapIos.getPendingPurchasesIOS).toHaveBeenCalledTimes(1);
+  expect(getPendingTransactionsIOS).toHaveBeenCalledTimes(1);
   expect(finishTransaction).not.toHaveBeenCalled();
 });
 
@@ -390,7 +397,7 @@ it('verifies a re-downloaded iOS ad removal by its original transaction', async 
   const redownload = {
     ...purchase('new-transaction', IAP_PRODUCT_IDS.REMOVE_ADS),
     originalTransactionIdentifierIOS: 'original-transaction',
-  } as Purchase;
+  } as unknown as Purchase;
   jest
     .mocked(verifyInAppPurchase)
     .mockRejectedValueOnce(new ApiError('Already processed', 'I4090', 409));
@@ -432,7 +439,7 @@ it('shows the granted currency when reloading the user fails', async () => {
 });
 
 it('deduplicates native errors and request promise rejections', async () => {
-  const pendingRequest = deferred<void>();
+  const pendingRequest = deferred<Awaited<ReturnType<typeof requestPurchase>>>();
   jest.mocked(requestPurchase).mockReturnValueOnce(pendingRequest.promise);
   await mount();
   let requesting!: Promise<void>;
@@ -440,7 +447,7 @@ it('deduplicates native errors and request promise rejections', async () => {
     requesting = controller.purchaseProduct(IAP_PRODUCT_IDS.PIECE_1000);
   });
   await act(async () => {
-    emitError({ code: 'E_NETWORK_ERROR' });
+    emitError({ code: 'network-error' });
     pendingRequest.reject(new Error('Store unavailable'));
     await requesting;
   });
@@ -452,7 +459,7 @@ it('ignores cancellation and permits the next purchase request', async () => {
   await mount();
   await request();
   await act(async () => {
-    emitError({ code: ErrorCode.E_USER_CANCELLED });
+    emitError({ code: ErrorCode.UserCancelled });
   });
   expect(showBottomToast).not.toHaveBeenCalled();
   expect(controller.pendingProductId).toBeNull();
@@ -464,7 +471,7 @@ it('tells the user when a purchase is waiting for Ask to Buy approval', async ()
   await mount();
   await request();
   await act(async () => {
-    emitError({ code: ErrorCode.E_DEFERRED_PAYMENT });
+    emitError({ code: ErrorCode.DeferredPayment });
   });
   expect(showBottomToast).toHaveBeenCalledTimes(1);
   expect(showBottomToast).toHaveBeenCalledWith('info', 'toast.purchaseDeferred');
@@ -477,7 +484,7 @@ it('restores an owned remove-ads purchase through the same transaction processor
   await mount();
   await request(IAP_PRODUCT_IDS.REMOVE_ADS);
   await act(async () => {
-    emitError({ code: ErrorCode.E_ALREADY_OWNED });
+    emitError({ code: ErrorCode.AlreadyOwned });
   });
   expect(verifyInAppPurchase).toHaveBeenCalledTimes(1);
   expect(mockUpdateUser).toHaveBeenCalledTimes(1);
@@ -504,7 +511,7 @@ it('uses Android purchase tokens for replay protection and the Android request s
   jest.replaceProperty(Platform, 'OS', 'android');
   await mount();
   await request();
-  expect(requestPurchase).toHaveBeenCalledWith({ skus: [IAP_PRODUCT_IDS.PIECE_1000] });
+  expect(requestPurchase).toHaveBeenCalledWith(purchaseRequest(IAP_PRODUCT_IDS.PIECE_1000));
   await act(async () => {
     emit(androidPurchase('token-1'));
     emit(androidPurchase('token-1'));
@@ -519,7 +526,7 @@ it('waits for an Android payment that is still pending', async () => {
   await request();
   await act(async () => {
     emit(androidPurchase('token-1', IAP_PRODUCT_IDS.PIECE_1000, {
-      purchaseStateAndroid: PurchaseStateAndroid.PENDING,
+      purchaseState: 'pending',
     }));
   });
   expect(verifyInAppPurchase).not.toHaveBeenCalled();
@@ -540,7 +547,7 @@ it('consumes an earlier pack that was already granted when Play says it is still
   await mount();
   await request();
   await act(async () => {
-    emitError({ code: ErrorCode.E_ALREADY_OWNED });
+    emitError({ code: ErrorCode.AlreadyOwned });
   });
   expect(finishTransaction).toHaveBeenCalledWith({ purchase: owned, isConsumable: true });
   expect(showBottomToast).toHaveBeenCalledTimes(1);
@@ -557,7 +564,7 @@ it('does not acknowledge an Android ad removal the server already acknowledged',
   await mount();
   await request(IAP_PRODUCT_IDS.REMOVE_ADS);
   await act(async () => {
-    emitError({ code: ErrorCode.E_ALREADY_OWNED });
+    emitError({ code: ErrorCode.AlreadyOwned });
   });
   expect(verifyInAppPurchase).toHaveBeenCalledTimes(1);
   expect(finishTransaction).not.toHaveBeenCalled();
@@ -589,12 +596,12 @@ it('recovers unconsumed packs and unacknowledged ad removal on Android', async (
 it('leaves purchases alone while signed out and recovers them after sign-in', async () => {
   mockAuth.accessToken = undefined;
   const event = purchase();
-  jest.mocked(IapIos.getPendingPurchasesIOS).mockResolvedValue([event]);
+  jest.mocked(getPendingTransactionsIOS).mockResolvedValue([event]);
   await mount();
   await act(async () => {
     emit(event);
   });
-  expect(IapIos.getPendingPurchasesIOS).not.toHaveBeenCalled();
+  expect(getPendingTransactionsIOS).not.toHaveBeenCalled();
   expect(verifyInAppPurchase).not.toHaveBeenCalled();
 
   mockAuth.accessToken = 'access-token';
@@ -606,29 +613,32 @@ it('leaves purchases alone while signed out and recovers them after sign-in', as
   expect(showBottomToast).toHaveBeenCalledWith('success', 'toast.previousPurchaseApplied');
 });
 
-it('leaves an unfinished iOS ad removal to the launch replay or a restore', async () => {
-  jest
-    .mocked(IapIos.getPendingPurchasesIOS)
-    .mockResolvedValueOnce([
-      purchase('pack'),
-      purchase('remove-ads', IAP_PRODUCT_IDS.REMOVE_ADS),
-    ]);
+it('recovers unfinished iOS purchases, verifying ad removal by its original transaction', async () => {
+  const removeAds = {
+    ...purchase('new-transaction', IAP_PRODUCT_IDS.REMOVE_ADS),
+    originalTransactionIdentifierIOS: 'original-transaction',
+  } as unknown as PurchaseIOS;
+  jest.mocked(getPendingTransactionsIOS).mockResolvedValueOnce([purchase('pack'), removeAds]);
   await mount();
-  expect(verifyInAppPurchase).toHaveBeenCalledTimes(1);
+  expect(verifyInAppPurchase).toHaveBeenCalledTimes(2);
   expect(verifyInAppPurchase).toHaveBeenCalledWith(purchase('pack'), {
     transactionId: 'pack',
+    background: true,
+  });
+  expect(verifyInAppPurchase).toHaveBeenCalledWith(removeAds, {
+    transactionId: 'original-transaction',
     background: true,
   });
 });
 
 it('checks the store queue again when the app returns to the foreground', async () => {
   await mount();
-  expect(IapIos.getPendingPurchasesIOS).toHaveBeenCalledTimes(1);
+  expect(getPendingTransactionsIOS).toHaveBeenCalledTimes(1);
   await act(async () => {
     appStateHandler?.('background');
     appStateHandler?.('active');
   });
-  expect(IapIos.getPendingPurchasesIOS).toHaveBeenCalledTimes(2);
+  expect(getPendingTransactionsIOS).toHaveBeenCalledTimes(2);
 });
 
 it('releases a purchase request left open by signing out', async () => {
@@ -651,6 +661,7 @@ it('does not call the store when restoring and ads are already removed', async (
   await act(async () => {
     await controller.restorePurchases();
   });
+  expect(restorePurchases).not.toHaveBeenCalled();
   expect(getAvailablePurchases).not.toHaveBeenCalled();
   expect(showBottomToast).toHaveBeenCalledWith('info', 'toast.adsAlreadyRemoved');
 });
@@ -668,12 +679,13 @@ it('restores ad removal on iOS with the original transaction ID', async () => {
   const restored = {
     ...purchase('restored-transaction', IAP_PRODUCT_IDS.REMOVE_ADS),
     originalTransactionIdentifierIOS: 'original-transaction',
-  } as Purchase;
+  } as unknown as Purchase;
   jest.mocked(getAvailablePurchases).mockResolvedValueOnce([restored]);
   await mount();
   await act(async () => {
     await controller.restorePurchases();
   });
+  expect(restorePurchases).toHaveBeenCalledTimes(1);
   expect(verifyInAppPurchase).toHaveBeenCalledWith(restored, {
     transactionId: 'original-transaction',
     background: false,

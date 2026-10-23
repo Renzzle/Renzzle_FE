@@ -12,13 +12,15 @@ import {
   ErrorCode,
   finishTransaction,
   getAvailablePurchases,
-  IapIos,
+  getPendingTransactionsIOS,
   isUserCancelledError,
   Purchase,
+  PurchaseAndroid,
   purchaseErrorListener,
-  PurchaseStateAndroid,
+  PurchaseIOS,
   purchaseUpdatedListener,
   requestPurchase,
+  restorePurchases as syncStorePurchases,
 } from 'react-native-iap';
 import { ToastType } from 'react-native-toast-message';
 import { ApiError } from '../apis/apiError';
@@ -66,11 +68,14 @@ const IapPurchaseContext = createContext<IapPurchaseContextValue | null>(null);
 
 const isConsumable = (productId: string) => productId !== IAP_PRODUCT_IDS.REMOVE_ADS;
 
-// Apple gives a restored or re-downloaded purchase a new transaction ID, while the server records
-// the original one, so one Apple ID's ad removal stays with one Renzzle account
+const isAcknowledged = (purchase: Purchase) =>
+  Platform.OS === 'android' && Boolean((purchase as PurchaseAndroid).isAcknowledgedAndroid);
+
+// Apple gives a re-downloaded purchase a new transaction ID, while the server records the original
+// one, so one Apple ID's ad removal stays with one Renzzle account
 const getVerifyTransactionId = (purchase: Purchase) =>
   Platform.OS === 'ios'
-    ? purchase.originalTransactionIdentifierIOS ?? purchase.transactionId
+    ? (purchase as PurchaseIOS).originalTransactionIdentifierIOS ?? purchase.transactionId ?? undefined
     : undefined;
 
 const verifyPurchase = async (
@@ -105,7 +110,7 @@ const verifyPurchase = async (
 const finishPurchase = async (purchase: Purchase) => {
   const consumable = isConsumable(purchase.productId);
   // The server acknowledges Android purchases, and Play refuses a second acknowledgement
-  if (!consumable && purchase.isAcknowledgedAndroid) {
+  if (!consumable && isAcknowledged(purchase)) {
     return true;
   }
   try {
@@ -233,7 +238,7 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
       const source: PurchaseSource = explicitSource ?? (request ? 'request' : 'background');
 
       // Play reports the purchase again once the payment clears
-      if (purchase.purchaseStateAndroid === PurchaseStateAndroid.PENDING) {
+      if (purchase.purchaseState === 'pending') {
         if (source !== 'background') {
           showBottomToast('info', i18n.t('toast.purchasePending'));
         }
@@ -349,12 +354,12 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
           return;
         }
         // Ask to Buy: the purchase arrives through the listener once a parent approves it
-        if (code === ErrorCode.E_DEFERRED_PAYMENT) {
+        if (code === ErrorCode.DeferredPayment) {
           showBottomToast('info', i18n.t('toast.purchaseDeferred'));
           return;
         }
         // An earlier purchase of the product was never finished, so finish it before buying again
-        if (code === ErrorCode.E_ALREADY_OWNED) {
+        if (code === ErrorCode.AlreadyOwned) {
           const purchases = await getAvailablePurchases();
           const owned = purchases.find((purchase) => purchase.productId === request.productId);
           if (owned) {
@@ -385,18 +390,12 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
     }
     recovering.current = true;
     try {
-      let purchases: Purchase[];
-      if (Platform.OS === 'ios') {
-        // The queue lacks an ad removal's original transaction ID, so that one is left to the
-        // replay at launch or a restore
-        purchases = (await IapIos.getPendingPurchasesIOS()).filter((purchase) =>
-          isConsumable(purchase.productId),
-        );
-      } else {
-        purchases = (await getAvailablePurchases()).filter(
-          (purchase) => isConsumable(purchase.productId) || !purchase.isAcknowledgedAndroid,
-        );
-      }
+      const purchases: Purchase[] =
+        Platform.OS === 'ios'
+          ? await getPendingTransactionsIOS()
+          : (await getAvailablePurchases()).filter(
+              (purchase) => isConsumable(purchase.productId) || !isAcknowledged(purchase),
+            );
       for (const purchase of purchases) {
         await processPurchase(purchase);
       }
@@ -421,14 +420,9 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
     if (!connected) {
       return;
     }
-    const updates = purchaseUpdatedListener(
-      (purchase) => {
-        processPurchase(purchase);
-      },
-      (error) => {
-        console.log('Failed to listen for purchases:', error);
-      },
-    );
+    const updates = purchaseUpdatedListener((purchase) => {
+      processPurchase(purchase);
+    });
     const errors = purchaseErrorListener((error) => {
       const request = activeRequest.current;
       if (request && (!error.productId || error.productId === request.productId)) {
@@ -482,16 +476,15 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
       updatePendingProduct();
       try {
         const products = await loadProducts();
-        if (!products.some((product) => product.productId === productId)) {
+        if (!products.some((product) => product.id === productId)) {
           showBottomToast('error', i18n.t('toast.productUnavailable'));
           clearRequest(request);
           return;
         }
-        if (Platform.OS === 'android') {
-          await requestPurchase({ skus: [productId] });
-        } else {
-          await requestPurchase({ sku: productId });
-        }
+        await requestPurchase({
+          request: { apple: { sku: productId }, google: { skus: [productId] } },
+          type: 'in-app',
+        });
         // Keep the request busy until the update listener finishes the transaction.
       } catch (error) {
         await handleRequestError(request, error);
@@ -516,6 +509,8 @@ export const IapPurchaseProvider = ({ children }: React.PropsWithChildren) => {
         showBottomToast('info', i18n.t('toast.adsAlreadyRemoved'));
         return;
       }
+      // Asks the App Store for purchases this device has not seen yet
+      await syncStorePurchases();
       const purchases = await getAvailablePurchases();
       const removeAds = purchases.find(
         (purchase) => purchase.productId === IAP_PRODUCT_IDS.REMOVE_ADS,

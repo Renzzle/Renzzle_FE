@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { endConnection, getProducts, initConnection, Product } from 'react-native-iap';
+import { endConnection, fetchProducts, initConnection, Product } from 'react-native-iap';
 import { ALL_IAP_PRODUCT_IDS } from '../constants/iap';
 
 interface IapProductsContextValue {
@@ -21,7 +21,7 @@ const IapProductsContext = createContext<IapProductsContextValue | null>(null);
 // An empty or partial answer can mean the store is not ready yet, so it is not kept and is asked again later
 const hasAllProducts = (products: Product[]) =>
   ALL_IAP_PRODUCT_IDS.every((productId) =>
-    products.some((product) => product.productId === productId),
+    products.some((product) => product.id === productId),
   );
 
 export const IapProductsProvider = ({ children }: React.PropsWithChildren) => {
@@ -30,8 +30,7 @@ export const IapProductsProvider = ({ children }: React.PropsWithChildren) => {
   const loadedProductsRef = useRef<Product[] | null>(null);
   const pendingRequestRef = useRef<Promise<Product[]> | null>(null);
 
-  // Only opens the connection. The purchase listener is IapPurchaseProvider's alone, because iOS hands
-  // the transactions left unfinished at launch to the first listener only
+  // Only opens the connection; IapPurchaseProvider owns the purchase listeners
   useEffect(() => {
     let active = true;
     initConnection()
@@ -64,8 +63,9 @@ export const IapProductsProvider = ({ children }: React.PropsWithChildren) => {
       return Promise.resolve(loadedProductsRef.current);
     }
 
-    pendingRequestRef.current = getProducts({ skus: ALL_IAP_PRODUCT_IDS })
-      .then((nextProducts) => {
+    pendingRequestRef.current = fetchProducts({ skus: ALL_IAP_PRODUCT_IDS, type: 'in-app' })
+      .then((result) => {
+        const nextProducts = (result ?? []) as Product[];
         if (hasAllProducts(nextProducts)) {
           loadedProductsRef.current = nextProducts;
         }

@@ -15,6 +15,7 @@ const CustomTextInput = ({
   error,
   isPassword = false,
   rightElement,
+  style,
   ...props
 }: CustomTextInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -33,6 +34,7 @@ const CustomTextInput = ({
         onBlur={() => setIsFocused(false)}
         editable={!disabled}
         {...props}
+        style={style ?? undefined}
       />
       {rightElement && <RightElementWrapper>{rightElement}</RightElementWrapper>}
     </InputContainer>
