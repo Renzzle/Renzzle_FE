@@ -413,8 +413,8 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 				127BE3C232512420BB313F2D /* [CP-User] [RNGoogleMobileAds] Configuration */,
-				6FDA82513020B970002F03F6 /* ShellScript */,
 				B37C01149E5873B7A35A2A7D /* [CP] Embed Pods Frameworks */,
+				6FDA82513020B970002F03F6 /* Copy Framework dSYMs */,
 			);
 			buildRules = (
 			);
@@ -552,8 +552,9 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Renzzle_FE-Renzzle_FETests/Pods-Renzzle_FE-Renzzle_FETests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6FDA82513020B970002F03F6 /* ShellScript */ = {
+		6FDA82513020B970002F03F6 /* Copy Framework dSYMs */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -561,13 +562,14 @@
 			);
 			inputPaths = (
 			);
+			name = "Copy Framework dSYMs";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "find \"${PODS_ROOT}/hermes-engine\" -type d -name \"hermes.framework.dSYM\" | grep -v \"simulator\" | while read -r dsym_path; do\n    cp -a \"$dsym_path\" \"${DWARF_DSYM_FOLDER_PATH}/\"\ndone\n";
+			shellScript = "/bin/bash \"${SRCROOT}/scripts/copy-framework-dsyms.sh\"\n";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
